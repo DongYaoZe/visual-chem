@@ -1256,9 +1256,9 @@ with tab3:
             title="H₂O - KNO₃ - NaNO₃ 三元液固平衡相图 (质量分数 %)",
             ternary=dict(
                 sum=1.0,
-                aaxis=dict(title='H₂O (A) (顶)', titlefont=dict(size=14)),
-                baxis=dict(title='KNO₃ (B) (左底)', titlefont=dict(size=14)),
-                caxis=dict(title='NaNO₃ (C) (右底)', titlefont=dict(size=14))
+                aaxis=dict(title=dict(text='H₂O (A) (顶)', font=dict(size=14))),
+                baxis=dict(title=dict(text='KNO₃ (B) (左底)', font=dict(size=14))),
+                caxis=dict(title=dict(text='NaNO₃ (C) (右底)', font=dict(size=14)))
             ),
             legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.01),
             margin=dict(l=20, r=20, t=40, b=20)
