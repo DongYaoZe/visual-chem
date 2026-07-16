@@ -3,7 +3,14 @@ export interface RootOptions {
 	maxIterations?: number;
 }
 
-/** Solve a continuous, sign-changing interval with deterministic bisection. */
+/**
+ * Solve a continuous, sign-changing interval with Brent's method (zeroin).
+ *
+ * Deterministic like the bisection it replaced, but superlinear: inverse
+ * quadratic interpolation with a secant fallback, guarded so every step
+ * stays inside the shrinking bracket. Interactive sliders call this on
+ * every input event via bubblePointAt, so evaluation count matters.
+ */
 export function solveBracketedRoot(
 	fn: (value: number) => number,
 	lower: number,
@@ -12,35 +19,85 @@ export function solveBracketedRoot(
 ): number {
 	const tolerance = options.tolerance ?? 1e-9;
 	const maxIterations = options.maxIterations ?? 120;
-	let left = lower;
-	let right = upper;
-	let fLeft = fn(left);
-	const fRight = fn(right);
+	let a = lower;
+	let b = upper;
+	let fa = fn(a);
+	let fb = fn(b);
 
-	if (!Number.isFinite(fLeft) || !Number.isFinite(fRight)) {
+	if (!Number.isFinite(fa) || !Number.isFinite(fb)) {
 		throw new Error('Root interval produced a non-finite value.');
 	}
-	if (Math.abs(fLeft) <= tolerance) return left;
-	if (Math.abs(fRight) <= tolerance) return right;
-	if (fLeft * fRight > 0) {
+	if (Math.abs(fa) <= tolerance) return a;
+	if (Math.abs(fb) <= tolerance) return b;
+	if (fa * fb > 0) {
 		throw new Error(`Root is not bracketed on [${lower}, ${upper}].`);
 	}
 
-	for (let iteration = 0; iteration < maxIterations; iteration += 1) {
-		const middle = (left + right) / 2;
-		const fMiddle = fn(middle);
-		if (!Number.isFinite(fMiddle)) throw new Error('Root solver produced a non-finite value.');
-		if (Math.abs(fMiddle) <= tolerance || (right - left) / 2 <= tolerance) return middle;
+	// c is the previous bracket endpoint: [b, c] always straddles the root
+	// and b is the current best estimate (|f(b)| <= |f(c)|).
+	let c = a;
+	let fc = fa;
+	let d = b - a;
+	let e = d;
 
-		if (fLeft * fMiddle <= 0) {
-			right = middle;
-		} else {
-			left = middle;
-			fLeft = fMiddle;
+	for (let iteration = 0; iteration < maxIterations; iteration += 1) {
+		if ((fb > 0 && fc > 0) || (fb < 0 && fc < 0)) {
+			c = a;
+			fc = fa;
+			d = b - a;
+			e = d;
 		}
+		if (Math.abs(fc) < Math.abs(fb)) {
+			a = b;
+			b = c;
+			c = a;
+			fa = fb;
+			fb = fc;
+			fc = fa;
+		}
+
+		const tol1 = 2 * Number.EPSILON * Math.abs(b) + tolerance / 2;
+		const xm = (c - b) / 2;
+		if (Math.abs(xm) <= tol1 || fb === 0 || Math.abs(fb) <= tolerance) return b;
+
+		if (Math.abs(e) >= tol1 && Math.abs(fa) > Math.abs(fb)) {
+			// Try inverse quadratic interpolation (secant when a === c).
+			const s = fb / fa;
+			let p: number;
+			let q: number;
+			if (a === c) {
+				p = 2 * xm * s;
+				q = 1 - s;
+			} else {
+				const inverseSlope = fa / fc;
+				const ratio = fb / fc;
+				p = s * (2 * xm * inverseSlope * (inverseSlope - ratio) - (b - a) * (ratio - 1));
+				q = (inverseSlope - 1) * (ratio - 1) * (s - 1);
+			}
+			if (p > 0) q = -q;
+			p = Math.abs(p);
+			// Accept the step only if it stays well inside the bracket and
+			// shrinks faster than the previous one; otherwise bisect.
+			if (2 * p < Math.min(3 * xm * q - Math.abs(tol1 * q), Math.abs(e * q))) {
+				e = d;
+				d = p / q;
+			} else {
+				d = xm;
+				e = d;
+			}
+		} else {
+			d = xm;
+			e = d;
+		}
+
+		a = b;
+		fa = fb;
+		b += Math.abs(d) > tol1 ? d : xm > 0 ? tol1 : -tol1;
+		fb = fn(b);
+		if (!Number.isFinite(fb)) throw new Error('Root solver produced a non-finite value.');
 	}
 
-	return (left + right) / 2;
+	return b;
 }
 
 export function findInteriorRoots(
