@@ -66,13 +66,13 @@ test('the reader can rebuild the phase envelope from literature measurements', a
 	// Clicking nudges the viewport, and the sticky graphic follows whichever
 	// scene the IntersectionObserver currently reports. Scroll back to the
 	// experiment scene so the assertions read the layer the reader would see.
-	await page.locator('[data-scene-index="4"]').scrollIntoViewIfNeeded();
+	await page.locator('[data-scene-id="build-the-map"]').scrollIntoViewIfNeeded();
 	await expect(page.locator('.graphic .recorded-point')).toHaveCount(10);
 	await expect(page.locator('.graphic .bubble-recorded')).not.toHaveAttribute('d', '');
 	await expect(page.locator('.graphic .literature-point')).toHaveCount(32);
 	await expect(page.locator('.graphic .bubble-line')).toHaveCount(0);
 
-	await page.locator('[data-scene-index="6"]').scrollIntoViewIfNeeded();
+	await page.locator('[data-scene-id="nonideal-model"]').scrollIntoViewIfNeeded();
 	await expect(page.locator('.graphic .bubble-line')).toHaveCount(1);
 });
 

@@ -20,6 +20,7 @@
 		type InlineText,
 		type LocaleCode
 	} from '$lib/content';
+	import { sceneDefinition } from './ethanol-distillation-scenes';
 
 	interface Props {
 		locale?: LocaleCode;
@@ -28,82 +29,6 @@
 	let { locale = 'zh-CN' }: Props = $props();
 	let site = $derived(getSiteContent(locale));
 	let story = $derived(getEthanolDistillationContent(locale));
-
-	type Focus = 'macro' | 'micro' | 'symbol' | 'all';
-
-	interface SceneState {
-		composition: number;
-		stage: number;
-		interactionScale: number;
-		reveal: number;
-		focus: Focus;
-	}
-
-	const sceneStates: readonly SceneState[] = [
-		{
-			composition: 0.1,
-			stage: 0,
-			interactionScale: 1,
-			reveal: 0.08,
-			focus: 'macro'
-		},
-		{
-			composition: 0.25,
-			stage: 0,
-			interactionScale: 0,
-			reveal: 0.08,
-			focus: 'micro'
-		},
-		{
-			composition: 0.1,
-			stage: 0,
-			interactionScale: 0,
-			reveal: 0.14,
-			focus: 'macro'
-		},
-		{
-			composition: 0.1,
-			stage: 0,
-			interactionScale: 0,
-			reveal: 0.22,
-			focus: 'all'
-		},
-		{
-			composition: 0.4,
-			stage: 0,
-			interactionScale: 0,
-			reveal: 1,
-			focus: 'symbol'
-		},
-		{
-			composition: 0.1,
-			stage: 7,
-			interactionScale: 0,
-			reveal: 1,
-			focus: 'symbol'
-		},
-		{
-			composition: 0.35,
-			stage: 0,
-			interactionScale: 1,
-			reveal: 1,
-			focus: 'all'
-		},
-		{
-			composition: 0.82,
-			stage: 10,
-			interactionScale: 1,
-			reveal: 1,
-			focus: 'symbol'
-		},
-		{
-			composition: 0.891,
-			stage: 0,
-			interactionScale: 1,
-			reveal: 1,
-			focus: 'macro'
-		}
-	];
 
 	let activeIndex = $state(0);
 	let hookStage = $state(0);
@@ -122,21 +47,29 @@
 	let openGraphicButton: HTMLButtonElement;
 	let closeGraphicButton: HTMLButtonElement;
 
-	let activeScene = $derived(sceneStates[activeIndex]);
+	let activeScene = $derived(sceneDefinition(story.scenes[activeIndex].id));
+	let activeSceneId = $derived(activeScene.id);
 	let experimentPoint = $derived(ETHANOL_WATER_LAI_2014.points[experimentIndex]);
+	let experimentSceneActive = $derived(activeSceneId === 'build-the-map');
 	let visualComposition = $derived(
-		activeIndex === 4
+		experimentSceneActive
 			? experimentPoint.x
-			: activeIndex === 7
+			: activeSceneId === 'fixed-point'
 				? azeotropeSearch
 				: activeScene.composition
 	);
 	let visualStage = $derived(
-		activeIndex === 0 ? hookStage : activeIndex === 5 ? stageControl : activeScene.stage
+		activeSceneId === 'hook'
+			? hookStage
+			: activeSceneId === 'equilibrium-cascade'
+				? stageControl
+				: activeScene.stage
 	);
-	let visualModel = $derived(activeIndex === 6 ? modelStrength : activeScene.interactionScale);
+	let visualModel = $derived(
+		activeSceneId === 'nonideal-model' ? modelStrength : activeScene.interactionScale
+	);
 	let visualPoint = $derived(
-		activeIndex === 4
+		experimentSceneActive
 			? experimentPoint
 			: bubblePointAt(visualComposition, ATM_BAR, ETHANOL_WATER, visualModel)
 	);
@@ -302,11 +235,11 @@
 				interactionScale={visualModel}
 				reveal={activeScene.reveal}
 				focus={activeScene.focus}
-				showAzeotrope={activeIndex >= 6}
-				experimentMode={activeIndex === 4}
-				showExperimentalData={activeIndex >= 6}
-				experimentalPoint={activeIndex === 4 ? experimentPoint : undefined}
-				recordedExperimentalIndices={activeIndex === 4 ? recordedExperimentalIndices : []}
+				showAzeotrope={activeScene.showAzeotrope}
+				experimentMode={experimentSceneActive}
+				showExperimentalData={activeScene.showExperimentalData}
+				experimentalPoint={experimentSceneActive ? experimentPoint : undefined}
+				recordedExperimentalIndices={experimentSceneActive ? recordedExperimentalIndices : []}
 				label={story.stage.triViewAriaLabel}
 				content={site.shared}
 			/>
@@ -329,8 +262,9 @@
 				<article
 					class="step"
 					class:active={activeIndex === index}
-					class:symbol-step={sceneStates[index].focus === 'symbol'}
+					class:symbol-step={sceneDefinition(scene.id).focus === 'symbol'}
 					data-scene-index={index}
+					data-scene-id={scene.id}
 				>
 					<div class="step-card">
 						<p class="eyebrow">{scene.kicker}</p>
@@ -342,7 +276,7 @@
 							<div class="formula"><Formula formula={scene.formula} display /></div>
 						{/if}
 
-						{#if index === 0}
+						{#if scene.id === 'hook'}
 							<div class="prediction">
 								<span>{story.interactions.hook.prompt}</span>
 								<div>
@@ -381,7 +315,7 @@
 							{/if}
 						{/if}
 
-						{#if index === 2}
+						{#if scene.id === 'first-bubble'}
 							<div class="prediction">
 								<span>{story.interactions.firstBubble.prompt}</span>
 								<div>
@@ -413,7 +347,7 @@
 							{/if}
 						{/if}
 
-						{#if index === 4}
+						{#if scene.id === 'build-the-map'}
 							<label class="range-control experiment">
 								<span>{story.interactions.experiment.controlLabel}</span>
 								<strong>{experimentPoint.x.toFixed(3)}</strong>
@@ -466,7 +400,7 @@
 							{/if}
 						{/if}
 
-						{#if index === 5}
+						{#if scene.id === 'equilibrium-cascade'}
 							<label class="range-control">
 								<span>{story.interactions.idealCascade.controlLabel}</span>
 								<strong>{stageControl}</strong>
@@ -481,7 +415,7 @@
 							</label>
 						{/if}
 
-						{#if index === 6}
+						{#if scene.id === 'nonideal-model'}
 							<label class="range-control">
 								<span>{story.interactions.nonidealModel.controlLabel}</span>
 								<strong>{modelStrength.toFixed(2)}</strong>
@@ -496,7 +430,7 @@
 							</label>
 						{/if}
 
-						{#if index === 7}
+						{#if scene.id === 'fixed-point'}
 							<label class="range-control search">
 								<span>{story.interactions.azeotropeSearch.controlLabel}</span>
 								<strong class:near={Math.abs(searchDelta) < 0.003}
