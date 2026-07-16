@@ -4,6 +4,13 @@ import { expect, test, type Page } from '@playwright/test';
 const basePath = process.env.BASE_PATH ?? '';
 const appPath = (path: string) => `${basePath}${path}`;
 
+/** Navigate and wait until the client bundle has actually hydrated, so that
+ * clicks and input events land on live components instead of inert SSR markup. */
+async function gotoHydrated(page: Page, path: string) {
+	await page.goto(appPath(path));
+	await page.waitForSelector('html[data-hydrated="true"]', { timeout: 15000 });
+}
+
 async function expectNoSeriousAccessibilityViolations(page: Page) {
 	const results = await new AxeBuilder({ page })
 		.withTags(['wcag2a', 'wcag2aa', 'wcag22aa'])
@@ -17,7 +24,7 @@ async function expectNoSeriousAccessibilityViolations(page: Page) {
 test('homepage presents the project and a working story entry', async ({ page }) => {
 	const pageErrors: Error[] = [];
 	page.on('pageerror', (error) => pageErrors.push(error));
-	await page.goto(appPath('/'));
+	await gotoHydrated(page, '/');
 	await expect(page).toHaveTitle(/VisualChem/);
 	await expect(page.getByRole('heading', { name: /不是把相图/ })).toBeVisible();
 	await expect(page.getByTestId('tri-view')).toBeVisible();
@@ -29,7 +36,7 @@ test('homepage presents the project and a working story entry', async ({ page })
 test('story keeps the prediction and synchronized apparatus interactive', async ({ page }) => {
 	const pageErrors: Error[] = [];
 	page.on('pageerror', (error) => pageErrors.push(error));
-	await page.goto(appPath('/stories/ethanol-distillation/'));
+	await gotoHydrated(page, '/stories/ethanol-distillation/');
 	await expect(page.getByRole('heading', { name: /永远到不了的/ })).toBeVisible();
 	await expect(page.getByTestId('tri-view').first()).not.toContainText(/实验共沸|模型极限/);
 	await page.getByRole('button', { name: '会停在某处' }).click();
@@ -40,7 +47,7 @@ test('story keeps the prediction and synchronized apparatus interactive', async 
 });
 
 test('the reader can rebuild the phase envelope from literature measurements', async ({ page }) => {
-	await page.goto(appPath('/stories/ethanol-distillation/'));
+	await gotoHydrated(page, '/stories/ethanol-distillation/');
 	const recordButton = page.getByRole('button', { name: '加入这组文献实验数据' });
 	await recordButton.scrollIntoViewIfNeeded();
 	const composition = page.locator('label.experiment input[type="range"]');
@@ -56,6 +63,10 @@ test('the reader can rebuild the phase envelope from literature measurements', a
 	}
 
 	await expect(page.locator('.experiment-actions output')).toContainText('已选 5 / 16 组');
+	// Clicking nudges the viewport, and the sticky graphic follows whichever
+	// scene the IntersectionObserver currently reports. Scroll back to the
+	// experiment scene so the assertions read the layer the reader would see.
+	await page.locator('[data-scene-index="4"]').scrollIntoViewIfNeeded();
 	await expect(page.locator('.graphic .recorded-point')).toHaveCount(10);
 	await expect(page.locator('.graphic .bubble-recorded')).not.toHaveAttribute('d', '');
 	await expect(page.locator('.graphic .literature-point')).toHaveCount(32);
@@ -78,7 +89,7 @@ test('story has no serious automated accessibility violations', async ({ page })
 test('English routes reuse the complete interactive story without Chinese UI leakage', async ({
 	page
 }) => {
-	await page.goto(appPath('/en/'));
+	await gotoHydrated(page, '/en/');
 	await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 	await expect(page.getByRole('heading', { name: /Do not just draw/ })).toBeVisible();
 	await page.getByRole('link', { name: /Enter the first story/ }).click();

@@ -7,7 +7,10 @@ if (basePath !== '' && !basePath.startsWith('/')) {
 
 export default defineConfig({
 	webServer: {
-		command: 'npm run build && npm run preview -- --host 127.0.0.1',
+		// Serve the static build with GitHub Pages semantics (see scripts/serve-pages.mjs)
+		// so every test exercises the exact artifact that gets deployed. `vite preview`
+		// is NOT faithful here: it SSR-renders unknown routes instead of serving 404.html.
+		command: 'npm run build && node scripts/serve-pages.mjs',
 		port: 4173,
 		reuseExistingServer: !process.env.CI && basePath === '',
 		env: { BASE_PATH: basePath }

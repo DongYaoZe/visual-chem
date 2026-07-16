@@ -12,6 +12,13 @@
 		relativePath === '/en' || relativePath.startsWith('/en/') ? 'en' : 'zh-CN'
 	);
 	let site = $derived(getSiteContent(locale));
+
+	// Marks the moment client-side interactivity is actually available. Tests
+	// (and only tests) wait on this before dispatching events; without it they
+	// race hydration on fast static hosting and click into inert markup.
+	$effect(() => {
+		document.documentElement.dataset.hydrated = 'true';
+	});
 </script>
 
 <svelte:head>

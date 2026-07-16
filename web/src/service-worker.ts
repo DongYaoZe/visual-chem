@@ -2,10 +2,19 @@ import { build, files, prerendered, version } from '$service-worker';
 
 const worker = self as unknown as ServiceWorkerGlobalScope;
 const cacheName = `visualchem-${version}`;
-const appFiles = [...build, ...files, ...prerendered];
+
+// Precache only what an offline reader actually needs: the prerendered pages,
+// the JS/CSS shell, and woff2 fonts (the only format modern browsers request).
+// Everything else — woff/ttf fallbacks, OG share images, 404 page — is served
+// on demand by the runtime cache below, keeping install fast and atomic.
+const shellAssets = [
+	...prerendered,
+	...build.filter((asset) => !/\.(?:woff|ttf)$/.test(asset)),
+	...files.filter((asset) => /\/(?:favicon\.svg|icon-\d+\.png|site\.webmanifest)$/.test(asset))
+];
 
 worker.addEventListener('install', (event) => {
-	event.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(appFiles)));
+	event.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(shellAssets)));
 	worker.skipWaiting();
 });
 
