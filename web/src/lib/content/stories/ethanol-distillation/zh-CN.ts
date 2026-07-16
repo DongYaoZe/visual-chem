@@ -178,7 +178,11 @@ export const zhCNEthanolDistillationContent = {
 		},
 		nonidealModel: {
 			controlLabel: '教学模型拨杆 λ',
-			sliderAriaLabel: '教学模型的非理想强度'
+			sliderAriaLabel: '教学模型的非理想强度',
+			scale: {
+				start: '0 · 理想 Raoult',
+				end: '1 · 校准 Margules'
+			}
 		},
 		azeotropeSearch: {
 			controlLabel: '在 Margules 模型中寻找 y − x = 0',
@@ -235,7 +239,11 @@ export const zhCNEthanolDistillationContent = {
 			equilibriumStages: '理论平衡级 N',
 			equilibriumStagesAriaLabel: '自由探索的理论平衡级数',
 			nonidealStrength: '非理想强度 λ',
-			nonidealStrengthAriaLabel: '自由探索的非理想强度'
+			nonidealStrengthAriaLabel: '自由探索的非理想强度',
+			nonidealStrengthScale: {
+				start: '0 · 理想 Raoult',
+				end: '1 · 校准 Margules'
+			}
 		},
 		challengeLabel: '试试看',
 		challenge: '从 x₀ = 0.95 出发反复蒸馏，阶梯会向左还是向右？它最终靠近哪里？',

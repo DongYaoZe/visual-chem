@@ -189,7 +189,11 @@ export const enEthanolDistillationContent = {
 		},
 		nonidealModel: {
 			controlLabel: 'Teaching-model control λ',
-			sliderAriaLabel: 'Nonideality strength of the teaching model'
+			sliderAriaLabel: 'Nonideality strength of the teaching model',
+			scale: {
+				start: '0 · ideal Raoult',
+				end: '1 · calibrated Margules'
+			}
 		},
 		azeotropeSearch: {
 			controlLabel: 'Find y − x = 0 in the Margules model',
@@ -251,7 +255,11 @@ export const enEthanolDistillationContent = {
 			equilibriumStages: 'Theoretical equilibrium stages N',
 			equilibriumStagesAriaLabel: 'Number of theoretical equilibrium stages for free exploration',
 			nonidealStrength: 'Nonideality strength λ',
-			nonidealStrengthAriaLabel: 'Nonideality strength for free exploration'
+			nonidealStrengthAriaLabel: 'Nonideality strength for free exploration',
+			nonidealStrengthScale: {
+				start: '0 · ideal Raoult',
+				end: '1 · calibrated Margules'
+			}
 		},
 		challengeLabel: 'TRY THIS',
 		challenge:

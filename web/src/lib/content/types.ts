@@ -250,6 +250,12 @@ export interface ChoiceContent {
 	label: string;
 }
 
+/** Endpoint captions rendered under a slider track. */
+export interface SliderScaleContent {
+	start: string;
+	end: string;
+}
+
 export interface StoryInteractionsContent {
 	hook: {
 		prompt: string;
@@ -290,6 +296,7 @@ export interface StoryInteractionsContent {
 	nonidealModel: {
 		controlLabel: string;
 		sliderAriaLabel: string;
+		scale: SliderScaleContent;
 	};
 	azeotropeSearch: {
 		controlLabel: string;
@@ -371,6 +378,7 @@ export interface EthanolDistillationStoryContent {
 			equilibriumStagesAriaLabel: string;
 			nonidealStrength: string;
 			nonidealStrengthAriaLabel: string;
+			nonidealStrengthScale: SliderScaleContent;
 		};
 		challengeLabel: string;
 		challenge: string;

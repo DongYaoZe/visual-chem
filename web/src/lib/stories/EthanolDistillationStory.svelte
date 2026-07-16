@@ -443,6 +443,10 @@
 									aria-label={story.interactions.nonidealModel.sliderAriaLabel}
 									bind:value={modelStrength}
 								/>
+								<span class="slider-scale" aria-hidden="true">
+									<span>{story.interactions.nonidealModel.scale.start}</span>
+									<span>{story.interactions.nonidealModel.scale.end}</span>
+								</span>
 							</label>
 						{/if}
 
@@ -601,6 +605,10 @@
 						aria-label={story.sandbox.controls.nonidealStrengthAriaLabel}
 						bind:value={labModel}
 					/>
+					<span class="slider-scale" aria-hidden="true">
+						<span>{story.sandbox.controls.nonidealStrengthScale.start}</span>
+						<span>{story.sandbox.controls.nonidealStrengthScale.end}</span>
+					</span>
 				</label>
 				<div class="challenge">
 					<strong>{story.sandbox.challengeLabel}</strong>
@@ -1016,6 +1024,17 @@
 		grid-column: 1 / -1;
 		color: var(--ink-muted);
 		font-family: var(--mono);
+	}
+
+	/* Endpoint captions under a slider track: what 0 and 1 actually claim. */
+	.slider-scale {
+		display: flex;
+		grid-column: 1 / -1;
+		justify-content: space-between;
+		margin-top: -0.2rem;
+		color: var(--ink-muted);
+		font-family: var(--mono);
+		font-size: 0.62rem;
 	}
 
 	.escape {

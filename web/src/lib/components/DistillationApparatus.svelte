@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { mixtureColor } from '$lib/color';
 	import { type ApparatusContent, zhCNSiteContent } from '$lib/content';
 
 	interface Props {
@@ -17,13 +18,6 @@
 		content = zhCNSiteContent.shared.apparatus
 	}: Props = $props();
 	const uid = $props.id();
-
-	function mixtureColor(composition: number): string {
-		const x = Math.min(1, Math.max(0, composition));
-		const water = [32, 127, 140];
-		const ethanol = [214, 107, 50];
-		return `rgb(${water.map((value, index) => Math.round(value + (ethanol[index] - value) * x)).join(',')})`;
-	}
 
 	let liquidColor = $derived(mixtureColor(liquidComposition));
 	let vaporColor = $derived(mixtureColor(vaporComposition));
