@@ -2,13 +2,7 @@
 	import { beforeNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { onMount, tick } from 'svelte';
-	import {
-		ATM_BAR,
-		ETHANOL_WATER,
-		ETHANOL_WATER_LAI_2014,
-		bubblePointAt,
-		simpleDistillationStages
-	} from '$lib/chem';
+	import { ETHANOL_WATER_LAI_2014, thermoFrame } from '$lib/chem';
 	import ConceptCheck from '$lib/components/ConceptCheck.svelte';
 	import Formula from '$lib/components/Math.svelte';
 	import Seo from '$lib/components/Seo.svelte';
@@ -69,12 +63,17 @@
 	let visualModel = $derived(
 		activeSceneId === 'nonideal-model' ? modelStrength : activeScene.interactionScale
 	);
-	let visualPoint = $derived(
-		experimentSceneActive
-			? experimentPoint
-			: bubblePointAt(visualComposition, ATM_BAR, ETHANOL_WATER, visualModel)
+	// The same frame the tri-view resolves internally (memoized), so the
+	// mobile status strip quotes exactly the numbers the stage displays.
+	let visualFrame = $derived(
+		thermoFrame({
+			composition: visualComposition,
+			stage: visualStage,
+			interactionScale: visualModel
+		})
 	);
-	let searchPoint = $derived(bubblePointAt(azeotropeSearch));
+	let visualPoint = $derived(experimentSceneActive ? experimentPoint : visualFrame.current);
+	let searchPoint = $derived(thermoFrame({ composition: azeotropeSearch }).current);
 	let searchDelta = $derived(searchPoint.y - azeotropeSearch);
 	const experimentalAzeotrope = ETHANOL_WATER_LAI_2014.azeotrope;
 	const sievePores = Array.from({ length: 24 }, (_, index) => index);
@@ -92,7 +91,7 @@
 	let dehydratedComposition = $derived(
 		azeotropeX / (azeotropeX + (1 - dehydration) * (1 - azeotropeX))
 	);
-	let hookStages = $derived(simpleDistillationStages(0.1, hookStage));
+	let hookStages = $derived(thermoFrame({ composition: 0.1, stage: hookStage }).stages);
 	let hookTop = $derived(hookStages.at(-1)?.x ?? 0.1);
 	let progress = $derived(((activeIndex + 1) / story.scenes.length) * 100);
 	let experimentAlreadySelected = $derived(recordedExperimentalIndices.includes(experimentIndex));

@@ -1,13 +1,5 @@
 <script lang="ts">
-	import {
-		ATM_BAR,
-		ETHANOL_WATER,
-		ETHANOL_WATER_LAI_2014,
-		buildTxyCurve,
-		findAzeotrope,
-		simpleDistillationStages,
-		type ExperimentalVlePoint
-	} from '$lib/chem';
+	import { ETHANOL_WATER_LAI_2014, type ExperimentalVlePoint, type ThermoFrame } from '$lib/chem';
 	import { type DiagramContent, zhCNSiteContent } from '$lib/content';
 
 	interface PlotPoint {
@@ -17,10 +9,9 @@
 	}
 
 	interface Props {
-		composition: number;
-		stage?: number;
-		pressureBar?: number;
-		interactionScale?: number;
+		/** The resolved thermodynamic state this diagram renders. Computed once
+		 * by the parent so every sibling panel narrates the same numbers. */
+		frame: ThermoFrame;
 		reveal?: number;
 		showAzeotrope?: boolean;
 		experimentMode?: boolean;
@@ -31,10 +22,7 @@
 	}
 
 	let {
-		composition,
-		stage = 0,
-		pressureBar = ATM_BAR,
-		interactionScale = 1,
+		frame,
 		reveal = 1,
 		showAzeotrope = true,
 		experimentMode = false,
@@ -47,20 +35,12 @@
 	const width = 560;
 	const height = 318;
 	const margin = { top: 22, right: 20, bottom: 48, left: 54 };
-	let curve = $derived(buildTxyCurve(pressureBar, 101, ETHANOL_WATER, interactionScale));
-	let azeotrope = $derived(findAzeotrope(pressureBar, ETHANOL_WATER, interactionScale));
-	let stages = $derived(
-		simpleDistillationStages(composition, stage, pressureBar, ETHANOL_WATER, interactionScale)
-	);
-	let modelCurrent = $derived(stages.at(-1) ?? stages[0]);
-	let current = $derived(currentPointOverride ?? modelCurrent);
-	let referenceTemperatures = $derived([
-		...buildTxyCurve(pressureBar, 101, ETHANOL_WATER, 0).map((point) => point.temperatureC),
-		...buildTxyCurve(pressureBar, 101, ETHANOL_WATER, 1).map((point) => point.temperatureC),
-		...ETHANOL_WATER_LAI_2014.points.map((point) => point.temperatureC)
-	]);
-	let minTemperature = $derived(Math.min(...referenceTemperatures) - 1.2);
-	let maxTemperature = $derived(Math.max(...referenceTemperatures) + 1.5);
+	let curve = $derived(frame.curve);
+	let azeotrope = $derived(frame.azeotrope);
+	let stages = $derived(frame.stages);
+	let current = $derived(currentPointOverride ?? frame.current);
+	let minTemperature = $derived(frame.temperatureExtent.minC - 1.2);
+	let maxTemperature = $derived(frame.temperatureExtent.maxC + 1.5);
 	let revealedCurve = $derived(
 		curve.slice(0, Math.max(2, Math.round(curve.length * Math.min(1, Math.max(0.03, reveal)))))
 	);
@@ -74,7 +54,7 @@
 	let plottedCurve = $derived(experimentMode ? [] : revealedCurve);
 	let showEnvelope = $derived(!experimentMode && reveal >= 0.95);
 	let experimentalPressureMatches = $derived(
-		Math.abs(pressureBar * 100 - ETHANOL_WATER_LAI_2014.pressureKPa) <= 0.05
+		Math.abs(frame.pressureBar * 100 - ETHANOL_WATER_LAI_2014.pressureKPa) <= 0.05
 	);
 	let showLiteraturePoints = $derived(
 		experimentalPressureMatches && (showExperimentalData || (experimentMode && experimentComplete))
@@ -95,7 +75,7 @@
 					liquidComposition: current.x.toFixed(3),
 					vaporComposition: current.y.toFixed(3),
 					bubblePointC: current.temperatureC.toFixed(2),
-					modelStrength: interactionScale.toFixed(2),
+					modelStrength: frame.interactionScale.toFixed(2),
 					withExperimentalData: showExperimentalData,
 					totalPoints: ETHANOL_WATER_LAI_2014.points.length
 				})
@@ -104,10 +84,10 @@
 		experimentMode
 			? content.captions.reconstruction
 			: showExperimentalData
-				? content.captions.comparison({ modelStrength: interactionScale.toFixed(2) })
-				: interactionScale === 0
+				? content.captions.comparison({ modelStrength: frame.interactionScale.toFixed(2) })
+				: frame.interactionScale === 0
 					? content.captions.ideal
-					: content.captions.margules({ modelStrength: interactionScale.toFixed(2) })
+					: content.captions.margules({ modelStrength: frame.interactionScale.toFixed(2) })
 	);
 
 	function xScale(value: number): number {
@@ -386,7 +366,7 @@
 		{#if experimentMode && recordedPoints.length > 1}
 			<span class="reconstruction-key">{content.legend.reconstruction}</span>
 		{/if}
-		<strong>{pressureBar.toFixed(3)} bar</strong>
+		<strong>{frame.pressureBar.toFixed(3)} bar</strong>
 	</div>
 	<figcaption>
 		<span>{experimentMode ? content.captionKind.evidence : content.captionKind.model}</span>

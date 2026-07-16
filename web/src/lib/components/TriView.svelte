@@ -2,10 +2,8 @@
 	import { onMount } from 'svelte';
 	import {
 		ATM_BAR,
-		ETHANOL_WATER,
 		ETHANOL_WATER_LAI_2014,
-		findAzeotrope,
-		simpleDistillationStages,
+		thermoFrame,
 		type ExperimentalVlePoint
 	} from '$lib/chem';
 	import { type VisualizationContent, zhCNSiteContent } from '$lib/content';
@@ -51,12 +49,10 @@
 	let root: HTMLElement;
 	let visible = $state(true);
 
-	let stages = $derived(
-		simpleDistillationStages(composition, stage, pressureBar, ETHANOL_WATER, interactionScale)
-	);
-	let modelCurrent = $derived(stages.at(-1) ?? stages[0]);
-	let current = $derived(experimentalPoint ?? modelCurrent);
-	let modelAzeotrope = $derived(findAzeotrope(pressureBar, ETHANOL_WATER, interactionScale));
+	// One resolved thermodynamic state feeds every panel below, so the header,
+	// the apparatus, the particles, and the diagram can never disagree.
+	let frame = $derived(thermoFrame({ composition, stage, pressureBar, interactionScale }));
+	let current = $derived(experimentalPoint ?? frame.current);
 	let usesExperimentalEvidence = $derived(experimentMode || showExperimentalData);
 	let running = $derived(active && visible);
 	let ariaLabel = $derived(label ?? content.triView.defaultAriaLabel);
@@ -111,12 +107,12 @@
 							})}
 						</dd>
 					</div>
-				{:else if modelAzeotrope}
+				{:else if frame.azeotrope}
 					<div class="limit">
 						<dt>{content.triView.modelLimit}</dt>
 						<dd>
 							{content.triView.massPercent({
-								value: (modelAzeotrope.massFractionA * 100).toFixed(1)
+								value: (frame.azeotrope.massFractionA * 100).toFixed(1)
 							})}
 						</dd>
 					</div>
@@ -150,10 +146,7 @@
 		</div>
 		<div class="panel symbol" class:dimmed={dimmed('symbol')}>
 			<TxyDiagram
-				{composition}
-				{stage}
-				{pressureBar}
-				{interactionScale}
+				{frame}
 				{reveal}
 				{showAzeotrope}
 				{experimentMode}
