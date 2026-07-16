@@ -7,3 +7,6 @@ __pycache__/
 .vscode/
 .idea/
 .streamlit/
+claude_auto_allow.log
+claude_auto_allow.pid
+/test-results/

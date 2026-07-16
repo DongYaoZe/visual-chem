@@ -1,0 +1,5 @@
+# VisualChem is an open educational resource; public pages may be crawled.
+User-agent: *
+Allow: /visual-chem/
+
+Sitemap: https://dongyaoze.github.io/visual-chem/sitemap.xml

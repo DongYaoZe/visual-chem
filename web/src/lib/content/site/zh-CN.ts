@@ -1,0 +1,216 @@
+import type { SiteContent } from '../types';
+
+export const zhCNSiteContent = {
+	locale: 'zh-CN',
+	htmlLang: 'zh-CN',
+	shared: {
+		seo: {
+			defaultImageAlt: 'VisualChem：把大学化学原理讲成可以走进去的故事'
+		},
+		header: {
+			brand: 'VisualChem',
+			tagline: '化学叙事可视化',
+			homeAriaLabel: 'VisualChem 首页',
+			navigationAriaLabel: '主导航',
+			storyLink: '开始第一篇故事',
+			githubLink: 'GitHub'
+		},
+		motionControl: {
+			pause: '暂停动画',
+			resume: '继续动画'
+		},
+		conceptCheck: {
+			eyebrow: 'CONCEPT CHECK · 先预测，再验证',
+			verifyButton: '验证我的预测',
+			correctFeedback: '这条因果链成立。',
+			incorrectFeedback: '再看一眼三幅图的共同证据。'
+		},
+		triView: {
+			defaultAriaLabel: '化学三联动视图',
+			liveSummary: ({ liquidComposition, vaporComposition, bubblePointC, stage }) =>
+				`当前状态：液相乙醇摩尔分数 ${liquidComposition}，气相 ${vaporComposition}，泡点温度 ${bubblePointC} 摄氏度，理论平衡级 ${stage}。`,
+			synchronizedState: '同步状态',
+			liquidComposition: '液 x',
+			vaporComposition: '气 y',
+			bubblePoint: '泡点',
+			experimentalAzeotrope: '实验共沸',
+			modelLimit: '模型极限',
+			massPercent: ({ value }) => `≈${value} wt%`
+		},
+		apparatus: {
+			ariaLabel: '烧瓶、冷凝器和接收瓶同步展示气液组成',
+			stillLiquid: ({ composition }) => `釜液 x = ${composition}`,
+			distillate: ({ composition }) => `馏出 y = ${composition}`,
+			equilibriumStage: ({ stage }) => `平衡级 ${stage}`,
+			viewName: '宏观',
+			caption: '理论平衡级示意，不代表真实塔板效率'
+		},
+		particles: {
+			vaporPhase: '气相',
+			liquidPhase: '液相',
+			ethanol: '乙醇',
+			water: '水',
+			viewName: '微观',
+			caption: '比例定量；位置、碰撞与轨迹仅为解释性示意'
+		},
+		diagram: {
+			accessibleReconstruction: ({
+				totalPoints,
+				selectedPoints,
+				liquidComposition,
+				vaporComposition,
+				temperatureC
+			}) =>
+				`乙醇水恒压温度组成相图重建，Lai 2014 文献共有 ${totalPoints} 组实验数据，已选择 ${selectedPoints} 组。当前液相 x ${liquidComposition}，气相 y ${vaporComposition}，温度 ${temperatureC} 摄氏度。平滑教学模型未显示。`,
+			accessibleModel: ({
+				liquidComposition,
+				vaporComposition,
+				bubblePointC,
+				modelStrength,
+				withExperimentalData,
+				totalPoints
+			}) =>
+				`乙醇水恒压温度组成相图，当前液相 x ${liquidComposition}，气相 y ${vaporComposition}，泡点 ${bubblePointC} 摄氏度。当前显示 Margules 教学模型，非理想强度 ${modelStrength}${withExperimentalData ? `，并叠加 ${totalPoints} 组 Lai 2014 文献实验数据` : ''}。`,
+			captions: {
+				reconstruction: 'Lai 2014 在 101.3 kPa 下的文献实验；虚线只是依据已选点绘制的视觉引导',
+				comparison: ({ modelStrength }) =>
+					`对照 · 空心符号为 Lai 2014 实验；平滑线为 Margules 教学模型 λ=${modelStrength}`,
+				ideal: '理想 Raoult 基线（γ = 1），不是实验测量曲线',
+				margules: ({ modelStrength }) =>
+					`三后缀 Margules 教学模型（λ=${modelStrength}），不是实验数据回归`
+			},
+			modelFixedPoint: '模型不动点',
+			laiExperimentalAzeotrope: 'Lai 实验共沸',
+			xAxis: '乙醇摩尔分数 · x（液）/ y（气）',
+			yAxis: '温度 / °C',
+			regions: {
+				vapor: '气相',
+				liquid: '液相',
+				twoPhase: '液 + 气'
+			},
+			legend: {
+				modelLiquid: '模型实线 · 液相 x',
+				modelVapor: '模型虚线 · 气相 y',
+				experiment: '○ x / △ y · 文献实验',
+				reconstruction: '粗虚线 · 你的重建'
+			},
+			captionKind: {
+				evidence: '证据',
+				model: '模型'
+			}
+		}
+	},
+	home: {
+		seo: {
+			title: 'VisualChem — 用故事看懂化学',
+			description:
+				'把宏观现象、微观粒子与化学符号锁进同一个可操纵故事。VisualChem 是面向大学化学的开源叙事可视化项目。',
+			path: '/',
+			alternateLocalePath: '/en/',
+			type: 'website',
+			image: '/og-home.png',
+			imageAlt: 'VisualChem 首页：宏观、微观与符号三重表征围绕乙醇—水相图同步',
+			modifiedTime: '2026-07-16'
+		},
+		hero: {
+			eyebrow: 'OPEN CHEMISTRY · EXPLORABLE STORIES',
+			heading: {
+				lines: ['不是把相图', '画出来。'],
+				emphasis: '是让它开口。'
+			},
+			lead: '宏观现象、微观粒子、符号图景不再各讲各的。滚动是一架摄影机，手指是实验旋钮；每一张图都在论证链里出现。',
+			primaryAction: {
+				label: '进入第一篇故事',
+				symbol: '↗'
+			},
+			methodAction: '我们的讲法',
+			proofs: [
+				{ value: '3', label: '种表征同步' },
+				{ value: '0', label: '服务器计算依赖' },
+				{ value: 'MIT', label: '代码开放许可' }
+			],
+			previewAriaLabel: '第一篇故事的共沸点视觉预告',
+			limitLabel: '普通常压精馏的路标',
+			limitValue: '≈95.5',
+			limitUnit: '%',
+			limitContext: '乙醇质量分数 · 常压实验约值',
+			unreachableValue: '100%',
+			fixedPointLabel: 'y = x',
+			azeotropeCompositionLabel: '共沸组成',
+			storyPreview: '第一篇 · 永远到不了的 100%'
+		},
+		method: {
+			eyebrow: 'THE JOHNSTONE TRIANGLE, IN MOTION',
+			heading: {
+				lines: ['同一个状态，', '从三个尺度看。']
+			},
+			body: '教材常把烧杯、分子和公式分散在三页。学生真正困难的不是“看见”三幅图，而是在它们之间完成转译。VisualChem 用一个状态源同时驱动三幅图：当组成改变，装置、粒子比例和相图状态点必须一起改变。',
+			controls: {
+				initialComposition: '初始釜液 · 乙醇摩尔分数',
+				initialCompositionAriaLabel: '初始釜液乙醇摩尔分数',
+				equilibriumStages: '重复平衡级',
+				equilibriumStagesAriaLabel: '重复平衡级数',
+				hint: '拖动任一旋钮，观察三幅图是否讲出同一件事。',
+				triViewAriaLabel: '首页三重表征同步演示'
+			}
+		},
+		season: {
+			eyebrow: 'SEASON 01 · PHASE EQUILIBRIUM',
+			title: '相平衡三部曲',
+			introduction: '先从最适合“三角联动”的概念开始。每篇都从反常现象出发，最后抵达可计算的模型。',
+			stories: [
+				{
+					number: '01',
+					status: '可交互原型 · 约 12 分钟',
+					title: '永远到不了的 100%',
+					description: '为什么酒精越蒸越浓，却会在最后 4.4% 前停下？',
+					action: '开始阅读 ↗'
+				},
+				{
+					number: '02',
+					status: '制作中 · 单组分相平衡',
+					title: '沸腾的地图',
+					description: '高原上的一锅水，如何带我们走进压力—温度地图？',
+					action: '下一篇'
+				},
+				{
+					number: '03',
+					status: '计划中 · 三元水盐体系',
+					title: '一锅盐水的分身术',
+					description: '沿一条蒸发轨迹，从盐湖里依次取出不同晶体。',
+					action: '第一季'
+				}
+			]
+		},
+		principles: {
+			eyebrow: 'WHAT COUNTS AS TRUE',
+			heading: {
+				lines: ['图可以有诗意，', '数字不能靠想象。']
+			},
+			items: [
+				{
+					number: '01',
+					title: '计算可核验',
+					body: '所有相界来自浏览器端热力学计算，并用单元测试锁住纯组分沸点、相平衡和共沸点。'
+				},
+				{
+					number: '02',
+					title: '隐喻有边界',
+					body: '粒子比例可以定量同步，粒子轨迹则明确标成示意；我们不把动画包装成分子动力学。'
+				},
+				{
+					number: '03',
+					title: '先预测后验证',
+					body: '读者先留下判断，再操纵模型，最后从三个尺度寻找共同证据，而不是被动观看答案。'
+				}
+			]
+		},
+		footer: {
+			tagline: 'VisualChem · 让化学原理成为可以走进去的故事。',
+			sourceCodeLink: '源代码',
+			firstStoryLink: '第一篇故事'
+		}
+	}
+} satisfies SiteContent;
+
+export default zhCNSiteContent;

@@ -1,85 +1,112 @@
-# VisualChem (物理化学相图交互式可视化平台)
+# VisualChem
 
-这是一个基于 **Streamlit** 和 **Plotly** 构建的物理化学相图交互式可视化应用。本项目旨在通过生动、直观且具备高度交互性的图表，帮助使用者深入理解物理化学中二元及三元体系的相平衡规律，包括气液平衡 (VLE)、固液平衡 (SLE) 以及三元体系蒸发结晶模拟。
+**让大学化学原理成为可以走进去的故事。**
 
-💻 **GitHub 仓库地址**：[DongYaoZe/visual-chem](https://github.com/DongYaoZe/visual-chem)
+VisualChem 是一个开源的大学化学叙事可视化项目。它不把相图、分子动画和实验装置当成三张彼此独立的插图，而是用同一个热力学状态同时驱动：
 
----
+- **宏观**：烧瓶、液面、沸腾、冷凝和分离流程；
+- **微观**：两相中的粒子比例与解释性动画；
+- **符号**：公式、T-x-y 相图、结线、杠杆规则和精馏阶梯。
 
-## 🌟 核心功能模块
+滚动负责作者控镜，交互负责预测—操作—验证。项目希望在“开放源码、作者控镜、三重表征严格同步的大学化学交互长文”这一可验证品类中做到最好。
 
-### 1. 二元汽液平衡相图 (VLE)
-* **多系统预设与自定义**：支持 **苯-甲苯**（近似理想）、**正己烷-正庚烷**（理想）、**乙醇-水**（非理想最低共沸）和 **部分互溶双液系**（LLE-VLE共存，含 UCST 临界点与 VLLE 三相平衡线），并支持自定义 Antoine 常数和液相活度系数参数。
-* **双向切片展示**：可在 **$p-x$ 恒温图** 与 **$T-x$ 恒压图** 之间自由切换。
-* **实时状态追踪与杠杆规则**：通过滑动条改变系统总组成 $z_A$、系统温度 $T$ 或压力 $P$，实时在图上标记状态点，自动识别相区（单相液区、单相气区、两相区、液液分层区、三相线），并动态计算两相平衡的杠杆规则比例（相摩尔分率）。
+## 当前成果
 
-### 2. 二元固液平衡相图 (SLE)
-* **两大典型体系**：
-  * **生成完全互溶固溶体**：类似 Cu-Ni 体系的透镜状固液相图，支持计算液相线 (Liquidus)、固相线 (Solidus) 以及共存相组成与量。
-  * **简单低共熔体系（无固溶体）**：经典共晶相图，支持动态计算共晶点（Eutectic Point $T_E$, $x_E$）、液相线与共晶温度线，直观呈现机械混合固相区以及冷却结晶轨迹。
-* **结线与热力学公式**：完全基于熔化焓、熔点和活度系数模型进行非线性方程组数值求解（Brent 方法），确保热力学物理真实性。
+第一篇 Alpha：《永远到不了的 100%》
 
-### 3. 三元体系与分盐模拟
-* **三元等边/直角坐标系**：直观展示三元水盐体系（如 NaCl-Na₂SO₄-H₂O 等）的等温溶解度相图（Gibbs 三角坐标）。
-* **蒸发/加水/变温结晶过程模拟**：通过时间轴或模拟步长动态演化，直观展示系统状态点随着溶剂蒸发或加水而沿结线、杠杆规则轨迹移动的过程。
-* **析出盐量与相轨迹追踪**：自动识别析出纯盐 A、纯盐 B、复盐或均相溶液，量化输出各固相的析出质量与母液成分，帮助理解化工分盐流程。
+它从“不断增加塔板能否得到 100% 乙醇”开始，依次讲清：
 
-### 4. 物理化学学理论推导与公式库
-* **精美公式排版**：全面整理并使用 LaTeX/KaTeX 渲染物化相平衡核心热力学推导，包括：
-  * Clapeyron 与 Clausius-Clapeyron 方程
-  * Duhem-Margules 关系式与拉乌尔定律偏差
-  * 杠杆规则的几何与代数严谨证明
-  * 多相多组分体系的吉布斯相律 ($F = C - \Phi + 2$)
-
----
-
-## 🛠️ 技术栈与依赖
-
-* **Python 3.8+**
-* **Streamlit** (Web UI 框架)
-* **Plotly** (交互式动态绘图)
-* **NumPy** (数值计算)
-* **SciPy** (非线性方程求根与插值)
-
----
-
-## 🚀 快速开始与运行指南
-
-### 1. 克隆仓库
-```bash
-git clone https://github.com/DongYaoZe/visual-chem.git
-cd visual-chem
+```text
+组成 z
+→ 第一颗气泡
+→ 液相 x 与气相 y
+→ T-x-y 地图
+→ 理论平衡级 x(n+1)=y(xn)
+→ 活度系数与非理想性
+→ 共沸不动点 y=x
+→ 更换分离机制
 ```
 
-### 2. 安装依赖
-确保已配置好 Python 环境，并在终端中运行：
-```bash
+页面包含九幕滚动叙事、宏观—微观—符号三联动舞台、NIST 文献实验点重建、实验—模型对照、共沸点搜索、选择性脱水物料衡算、概念题和自由探索区，并适配桌面与手机。
+
+> 当前仍是 Alpha：页面已经引入 16 组带来源与不确定度的常压实验 VLE 数据，并用第二实验室 21 点作独立验证；连续 Margules 教学模型仍只校准共沸点，并非整条实验曲线的统计回归。发布 Beta 前还需要真实学生测试、教师审校、读屏器人工验收和真实 Pages 发布回归。详见 [落地进展](docs/落地进展.md) 与 [数值模型卡](docs/乙醇水数值模型卡.md)。
+
+## 快速开始
+
+### 叙事站点（主产品）
+
+需要 Node.js 22+：
+
+```powershell
+npm --prefix web install
+npm --prefix web run dev -- --open
+```
+
+静态构建：
+
+```powershell
+npm --prefix web run build
+```
+
+### 旧 Streamlit 相图原型（参考实现）
+
+`app.py` 保留了早期 VLE、SLE、三元水盐与理论页，用于追溯原型和比对功能，不再作为 2.0 产品主入口：
+
+```powershell
 pip install -r requirements.txt
-```
-*(如果没有 `requirements.txt`，可直接执行：`pip install streamlit plotly numpy scipy`)*
-
-### 3. 运行本地开发服务器
-```bash
 streamlit run app.py
 ```
-运行后，可在浏览器中访问默认地址 `http://localhost:8501` 即可体验完整的交互功能。
 
----
+旧版乙醇—水单参数 Margules 预设会把常压共沸点算到约 `89.0 wt%`，不能用作真实酒精精馏极限。新故事没有沿用这个参数。
 
-## 📖 热力学模型说明
+## 工程结构
 
-本应用的核心计算引擎基于经典的经典物化热力学框架：
-1. **汽相压力**：由 Antoine 方程计算：
-   $$\log_{10} p^* = A - \frac{B}{T + C}$$
-2. **液相非理想性**：使用单参数 Margules 活度系数模型描述：
-   $$\ln \gamma_A = \frac{\Omega}{RT} x_B^2, \quad \ln \gamma_B = \frac{\Omega}{RT} x_A^2$$
-3. **固液共熔计算**：基于理想/正则溶液熔度方程计算：
-   $$\ln x_i + \ln \gamma_i = \frac{\Delta_{\text{fus}}H_i}{R} \left(\frac{1}{T_i^*} - \frac{1}{T}\right)$$
-   通过 SciPy 中的求根函数在各温度下求解共存组成，还原真实热力学趋势。
+```text
+visual-chem/
+├─ web/                            # SvelteKit 叙事站点
+│  ├─ src/lib/chem/                # TypeScript 热力学内核与 Vitest
+│  ├─ src/lib/components/          # 三联动视图和教学组件
+│  ├─ src/routes/                  # 首页和故事
+│  └─ scripts/capture-audit.mjs    # 桌面/移动端视觉截图
+├─ validation/                     # 独立 Python/SciPy 数值参考
+├─ docs/                           # 蓝图、调研、模型卡、实施状态
+├─ app.py                          # 旧 Streamlit 原型
+└─ .github/workflows/              # GitHub Pages 构建部署
+```
 
----
+## 数值验证
 
-## 👨‍💻 作者与贡献
+浏览器引擎包含 Antoine 蒸气压、三后缀 Margules 活度系数、泡点、露点、共沸点、flash/杠杆规则和理想平衡级联。实验参考层来自 Lai 2014 的 NIST ThermoML 常压 `x–T–y` 表，保留 16 行数据、逐点不确定度、来源 DOI、转换记录和校验和。
 
-* **GitHub**: [@DongYaoZe](https://github.com/DongYaoZe)
-* 本项目主要用于物理化学相平衡教学辅助与可视化研究。如有改进建议，欢迎提交 Issue 或 Pull Request！
+独立 SciPy 脚本生成 10 个覆盖 `x=0…1` 的 golden points，TypeScript 测试对温度与气相组成验证到 `1e-6` 以内；另有实验数据完整性和模型残差测试：
+
+```powershell
+python validation\generate_ethanol_water_reference.py
+npm --prefix web run test:unit -- --run
+```
+
+完整质量门：
+
+```powershell
+npm --prefix web run validate
+npx --prefix web playwright install chromium
+npm --prefix web run test:e2e
+```
+
+## 设计与研究依据
+
+- [化学叙事可视化蓝图](docs/化学叙事可视化蓝图.md)：愿景、Johnstone 三角、技术架构和内容路线；
+- [第二轮定向调研](docs/第二轮定向调研.md)：PhET、Labster、ChemTube3D、MolView、JCE、The Pudding、Ciechanowski 与 pycalphad/WASM 核验；
+- [乙醇—水数值模型卡](docs/乙醇水数值模型卡.md)：公式、参数、跨语言基准和适用边界；
+- [落地进展](docs/落地进展.md)：已经完成、仍未完成与公开 Beta 门槛。
+
+调研已经确认：二元 VLE WebApp 和化学叙事教学都不是空白。VisualChem 的差异化不建立在“别人从未做过”的口号上，而建立在成品中可检查的叙事质量、三重表征同步、数值透明度和开放创作能力上。
+
+## 许可
+
+- 软件代码：仓库根目录 `LICENSE`（MIT）；
+- 教学文字与原创图形：`LICENSE-CONTENT.md`（CC BY 4.0）；第三方材料仍服从其各自许可。
+
+参与开发前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)，尤其是“实验测量 / 读者重建 / 教学模型 / 解释性隐喻”四层证据规则。教学与研究引用信息见 [CITATION.cff](CITATION.cff)。
+
+作者：[DongYaoZe](https://github.com/DongYaoZe)

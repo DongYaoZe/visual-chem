@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use VisualChem in teaching, research, or derivative work, please cite it using this metadata."
+title: "VisualChem: Narrative Visualizations for University Chemistry"
+abstract: >-
+  VisualChem is an open-source project that connects macroscopic phenomena,
+  submicroscopic models, and symbolic representations through explorable
+  stories for university chemistry. Software is licensed under the MIT
+  License. Original educational prose, story scripts, and explanatory graphics
+  are licensed under CC BY 4.0 as described in LICENSE-CONTENT.md.
+authors:
+  - family-names: Dong
+    given-names: YaoZe
+    alias: DongYaoZe
+    website: "https://github.com/DongYaoZe"
+type: software
+version: 0.1.0-alpha.1
+date-released: 2026-07-16
+license: MIT
+repository-code: "https://github.com/DongYaoZe/visual-chem"
+url: "https://dongyaoze.github.io/visual-chem/"
+keywords:
+  - chemistry education
+  - narrative visualization
+  - phase equilibrium
+  - explorable explanation
+  - open educational resources

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#173f43" />
+    <meta name="description" content="VisualChem 页面未找到。返回首页，继续探索大学化学的可操纵故事。" />
+    <link rel="icon" href="/visual-chem/favicon.svg" />
+    <title>页面未找到 — VisualChem</title>
+    <style>
+      :root {
+        color: #1f2826;
+        background: #f4efe4;
+        font-family: 'Avenir Next', Avenir, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        font-synthesis: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        display: grid;
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        place-items: center;
+        background:
+          radial-gradient(circle at 10% 5%, rgb(245 165 90 / 22%), transparent 30rem),
+          radial-gradient(circle at 94% 10%, rgb(114 198 203 / 20%), transparent 32rem),
+          linear-gradient(rgb(31 40 38 / 4%) 1px, transparent 1px),
+          linear-gradient(90deg, rgb(31 40 38 / 4%) 1px, transparent 1px), #f4efe4;
+        background-size: auto, auto, 32px 32px, 32px 32px;
+      }
+
+      main {
+        display: grid;
+        width: min(1080px, calc(100% - 40px));
+        grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+        gap: clamp(2.5rem, 8vw, 7rem);
+        align-items: center;
+        padding-block: 3rem;
+      }
+
+      .brand {
+        display: inline-flex;
+        gap: 0.75rem;
+        align-items: center;
+        color: inherit;
+        font-size: 1.05rem;
+        font-weight: 750;
+        text-decoration: none;
+      }
+
+      .brand svg {
+        width: 2.4rem;
+        height: 2.4rem;
+      }
+
+      .kicker {
+        margin: clamp(3rem, 10vh, 6rem) 0 1rem;
+        color: #496552;
+        font-family: Consolas, 'SFMono-Regular', monospace;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+      }
+
+      h1 {
+        max-width: 12ch;
+        margin: 0;
+        font-family: 'Iowan Old Style', Baskerville, 'Songti SC', STSong, serif;
+        font-size: clamp(3rem, 6vw, 5.6rem);
+        font-weight: 500;
+        letter-spacing: -0.055em;
+        line-height: 0.98;
+      }
+
+      h1 em {
+        color: #d66b32;
+        font-style: normal;
+      }
+
+      .explanation {
+        max-width: 34rem;
+        margin: 1.6rem 0 2rem;
+        color: #46534f;
+        font-size: clamp(1rem, 1.5vw, 1.15rem);
+        line-height: 1.75;
+      }
+
+      .home-link {
+        display: inline-flex;
+        min-height: 48px;
+        padding: 0.75rem 1.15rem;
+        border-radius: 999px;
+        align-items: center;
+        background: #173f43;
+        color: #fffaf0;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      a:focus-visible {
+        outline: 3px solid #fffaf0;
+        outline-offset: 3px;
+        box-shadow: 0 0 0 6px #173f43;
+      }
+
+      figure {
+        position: relative;
+        aspect-ratio: 1;
+        margin: 0;
+        overflow: hidden;
+        border: 1px solid rgb(31 40 38 / 12%);
+        border-radius: 2rem;
+        background: #173f43;
+        box-shadow: 0 30px 90px rgb(31 40 38 / 18%);
+      }
+
+      figure::before {
+        position: absolute;
+        inset: 0;
+        content: '';
+        background-image:
+          linear-gradient(rgb(244 239 228 / 7%) 1px, transparent 1px),
+          linear-gradient(90deg, rgb(244 239 228 / 7%) 1px, transparent 1px);
+        background-size: 20% 20%;
+      }
+
+      figure svg {
+        position: absolute;
+        inset: 8%;
+        width: 84%;
+        height: 84%;
+      }
+
+      figcaption {
+        position: absolute;
+        right: 1.5rem;
+        bottom: 1.3rem;
+        left: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        color: #d9e2dc;
+        font-family: Consolas, 'SFMono-Regular', monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+      }
+
+      @media (max-width: 760px) {
+        main {
+          width: min(100% - 28px, 580px);
+          grid-template-columns: 1fr;
+          gap: 2.5rem;
+        }
+
+        .kicker {
+          margin-top: 2.5rem;
+        }
+
+        figure {
+          width: min(100%, 430px);
+          justify-self: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section aria-labelledby="missing-title">
+        <a class="brand" href="/visual-chem/" aria-label="VisualChem 首页">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <rect x="2" y="2" width="60" height="60" rx="16" fill="#173f43" />
+            <path d="M11 49C17 25 31 14 47 20C51 22 53 27 54 34" fill="none" stroke="#f4efe4" stroke-width="5" stroke-linecap="round" />
+            <path d="M11 49C20 39 30 33 40 32C46 31 51 32 54 34" fill="none" stroke="#f5a55a" stroke-width="5" stroke-linecap="round" />
+            <circle cx="52" cy="33" r="4" fill="#fff8e9" stroke="#173f43" stroke-width="2" />
+          </svg>
+          VisualChem
+        </a>
+        <p class="kicker">404 / LOST IN PHASE SPACE</p>
+        <h1 id="missing-title">这个状态点，<em>不在图上。</em></h1>
+        <p class="explanation">链接可能已经改变，也可能从未存在。实验没有坏，只是该把状态点放回已知区域了。</p>
+        <a class="home-link" href="/visual-chem/">返回首页，继续探索&nbsp;→</a>
+      </section>
+
+      <figure aria-label="一个落在相图边界之外的状态点">
+        <svg viewBox="0 0 420 420" aria-hidden="true">
+          <path d="M45 345C82 165 199 66 326 158C349 175 363 207 370 239" fill="none" stroke="#72c6cb" stroke-width="7" stroke-linecap="round" />
+          <path d="M45 345C104 277 180 231 261 220C308 214 349 224 370 239" fill="none" stroke="#f5a55a" stroke-width="7" stroke-linecap="round" stroke-dasharray="18 13" />
+          <path d="M334 119V354" stroke="#f4efe4" stroke-width="2" stroke-dasharray="6 9" opacity=".55" />
+          <circle cx="366" cy="232" r="10" fill="#fffaf0" stroke="#173f43" stroke-width="4" />
+          <circle cx="385" cy="74" r="14" fill="#bf3d30" />
+          <path d="M378 67L392 81M392 67L378 81" stroke="#fffaf0" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <figcaption><span>KNOWN PHASES</span><span>STATE NOT FOUND</span></figcaption>
+      </figure>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,195 @@
+import AxeBuilder from '@axe-core/playwright';
+import { expect, test, type Page } from '@playwright/test';
+
+const basePath = process.env.BASE_PATH ?? '';
+const appPath = (path: string) => `${basePath}${path}`;
+
+async function expectNoSeriousAccessibilityViolations(page: Page) {
+	const results = await new AxeBuilder({ page })
+		.withTags(['wcag2a', 'wcag2aa', 'wcag22aa'])
+		.analyze();
+	const violations = results.violations.filter(
+		(violation) => violation.impact === 'serious' || violation.impact === 'critical'
+	);
+	expect(violations, JSON.stringify(violations, null, 2)).toEqual([]);
+}
+
+test('homepage presents the project and a working story entry', async ({ page }) => {
+	const pageErrors: Error[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error));
+	await page.goto(appPath('/'));
+	await expect(page).toHaveTitle(/VisualChem/);
+	await expect(page.getByRole('heading', { name: /不是把相图/ })).toBeVisible();
+	await expect(page.getByTestId('tri-view')).toBeVisible();
+	await page.getByRole('link', { name: /进入第一篇故事/ }).click();
+	await expect(page).toHaveURL(/stories\/ethanol-distillation/);
+	expect(pageErrors).toEqual([]);
+});
+
+test('story keeps the prediction and synchronized apparatus interactive', async ({ page }) => {
+	const pageErrors: Error[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error));
+	await page.goto(appPath('/stories/ethanol-distillation/'));
+	await expect(page.getByRole('heading', { name: /永远到不了的/ })).toBeVisible();
+	await expect(page.getByTestId('tri-view').first()).not.toContainText(/实验共沸|模型极限/);
+	await page.getByRole('button', { name: '会停在某处' }).click();
+	await page.getByRole('button', { name: '+ 再加一级' }).click();
+	await expect(page.getByText(/第 1 级：x/)).toBeVisible();
+	await expect(page.getByTestId('tri-view').first()).toContainText('同步状态');
+	expect(pageErrors).toEqual([]);
+});
+
+test('the reader can rebuild the phase envelope from literature measurements', async ({ page }) => {
+	await page.goto(appPath('/stories/ethanol-distillation/'));
+	const recordButton = page.getByRole('button', { name: '加入这组文献实验数据' });
+	await recordButton.scrollIntoViewIfNeeded();
+	const composition = page.locator('label.experiment input[type="range"]');
+	await expect(page.locator('.graphic .bubble-line')).toHaveCount(0);
+
+	for (const value of ['1', '4', '7', '10', '13']) {
+		await composition.evaluate((element, nextValue) => {
+			const input = element as HTMLInputElement;
+			input.value = nextValue;
+			input.dispatchEvent(new Event('input', { bubbles: true }));
+		}, value);
+		await recordButton.click();
+	}
+
+	await expect(page.locator('.experiment-actions output')).toContainText('已选 5 / 16 组');
+	await expect(page.locator('.graphic .recorded-point')).toHaveCount(10);
+	await expect(page.locator('.graphic .bubble-recorded')).not.toHaveAttribute('d', '');
+	await expect(page.locator('.graphic .literature-point')).toHaveCount(32);
+	await expect(page.locator('.graphic .bubble-line')).toHaveCount(0);
+
+	await page.locator('[data-scene-index="6"]').scrollIntoViewIfNeeded();
+	await expect(page.locator('.graphic .bubble-line')).toHaveCount(1);
+});
+
+test('homepage has no serious automated accessibility violations', async ({ page }) => {
+	await page.goto(appPath('/'));
+	await expectNoSeriousAccessibilityViolations(page);
+});
+
+test('story has no serious automated accessibility violations', async ({ page }) => {
+	await page.goto(appPath('/stories/ethanol-distillation/'));
+	await expectNoSeriousAccessibilityViolations(page);
+});
+
+test('English routes reuse the complete interactive story without Chinese UI leakage', async ({
+	page
+}) => {
+	await page.goto(appPath('/en/'));
+	await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+	await expect(page.getByRole('heading', { name: /Do not just draw/ })).toBeVisible();
+	await page.getByRole('link', { name: /Enter the first story/ }).click();
+	await expect(page).toHaveURL(/\/en\/stories\/ethanol-distillation\//);
+	await expect(page.getByRole('heading', { name: /The unreachable/ })).toBeVisible();
+	await page.getByRole('button', { name: 'It will stop somewhere' }).click();
+	await page.getByRole('button', { name: '+ Add one stage' }).click();
+	await expect(page.getByText(/Stage 1: x/)).toBeVisible();
+	await expect(page.getByTestId('tri-view').first()).toContainText('Synchronized state');
+	await expect(page.locator('main')).not.toContainText(/[\u3400-\u9fff]/);
+});
+
+test('English pages have no serious automated accessibility violations', async ({ page }) => {
+	await page.goto(appPath('/en/'));
+	await expectNoSeriousAccessibilityViolations(page);
+	await page.goto(appPath('/en/stories/ethanol-distillation/'));
+	await expectNoSeriousAccessibilityViolations(page);
+});
+
+test('canonical, alternate, social, and structured metadata identify each locale', async ({
+	page
+}) => {
+	await page.goto(appPath('/'));
+	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+		'href',
+		'https://dongyaoze.github.io/visual-chem/'
+	);
+	await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
+		'href',
+		'https://dongyaoze.github.io/visual-chem/en/'
+	);
+	await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+		'content',
+		'https://dongyaoze.github.io/visual-chem/og-home.png'
+	);
+
+	await page.goto(appPath('/en/stories/ethanol-distillation/'));
+	await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+		'href',
+		'https://dongyaoze.github.io/visual-chem/en/stories/ethanol-distillation/'
+	);
+	await expect(page.locator('link[rel="alternate"][hreflang="zh-CN"]')).toHaveAttribute(
+		'href',
+		'https://dongyaoze.github.io/visual-chem/stories/ethanol-distillation/'
+	);
+	await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
+	const structuredData = await page.locator('script[type="application/ld+json"]').textContent();
+	expect(JSON.parse(structuredData ?? '{}')).toMatchObject({
+		'@type': 'Article',
+		inLanguage: 'en'
+	});
+});
+
+test('all public routes load their local production assets without HTTP errors', async ({
+	page
+}) => {
+	const failures: string[] = [];
+	page.on('response', (response) => {
+		if (response.url().startsWith('http://127.0.0.1:4173') && response.status() >= 400) {
+			failures.push(`${response.status()} ${response.url()}`);
+		}
+	});
+	for (const path of [
+		'/',
+		'/stories/ethanol-distillation/',
+		'/en/',
+		'/en/stories/ethanol-distillation/'
+	]) {
+		await page.goto(appPath(path));
+		await expect(page.locator('main')).toBeVisible();
+	}
+	expect(failures).toEqual([]);
+});
+
+test('the static not-found page is branded and useful without client JavaScript', async ({
+	browser
+}) => {
+	const context = await browser.newContext({ javaScriptEnabled: false });
+	const page = await context.newPage();
+	const response = await page.goto(`http://127.0.0.1:4173${appPath('/missing-phase-state/')}`);
+	expect(response?.status()).toBe(404);
+	await expect(page.getByRole('heading', { name: /不在图上/ })).toBeVisible();
+	await expect(page.getByRole('link', { name: /返回首页/ })).toHaveAttribute(
+		'href',
+		`${basePath}/`
+	);
+	await context.close();
+});
+
+test('the story remains readable and labels its limits without JavaScript', async ({ browser }) => {
+	const context = await browser.newContext({ javaScriptEnabled: false });
+	const page = await context.newPage();
+	await page.goto(`http://127.0.0.1:4173${appPath('/stories/ethanol-distillation/')}`);
+	await expect(page.getByRole('heading', { name: /永远到不了的/ })).toBeVisible();
+	await expect(page.getByText(/正文与公式仍可阅读/)).toBeVisible();
+	await expect(page.getByRole('heading', { name: /把实验表重新变回一张地图/ })).toBeVisible();
+	await context.close();
+});
+
+test('the installed story can reload offline', async ({ page, context }, testInfo) => {
+	test.skip(
+		testInfo.project.name !== 'desktop-chromium',
+		'One browser-level offline check is enough.'
+	);
+	await page.goto(appPath('/stories/ethanol-distillation/'));
+	await page.evaluate(async () => {
+		if (!('serviceWorker' in navigator)) throw new Error('Service workers are unavailable.');
+		await navigator.serviceWorker.ready;
+	});
+	await context.setOffline(true);
+	await page.reload({ waitUntil: 'domcontentloaded' });
+	await expect(page.getByRole('heading', { name: /永远到不了的/ })).toBeVisible();
+});

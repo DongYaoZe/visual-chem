@@ -1,0 +1,102 @@
+{
+	"schema": "visual-chem/ethanol-water-reference@1",
+	"generator": "validation/generate_ethanol_water_reference.py (SciPy brentq)",
+	"pressure_bar": 1.01325,
+	"model": {
+		"kind": "three-suffix-margules",
+		"a12": 1.39081729,
+		"a21": 0.95455763,
+		"mmhg_per_bar": 750.061683
+	},
+	"points": [
+		{
+			"x": 0.0,
+			"y": 0.0,
+			"temperature_c": 99.99682974771959,
+			"gamma_ethanol": 4.018132691044916,
+			"gamma_water": 1.0,
+			"pressure_closure_bar": 1.013249999999999
+		},
+		{
+			"x": 0.05,
+			"y": 0.28511564209582446,
+			"temperature_c": 92.1300303038242,
+			"gamma_ethanol": 3.373126873836322,
+			"gamma_water": 1.004468581928337,
+			"pressure_closure_bar": 1.0132499999999998
+		},
+		{
+			"x": 0.1,
+			"y": 0.4158719519716069,
+			"temperature_c": 87.90680755047362,
+			"gamma_ethanol": 2.874526427983564,
+			"gamma_water": 1.0175504813049063,
+			"pressure_closure_bar": 1.013249999999999
+		},
+		{
+			"x": 0.25,
+			"y": 0.5710464071920155,
+			"temperature_c": 82.56578098747929,
+			"gamma_ethanol": 1.9340895447622581,
+			"gamma_water": 1.1057890969523407,
+			"pressure_closure_bar": 1.0132499999999993
+		},
+		{
+			"x": 0.4,
+			"y": 0.6367409566817971,
+			"temperature_c": 80.59807314944457,
+			"gamma_ethanol": 1.4550662646773633,
+			"gamma_water": 1.2667962500718881,
+			"pressure_closure_bar": 1.013250000000001
+		},
+		{
+			"x": 0.6,
+			"y": 0.7119698479654849,
+			"temperature_c": 79.1355361639099,
+			"gamma_ethanol": 1.148858581526155,
+			"gamma_water": 1.598848254150896,
+			"pressure_closure_bar": 1.0132499999999989
+		},
+		{
+			"x": 0.8,
+			"y": 0.8209117515416743,
+			"temperature_c": 78.27116389600029,
+			"gamma_ethanol": 1.028099624531229,
+			"gamma_water": 2.059780360828433,
+			"pressure_closure_bar": 1.0132499999999993
+		},
+		{
+			"x": 0.895,
+			"y": 0.8950000013592609,
+			"temperature_c": 78.14998940939721,
+			"gamma_ethanol": 1.006746944062973,
+			"gamma_water": 2.3117621132941673,
+			"pressure_closure_bar": 1.0132500000000018
+		},
+		{
+			"x": 0.95,
+			"y": 0.946657842455271,
+			"temperature_c": 78.19514632652671,
+			"gamma_ethanol": 1.0014057970475687,
+			"gamma_water": 2.4617209915101372,
+			"pressure_closure_bar": 1.0132500000000007
+		},
+		{
+			"x": 1.0,
+			"y": 1.000000000000001,
+			"temperature_c": 78.31920078666296,
+			"gamma_ethanol": 1.0,
+			"gamma_water": 2.5975212632447704,
+			"pressure_closure_bar": 1.013250000000001
+		}
+	],
+	"azeotrope": {
+		"x": 0.8950000110291552,
+		"y": 0.8950000110291555,
+		"temperature_c": 78.14998940939722,
+		"gamma_ethanol": 1.0067469425339992,
+		"gamma_water": 2.3117621432207196,
+		"pressure_closure_bar": 1.013250000000002,
+		"mass_fraction_ethanol": 0.9561345359122185
+	}
+}
