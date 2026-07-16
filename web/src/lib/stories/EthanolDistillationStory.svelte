@@ -21,6 +21,7 @@
 		type LocaleCode
 	} from '$lib/content';
 	import { sceneDefinition } from './ethanol-distillation-scenes';
+	import { heroCurveGeometry } from './hero-curve';
 
 	interface Props {
 		locale?: LocaleCode;
@@ -78,6 +79,16 @@
 	const experimentalAzeotrope = ETHANOL_WATER_LAI_2014.azeotrope;
 	const sievePores = Array.from({ length: 24 }, (_, index) => index);
 	const azeotropeX = experimentalAzeotrope.x;
+	// The hero backdrop draws the same calibrated envelope as the interactive
+	// diagram — no hand-tuned béziers on a site about computed maps.
+	const heroCurve = heroCurveGeometry({
+		width: 1000,
+		height: 300,
+		insetLeft: 20,
+		insetRight: 40,
+		insetTop: 20,
+		insetBottom: 24
+	});
 	let dehydratedComposition = $derived(
 		azeotropeX / (azeotropeX + (1 - dehydration) * (1 - azeotropeX))
 	);
@@ -197,10 +208,15 @@
 		</div>
 		<div class="hero-curve" aria-hidden="true">
 			<svg viewBox="0 0 1000 300">
-				<path d="M20 255C220 70 675 56 960 239" />
-				<path class="dashed" d="M20 255C260 0 729 7 960 239" />
-				<circle cx="811" cy="143" r="10" />
-				<line x1="811" x2="811" y1="143" y2="278" />
+				<path d={heroCurve.bubblePath} />
+				<path class="dashed" d={heroCurve.dewPath} />
+				<circle cx={heroCurve.azeotrope.px.toFixed(1)} cy={heroCurve.azeotrope.py.toFixed(1)} r="10" />
+				<line
+					x1={heroCurve.azeotrope.px.toFixed(1)}
+					x2={heroCurve.azeotrope.px.toFixed(1)}
+					y1={heroCurve.azeotrope.py.toFixed(1)}
+					y2={heroCurve.baselineY}
+				/>
 			</svg>
 			<span>{story.hero.curveEvidence}</span>
 		</div>

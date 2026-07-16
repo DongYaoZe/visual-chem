@@ -4,6 +4,7 @@
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import TriView from '$lib/components/TriView.svelte';
 	import { getSiteContent, type LocaleCode } from '$lib/content';
+	import { heroCurveGeometry } from './hero-curve';
 
 	interface Props {
 		locale?: LocaleCode;
@@ -18,6 +19,15 @@
 	);
 	let demoComposition = $state(0.1);
 	let demoStage = $state(2);
+	// The hero envelope is computed from the calibrated model, not sketched.
+	const heroCurve = heroCurveGeometry({
+		width: 600,
+		height: 500,
+		insetLeft: 52,
+		insetRight: 52,
+		insetTop: 130,
+		insetBottom: 104
+	});
 </script>
 
 <Seo
@@ -66,14 +76,25 @@
 			</div>
 			<div class="hundred">{site.home.hero.unreachableValue}</div>
 			<svg viewBox="0 0 600 500" aria-hidden="true">
-				<path class="orbit one" d="M58 376C150 74 452 58 545 331" />
-				<path class="orbit two" d="M70 421C207 195 397 135 548 273" />
-				<path class="curve warm" d="M52 396C192 202 391 163 548 327" />
-				<path class="curve cool" d="M52 396C182 112 416 110 548 327" />
-				<circle cx="462" cy="220" r="9" />
-				<line x1="462" x2="462" y1="220" y2="420" />
-				<text x="448" y="201" text-anchor="end">{site.home.hero.fixedPointLabel}</text>
-				<text x="462" y="446" text-anchor="middle">{site.home.hero.azeotropeCompositionLabel}</text>
+				<path class="ideal" d={heroCurve.idealBubblePath} />
+				<path class="ideal dew" d={heroCurve.idealDewPath} />
+				<path class="curve warm" d={heroCurve.bubblePath} />
+				<path class="curve cool" d={heroCurve.dewPath} />
+				<circle cx={heroCurve.azeotrope.px.toFixed(1)} cy={heroCurve.azeotrope.py.toFixed(1)} r="9" />
+				<line
+					x1={heroCurve.azeotrope.px.toFixed(1)}
+					x2={heroCurve.azeotrope.px.toFixed(1)}
+					y1={heroCurve.azeotrope.py.toFixed(1)}
+					y2={heroCurve.baselineY + 24}
+				/>
+				<text
+					x={(heroCurve.azeotrope.px - 14).toFixed(1)}
+					y={(heroCurve.azeotrope.py - 19).toFixed(1)}
+					text-anchor="end">{site.home.hero.fixedPointLabel}</text
+				>
+				<text x={heroCurve.azeotrope.px.toFixed(1)} y={heroCurve.baselineY + 50} text-anchor="middle"
+					>{site.home.hero.azeotropeCompositionLabel}</text
+				>
 			</svg>
 			<p>{site.home.hero.storyPreview}</p>
 		</div>
@@ -303,18 +324,20 @@
 		overflow: visible;
 	}
 
-	.orbit,
+	.ideal,
 	.curve {
 		fill: none;
 		stroke-linecap: round;
 	}
 
-	.orbit {
-		stroke: rgba(31, 40, 38, 0.09);
-		stroke-width: 1;
+	/* The ideal-Raoult envelope: same scale, no fixed point. Kept faint —
+	   it is the counterfactual the calibrated curves argue against. */
+	.ideal {
+		stroke: rgba(31, 40, 38, 0.14);
+		stroke-width: 1.5;
 	}
 
-	.orbit.two {
+	.ideal.dew {
 		stroke-dasharray: 3 8;
 	}
 
