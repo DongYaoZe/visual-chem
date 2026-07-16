@@ -62,8 +62,7 @@ function oklchToSrgb({ lightness, chroma, hue }: Oklch): [number, number, number
 const WATER = srgbToOklch(WATER_RGB);
 const ETHANOL = srgbToOklch(ETHANOL_RGB);
 /** Shorter arc from teal to orange — the sweep passes through green, not gray. */
-const HUE_DELTA =
-	((ETHANOL.hue - WATER.hue + 3 * Math.PI) % (2 * Math.PI)) - Math.PI;
+const HUE_DELTA = ((ETHANOL.hue - WATER.hue + 3 * Math.PI) % (2 * Math.PI)) - Math.PI;
 
 /** Color for a liquid or vapor of the given ethanol mole fraction. */
 export function mixtureColor(composition: number): string {

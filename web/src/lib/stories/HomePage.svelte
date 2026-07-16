@@ -80,7 +80,11 @@
 				<path class="ideal dew" d={heroCurve.idealDewPath} />
 				<path class="curve warm" d={heroCurve.bubblePath} />
 				<path class="curve cool" d={heroCurve.dewPath} />
-				<circle cx={heroCurve.azeotrope.px.toFixed(1)} cy={heroCurve.azeotrope.py.toFixed(1)} r="9" />
+				<circle
+					cx={heroCurve.azeotrope.px.toFixed(1)}
+					cy={heroCurve.azeotrope.py.toFixed(1)}
+					r="9"
+				/>
 				<line
 					x1={heroCurve.azeotrope.px.toFixed(1)}
 					x2={heroCurve.azeotrope.px.toFixed(1)}
@@ -92,8 +96,10 @@
 					y={(heroCurve.azeotrope.py - 19).toFixed(1)}
 					text-anchor="end">{site.home.hero.fixedPointLabel}</text
 				>
-				<text x={heroCurve.azeotrope.px.toFixed(1)} y={heroCurve.baselineY + 50} text-anchor="middle"
-					>{site.home.hero.azeotropeCompositionLabel}</text
+				<text
+					x={heroCurve.azeotrope.px.toFixed(1)}
+					y={heroCurve.baselineY + 50}
+					text-anchor="middle">{site.home.hero.azeotropeCompositionLabel}</text
 				>
 			</svg>
 			<p>{site.home.hero.storyPreview}</p>

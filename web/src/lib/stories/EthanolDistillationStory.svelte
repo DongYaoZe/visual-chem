@@ -210,7 +210,11 @@
 			<svg viewBox="0 0 1000 300">
 				<path d={heroCurve.bubblePath} />
 				<path class="dashed" d={heroCurve.dewPath} />
-				<circle cx={heroCurve.azeotrope.px.toFixed(1)} cy={heroCurve.azeotrope.py.toFixed(1)} r="10" />
+				<circle
+					cx={heroCurve.azeotrope.px.toFixed(1)}
+					cy={heroCurve.azeotrope.py.toFixed(1)}
+					r="10"
+				/>
 				<line
 					x1={heroCurve.azeotrope.px.toFixed(1)}
 					x2={heroCurve.azeotrope.px.toFixed(1)}
