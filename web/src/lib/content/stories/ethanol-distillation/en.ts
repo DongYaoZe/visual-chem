@@ -62,7 +62,7 @@ export const enEthanolDistillationContent = {
 			title: 'One more stage—will it reach 100%?',
 			paragraphs: [
 				'Distill once and the ethanol gets richer. Distill again and it gets richer again. Intuition says that repeating the same step often enough must end at pure ethanol.',
-				'Do not accept the answer yet. Add stages to this “ideal equilibrium column” and watch where the top composition chooses to stop.'
+				'Do not accept the answer yet. Add stages to this “theoretical-stage column” — every stage truly reaches vapor–liquid equilibrium — and watch where the top composition chooses to stop.'
 			]
 		},
 		{
@@ -184,7 +184,7 @@ export const enEthanolDistillationContent = {
 				'The heavy dashed lines are only your sketch through the selected data. The remaining literature points are now revealed: look for regions where your sketch lacked evidence, and later ask how the model explains the full trend.'
 		},
 		idealCascade: {
-			controlLabel: 'Ideal-model equilibrium stages N',
+			controlLabel: 'Equilibrium stages N (ideal Raoult model)',
 			sliderAriaLabel: 'Number of theoretical equilibrium stages'
 		},
 		nonidealModel: {

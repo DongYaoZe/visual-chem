@@ -56,7 +56,7 @@ export const zhCNEthanolDistillationContent = {
 			title: '再加一级，会到 100% 吗？',
 			paragraphs: [
 				'蒸一次，酒精浓一点；再蒸一次，还是浓一点。直觉说：只要把这样的步骤重复得足够多，终点就该是纯乙醇。',
-				'先别接受答案。给这座“理想平衡塔”继续加级，看看顶部组成自己会停在哪里。'
+				'先别接受答案。给这座每一级都恰好达到气液平衡的“理论级塔”继续加级，看看顶部组成自己会停在哪里。'
 			]
 		},
 		{
@@ -173,7 +173,7 @@ export const zhCNEthanolDistillationContent = {
 				'粗虚线只是你依据已选数据画出的草图。现在其余文献点也已展开：看看哪些区段刚才仍缺证据，以及模型稍后会怎样解释整条趋势。'
 		},
 		idealCascade: {
-			controlLabel: '理想模型平衡级 N',
+			controlLabel: '理想 Raoult 模型 · 平衡级数 N',
 			sliderAriaLabel: '理论平衡级数'
 		},
 		nonidealModel: {
