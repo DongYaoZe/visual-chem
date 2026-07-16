@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { beforeNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { onMount, tick } from 'svelte';
 	import { ETHANOL_WATER_LAI_2014, thermoFrame } from '$lib/chem';
 	import ConceptCheck from '$lib/components/ConceptCheck.svelte';
 	import Formula from '$lib/components/Math.svelte';
 	import Seo from '$lib/components/Seo.svelte';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
+	import StoryStage from '$lib/components/StoryStage.svelte';
 	import TriView from '$lib/components/TriView.svelte';
 	import {
 		getEthanolDistillationContent,
@@ -16,6 +15,7 @@
 	} from '$lib/content';
 	import { sceneDefinition } from './ethanol-distillation-scenes';
 	import { heroCurveGeometry } from './hero-curve';
+	import { scrolly } from './scrolly';
 
 	interface Props {
 		locale?: LocaleCode;
@@ -38,9 +38,6 @@
 	let labComposition = $state(0.1);
 	let labStage = $state(4);
 	let labModel = $state(1);
-	let shortGraphicOpen = $state(false);
-	let openGraphicButton: HTMLButtonElement;
-	let closeGraphicButton: HTMLButtonElement;
 
 	let activeScene = $derived(sceneDefinition(story.scenes[activeIndex].id));
 	let activeSceneId = $derived(activeScene.id);
@@ -103,53 +100,6 @@
 			(first, second) => first - second
 		);
 	}
-
-	async function openShortGraphic() {
-		shortGraphicOpen = true;
-		document.body.style.overflow = 'hidden';
-		await tick();
-		closeGraphicButton.focus();
-	}
-
-	async function closeShortGraphic(restoreFocus = true) {
-		shortGraphicOpen = false;
-		document.body.style.overflow = '';
-		await tick();
-		if (restoreFocus && openGraphicButton?.isConnected && openGraphicButton.offsetParent !== null) {
-			openGraphicButton.focus();
-		}
-	}
-
-	beforeNavigate(() => {
-		shortGraphicOpen = false;
-		document.body.style.overflow = '';
-	});
-
-	onMount(() => {
-		const nodes = [...document.querySelectorAll<HTMLElement>('[data-scene-index]')];
-		const observer = new IntersectionObserver(
-			(entries) => {
-				const visible = entries
-					.filter((entry) => entry.isIntersecting)
-					.sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-				if (!visible) return;
-				activeIndex = Number((visible.target as HTMLElement).dataset.sceneIndex ?? 0);
-			},
-			{ rootMargin: '-18% 0px -38% 0px', threshold: [0.2, 0.45, 0.7] }
-		);
-		nodes.forEach((node) => observer.observe(node));
-		const shortViewport = window.matchMedia('(max-width: 850px) and (max-height: 650px)');
-		const closeWhenViewportGrows = () => {
-			if (shortGraphicOpen && !shortViewport.matches) void closeShortGraphic(false);
-		};
-		shortViewport.addEventListener('change', closeWhenViewportGrows);
-		return () => {
-			observer.disconnect();
-			shortViewport.removeEventListener('change', closeWhenViewportGrows);
-			shortGraphicOpen = false;
-			document.body.style.overflow = '';
-		};
-	});
 </script>
 
 {#snippet inlineText(segments: InlineText)}
@@ -165,16 +115,6 @@
 		{/if}
 	{/each}
 {/snippet}
-
-<svelte:window
-	onkeydown={(event) => {
-		if (event.key === 'Escape' && shortGraphicOpen) closeShortGraphic();
-		if (event.key === 'Tab' && shortGraphicOpen) {
-			event.preventDefault();
-			closeGraphicButton.focus();
-		}
-	}}
-/>
 
 <Seo
 	title={story.seo.title}
@@ -233,50 +173,40 @@
 	</section>
 
 	<section class="scrolly shell" id="story-flow">
-		<div
-			class="graphic"
-			class:short-open={shortGraphicOpen}
-			id="story-graphic"
-			role={shortGraphicOpen ? 'dialog' : undefined}
-			aria-modal={shortGraphicOpen ? 'true' : undefined}
-			aria-label={shortGraphicOpen ? story.stage.dialogAriaLabel : undefined}
+		<StoryStage
+			dialogAriaLabel={story.stage.dialogAriaLabel}
+			closeAriaLabel={story.stage.closeGraphicAriaLabel}
+			openButtonLabel={story.stage.openGraphicButton}
+			statusAriaLabel={story.stage.shortStateAriaLabel}
 		>
-			<button
-				bind:this={closeGraphicButton}
-				class="close-graphic"
-				type="button"
-				onclick={() => closeShortGraphic()}
-				aria-label={story.stage.closeGraphicAriaLabel}>×</button
-			>
-			<TriView
-				composition={visualComposition}
-				stage={visualStage}
-				interactionScale={visualModel}
-				reveal={activeScene.reveal}
-				focus={activeScene.focus}
-				showAzeotrope={activeScene.showAzeotrope}
-				experimentMode={experimentSceneActive}
-				showExperimentalData={activeScene.showExperimentalData}
-				experimentalPoint={experimentSceneActive ? experimentPoint : undefined}
-				recordedExperimentalIndices={experimentSceneActive ? recordedExperimentalIndices : []}
-				label={story.stage.triViewAriaLabel}
-				content={site.shared}
-			/>
-		</div>
-		<aside class="short-state" aria-label={story.stage.shortStateAriaLabel}>
-			<span>{story.stage.shortState.liquid({ composition: visualComposition.toFixed(3) })}</span>
-			<span>{story.stage.shortState.vapor({ composition: visualPoint.y.toFixed(3) })}</span>
-			<span
-				>{story.stage.shortState.temperature({
-					temperatureC: visualPoint.temperatureC.toFixed(1)
-				})}</span
-			>
-			<button bind:this={openGraphicButton} type="button" onclick={openShortGraphic}
-				>{story.stage.openGraphicButton}</button
-			>
-		</aside>
+			{#snippet stage()}
+				<TriView
+					composition={visualComposition}
+					stage={visualStage}
+					interactionScale={visualModel}
+					reveal={activeScene.reveal}
+					focus={activeScene.focus}
+					showAzeotrope={activeScene.showAzeotrope}
+					experimentMode={experimentSceneActive}
+					showExperimentalData={activeScene.showExperimentalData}
+					experimentalPoint={experimentSceneActive ? experimentPoint : undefined}
+					recordedExperimentalIndices={experimentSceneActive ? recordedExperimentalIndices : []}
+					label={story.stage.triViewAriaLabel}
+					content={site.shared}
+				/>
+			{/snippet}
+			{#snippet status()}
+				<span>{story.stage.shortState.liquid({ composition: visualComposition.toFixed(3) })}</span>
+				<span>{story.stage.shortState.vapor({ composition: visualPoint.y.toFixed(3) })}</span>
+				<span
+					>{story.stage.shortState.temperature({
+						temperatureC: visualPoint.temperatureC.toFixed(1)
+					})}</span
+				>
+			{/snippet}
+		</StoryStage>
 
-		<div class="steps">
+		<div class="steps" use:scrolly={{ onActive: (index) => (activeIndex = index) }}>
 			{#each story.scenes as scene, index (scene.id)}
 				<article
 					class="step"
@@ -851,21 +781,6 @@
 		padding-block: 8rem;
 	}
 
-	.graphic {
-		position: sticky;
-		top: 1rem;
-		grid-column: 2;
-		grid-row: 1;
-	}
-
-	.close-graphic {
-		display: none;
-	}
-
-	.short-state {
-		display: none;
-	}
-
 	.steps {
 		grid-column: 1;
 		grid-row: 1;
@@ -1341,15 +1256,6 @@
 			padding-top: 1rem;
 		}
 
-		.graphic {
-			position: sticky;
-			top: 0;
-			z-index: 6;
-			width: calc(100% - 16px);
-			margin-inline: auto;
-			padding-top: 0.35rem;
-		}
-
 		.steps {
 			position: relative;
 			z-index: 5;
@@ -1410,10 +1316,6 @@
 			gap: 1rem;
 		}
 
-		.graphic {
-			width: calc(100% - 8px);
-		}
-
 		.step {
 			min-height: 96vh;
 		}
@@ -1456,68 +1358,6 @@
 	}
 
 	@media (max-width: 850px) and (max-height: 650px) {
-		.graphic {
-			position: relative;
-			top: auto;
-		}
-
-		.short-state {
-			position: sticky;
-			top: 0;
-			z-index: 7;
-			display: flex;
-			min-height: 38px;
-			padding: 0.4rem 0.7rem;
-			gap: 0.65rem;
-			align-items: center;
-			justify-content: center;
-			border-block: 1px solid var(--line);
-			background: rgba(250, 247, 239, 0.96);
-			font-family: var(--mono);
-			font-size: 0.58rem;
-		}
-
-		.short-state button {
-			margin-left: auto;
-			padding: 0.35rem 0.55rem;
-			border: 1px solid var(--ink);
-			border-radius: 999px;
-			background: var(--ink);
-			color: var(--paper);
-			cursor: pointer;
-			font-weight: 800;
-		}
-
-		.graphic.short-open {
-			position: fixed;
-			inset: 6px;
-			z-index: 120;
-			display: grid;
-			width: auto;
-			margin: 0;
-			overflow: auto;
-			place-items: center;
-			padding: 34px 4px 4px;
-			background: rgba(244, 239, 228, 0.98);
-		}
-
-		.graphic.short-open .close-graphic {
-			position: fixed;
-			top: 12px;
-			right: 12px;
-			z-index: 121;
-			display: grid;
-			width: 36px;
-			height: 36px;
-			place-items: center;
-			border: 1px solid var(--ink);
-			border-radius: 50%;
-			background: var(--paper);
-			color: var(--ink);
-			cursor: pointer;
-			font-size: 1.2rem;
-		}
-
 		.step {
 			min-height: auto;
 			padding-block: 2rem;
