@@ -76,6 +76,37 @@ test('the reader can rebuild the phase envelope from literature measurements', a
 	await expect(page.locator('.graphic .bubble-line')).toHaveCount(1);
 });
 
+test('the boiling map story computes its stage from the reader state', async ({ page }) => {
+	const pageErrors: Error[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error));
+	await gotoHydrated(page, '/stories/boiling-map/');
+	await expect(page.getByRole('heading', { name: /沸腾的/ })).toBeVisible();
+
+	// The hook: prediction reveals the evidence and the stage shows Lhasa.
+	await page.getByRole('button', { name: '更凉' }).click();
+	await expect(page.getByText(/64 kPa/)).toBeVisible();
+	await expect(page.getByTestId('water-tri-view').first()).toContainText('同一状态');
+
+	// Altitude travel: dragging to Everest slides the boiling point to ~71 °C.
+	await page.locator('[data-scene-id="altitude-travel"]').scrollIntoViewIfNeeded();
+	const altitude = page.locator('[data-scene-id="altitude-travel"] input[type="range"]');
+	await altitude.evaluate((element) => {
+		const input = element as HTMLInputElement;
+		input.value = '8849';
+		input.dispatchEvent(new Event('input', { bubbles: true }));
+	});
+	await expect(page.locator('[data-scene-id="altitude-travel"]')).toContainText('珠峰');
+	await expect(page.locator('[data-scene-id="altitude-travel"] small')).toContainText(/7[01]\./);
+	expect(pageErrors).toEqual([]);
+});
+
+test('the boiling map story has no serious automated accessibility violations', async ({
+	page
+}) => {
+	await page.goto(appPath('/stories/boiling-map/'));
+	await expectNoSeriousAccessibilityViolations(page);
+});
+
 test('homepage has no serious automated accessibility violations', async ({ page }) => {
 	await page.goto(appPath('/'));
 	await expectNoSeriousAccessibilityViolations(page);
@@ -156,8 +187,10 @@ test('all public routes load their local production assets without HTTP errors',
 	for (const path of [
 		'/',
 		'/stories/ethanol-distillation/',
+		'/stories/boiling-map/',
 		'/en/',
-		'/en/stories/ethanol-distillation/'
+		'/en/stories/ethanol-distillation/',
+		'/en/stories/boiling-map/'
 	]) {
 		await page.goto(appPath(path));
 		await expect(page.locator('main')).toBeVisible();

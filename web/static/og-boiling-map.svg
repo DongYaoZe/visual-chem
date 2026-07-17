@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">沸腾的地图 — VisualChem</title>
+  <desc id="desc">水的压力—温度相图分享图：汽化线、三相点与拉萨的外压线在约 88 摄氏度相交。</desc>
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#0f2c38"/>
+      <stop offset="1" stop-color="#1c4a58"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="translate(1000 116) rotate(126) scale(460 420)">
+      <stop stop-color="#72c6cb" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#72c6cb" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.5" fill="#f4efe4" fill-opacity=".08"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#06181f" flood-opacity=".4"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#night)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <g transform="translate(78 52)">
+    <rect width="42" height="42" rx="11" fill="#f4efe4"/>
+    <path d="M8 33C12 17 22 10 32 15C35 17 36 20 36 23" fill="none" stroke="#173f43" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M8 33C14 26 23 21 30 21C33 21 35 22 36 23" fill="none" stroke="#d66b32" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="35" cy="23" r="2.7" fill="#173f43"/>
+    <text x="56" y="29" fill="#f4efe4" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" letter-spacing="-.5">VisualChem</text>
+  </g>
+
+  <text x="78" y="196" fill="#8fd0d4" font-family="SF Mono, Consolas, monospace" font-size="24" font-weight="700" letter-spacing="6">PHASE EQUILIBRIUM · STORY 02</text>
+  <text x="74" y="300" fill="#f4efe4" font-family="Georgia, Songti SC, serif" font-size="92" font-weight="600" letter-spacing="-2">沸腾的地图</text>
+  <text x="78" y="360" fill="#c8dcd6" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="30">在拉萨，水不到 90 °C 就翻滚 —</text>
+  <text x="78" y="404" fill="#c8dcd6" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="30">一张会计算的地图解释一切例外</text>
+
+  <!-- p-T map card -->
+  <g transform="translate(700 118)" filter="url(#shadow)">
+    <rect width="430" height="430" rx="26" fill="#f7f2e6"/>
+    <g transform="translate(46 38)">
+      <!-- axes -->
+      <path d="M8 330H340M8 330V16" fill="none" stroke="#233532" stroke-width="3" stroke-linecap="round"/>
+      <!-- sublimation line (dashed teal, below triple point) -->
+      <path d="M22 322C48 296 74 264 96 232" fill="none" stroke="#207f8c" stroke-width="5" stroke-linecap="round" stroke-dasharray="10 9"/>
+      <!-- melting line (near-vertical, leaning left) -->
+      <path d="M96 232C94 176 90 96 84 30" fill="none" stroke="#207f8c" stroke-width="5" stroke-linecap="round"/>
+      <!-- vaporization curve -->
+      <path d="M96 232C150 196 220 150 296 74" fill="none" stroke="#d66b32" stroke-width="6" stroke-linecap="round"/>
+      <!-- ambient pressure line at Lhasa -->
+      <path d="M14 182H330" fill="none" stroke="#bf3d30" stroke-width="3" stroke-dasharray="5 8"/>
+      <!-- boiling intersection -->
+      <circle cx="164" cy="182" r="11" fill="#bf3d30"/>
+      <circle cx="164" cy="182" r="4.5" fill="#f7f2e6"/>
+      <!-- triple point -->
+      <circle cx="96" cy="232" r="8" fill="#f7f2e6" stroke="#bf3d30" stroke-width="4"/>
+      <!-- critical point -->
+      <circle cx="296" cy="74" r="8" fill="#f7f2e6" stroke="#233532" stroke-width="4"/>
+      <text x="112" y="252" fill="#bf3d30" font-family="SF Mono, Consolas, monospace" font-size="17" font-weight="700">三相点</text>
+      <text x="236" y="66" fill="#233532" font-family="SF Mono, Consolas, monospace" font-size="17" font-weight="700">临界点</text>
+      <text x="186" y="168" fill="#bf3d30" font-family="SF Mono, Consolas, monospace" font-size="18" font-weight="800">≈88 °C</text>
+      <text x="176" y="346" fill="#5c6b66" font-family="SF Mono, Consolas, monospace" font-size="16" text-anchor="middle">T</text>
+      <text x="-8" y="172" fill="#5c6b66" font-family="SF Mono, Consolas, monospace" font-size="16">p</text>
+    </g>
+  </g>
+
+  <g transform="translate(78 520)">
+    <rect width="330" height="58" rx="29" fill="#f4efe4" fill-opacity=".1" stroke="#f4efe4" stroke-opacity=".35"/>
+    <text x="165" y="37" fill="#f4efe4" font-family="SF Mono, Consolas, monospace" font-size="21" font-weight="700" text-anchor="middle">the map is computed</text>
+  </g>
+</svg>

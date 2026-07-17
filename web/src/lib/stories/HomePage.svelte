@@ -17,6 +17,9 @@
 			? resolve('/en/stories/ethanol-distillation/')
 			: resolve('/stories/ethanol-distillation/')
 	);
+	let boilingMapHref = $derived(
+		locale === 'en' ? resolve('/en/stories/boiling-map/') : resolve('/stories/boiling-map/')
+	);
 	let demoComposition = $state(0.1);
 	let demoStage = $state(2);
 	// The hero envelope is computed from the calibrated model, not sketched.
@@ -172,7 +175,16 @@
 				</div>
 				<strong>{site.home.season.stories[0].action}</strong>
 			</a>
-			{#each site.home.season.stories.slice(1) as storyCard (storyCard.number)}
+			<a class="story live" href={boilingMapHref}>
+				<span class="number">{site.home.season.stories[1].number}</span>
+				<div>
+					<small>{site.home.season.stories[1].status}</small>
+					<h3>{site.home.season.stories[1].title}</h3>
+					<p>{site.home.season.stories[1].description}</p>
+				</div>
+				<strong>{site.home.season.stories[1].action}</strong>
+			</a>
+			{#each site.home.season.stories.slice(2) as storyCard (storyCard.number)}
 				<article class="story">
 					<span class="number">{storyCard.number}</span>
 					<div>
