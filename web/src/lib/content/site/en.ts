@@ -174,19 +174,19 @@ export const enSiteContent = {
 				},
 				{
 					number: '02',
-					status: 'In production · one-component phase equilibrium',
+					status: 'Interactive alpha · about 10 minutes',
 					title: 'A map of boiling',
 					description:
 						'How does a pot of water at high altitude lead us into the pressure–temperature map?',
-					action: 'Next story'
+					action: 'Start reading ↗'
 				},
 				{
 					number: '03',
-					status: 'Planned · ternary water–salt system',
-					title: 'One brine, many crystals',
+					status: 'Interactive alpha · about 12 minutes',
+					title: 'A pot of brine, split in two',
 					description:
-						'Follow an evaporation path and recover different crystals from a salt lake in sequence.',
-					action: 'Season one'
+						'Two salts dissolve into one pot of water; a triangular map shows how to usher them out one at a time.',
+					action: 'Start reading ↗'
 				}
 			]
 		},

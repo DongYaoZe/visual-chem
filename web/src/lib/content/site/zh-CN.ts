@@ -168,17 +168,17 @@ export const zhCNSiteContent = {
 				},
 				{
 					number: '02',
-					status: '制作中 · 单组分相平衡',
+					status: '可交互 Alpha · 约 10 分钟',
 					title: '沸腾的地图',
 					description: '高原上的一锅水，如何带我们走进压力—温度地图？',
-					action: '下一篇'
+					action: '开始阅读 ↗'
 				},
 				{
 					number: '03',
-					status: '计划中 · 三元水盐体系',
+					status: '可交互 Alpha · 约 12 分钟',
 					title: '一锅盐水的分身术',
-					description: '沿一条蒸发轨迹，从盐湖里依次取出不同晶体。',
-					action: '第一季'
+					description: '两种盐溶进同一锅水，三角地图教你一种一种请出来。',
+					action: '开始阅读 ↗'
 				}
 			]
 		},

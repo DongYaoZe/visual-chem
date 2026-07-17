@@ -239,6 +239,17 @@ export type BoilingMapSceneId =
 	| 'freeze-dry-detour'
 	| 'pressure-cooker';
 
+export type SaltSplitSceneId =
+	| 'hook'
+	| 'two-curves'
+	| 'shared-water'
+	| 'triangle-map'
+	| 'isotherm'
+	| 'cooling'
+	| 'filter-jump'
+	| 'evaporate'
+	| 'honest-map';
+
 export interface StorySceneContent<Id extends string = EthanolDistillationSceneId> {
 	id: Id;
 	kicker: string;
@@ -269,6 +280,18 @@ export type BoilingMapScenes = readonly [
 	StorySceneContent<BoilingMapSceneId>,
 	StorySceneContent<BoilingMapSceneId>,
 	StorySceneContent<BoilingMapSceneId>
+];
+
+export type SaltSplitScenes = readonly [
+	StorySceneContent<SaltSplitSceneId>,
+	StorySceneContent<SaltSplitSceneId>,
+	StorySceneContent<SaltSplitSceneId>,
+	StorySceneContent<SaltSplitSceneId>,
+	StorySceneContent<SaltSplitSceneId>,
+	StorySceneContent<SaltSplitSceneId>,
+	StorySceneContent<SaltSplitSceneId>,
+	StorySceneContent<SaltSplitSceneId>,
+	StorySceneContent<SaltSplitSceneId>
 ];
 
 export interface ChoiceContent {
@@ -532,6 +555,223 @@ export interface BoilingMapInteractionsContent {
 		sliderAriaLabel: string;
 		scale: SliderScaleContent;
 		readout: ContentMessage<{ pressureKPa: DisplayValue; temperatureC: DisplayValue }>;
+	};
+}
+
+/** Salt tri-view: the shared chrome around the salt-split panels. */
+export interface SaltTriViewContent {
+	defaultAriaLabel: string;
+	liveSummary: ContentMessage<{
+		temperatureC: DisplayValue;
+		liquidKno3G: DisplayValue;
+		liquidNano3G: DisplayValue;
+		region: string;
+	}>;
+	synchronizedState: string;
+	temperature: string;
+	liquidKno3: string;
+	liquidNano3: string;
+	region: string;
+	gramsValue: ContentMessage<{ grams: DisplayValue }>;
+	regionNames: Record<'unsaturated' | 'kno3' | 'nano3' | 'both' | 'dry', string>;
+	pot: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		temperatureLabel: ContentMessage<{ temperatureC: DisplayValue }>;
+		dissolvedLabel: ContentMessage<{ kno3G: DisplayValue; nano3G: DisplayValue }>;
+		kno3CrystalsLabel: ContentMessage<{ grams: DisplayValue }>;
+		nano3CrystalsLabel: ContentMessage<{ grams: DisplayValue }>;
+		waterLabel: ContentMessage<{ grams: DisplayValue }>;
+	};
+	ions: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		potassium: string;
+		sodium: string;
+		nitrate: string;
+		dissolvedTag: string;
+		latticeTag: string;
+	};
+	triangle: {
+		ariaLabel: ContentMessage<{
+			temperatureC: DisplayValue;
+			region: string;
+		}>;
+		waterVertex: string;
+		kno3Vertex: string;
+		nano3Vertex: string;
+		isothermLabel: ContentMessage<{ temperatureC: DisplayValue }>;
+		regions: {
+			unsaturated: string;
+			kno3Field: string;
+			nano3Field: string;
+			bothField: string;
+		};
+		eutonicPoint: string;
+		totalPoint: string;
+		liquidPoint: string;
+		tieLine: string;
+		trajectory: string;
+		experimentPoints: string;
+		curvesXAxis: string;
+		curvesYAxis: string;
+		caption: {
+			curves: string;
+			map: string;
+			calibrated: string;
+			ideal: string;
+		};
+		captionKind: string;
+	};
+}
+
+export interface SaltSplitInteractionsContent {
+	hook: {
+		prompt: string;
+		choices: readonly [ChoiceContent, ChoiceContent, ChoiceContent];
+		evidence: string;
+	};
+	twoCurves: {
+		controlLabel: string;
+		sliderAriaLabel: string;
+		readout: ContentMessage<{
+			temperatureC: DisplayValue;
+			kno3Solubility: DisplayValue;
+			nano3Solubility: DisplayValue;
+		}>;
+	};
+	sharedWater: {
+		controlLabel: string;
+		sliderAriaLabel: string;
+		scale: SliderScaleContent;
+		readout: ContentMessage<{
+			nano3G: DisplayValue;
+			kno3CapacityG: DisplayValue;
+			soloCapacityG: DisplayValue;
+		}>;
+	};
+	triangleMap: {
+		kno3ControlLabel: string;
+		kno3SliderAriaLabel: string;
+		nano3ControlLabel: string;
+		nano3SliderAriaLabel: string;
+		readout: ContentMessage<{
+			waterPct: DisplayValue;
+			kno3Pct: DisplayValue;
+			nano3Pct: DisplayValue;
+		}>;
+	};
+	isotherm: {
+		regionReadout: ContentMessage<{ region: string }>;
+		crystalReadout: ContentMessage<{ summary: string }>;
+	};
+	cooling: {
+		controlLabel: string;
+		sliderAriaLabel: string;
+		readout: ContentMessage<{ temperatureC: DisplayValue; kno3CrystalsG: DisplayValue }>;
+	};
+	filterJump: {
+		filterButton: string;
+		resetButton: string;
+		waitingHint: string;
+		harvestOutput: ContentMessage<{ crystalsG: DisplayValue }>;
+	};
+	evaporate: {
+		controlLabel: string;
+		sliderAriaLabel: string;
+		readout: ContentMessage<{ waterRemovedG: DisplayValue; nano3CrystalsG: DisplayValue }>;
+	};
+	honestMap: {
+		toggleLabel: string;
+		idealButton: string;
+		calibratedButton: string;
+		verdictIdeal: string;
+		verdictCalibrated: string;
+	};
+}
+
+export interface SaltSplitStoryContent {
+	locale: LocaleCode;
+	seo: SeoContent;
+	hero: {
+		eyebrow: string;
+		metadata: readonly string[];
+		heading: SplitHeading;
+		ledeLines: readonly string[];
+		scrollCue: string;
+		curveEvidence: string;
+	};
+	readingNote: {
+		eyebrow: string;
+		body: InlineText;
+	};
+	stage: {
+		dialogAriaLabel: string;
+		closeGraphicAriaLabel: string;
+		triViewAriaLabel: string;
+		shortStateAriaLabel: string;
+		openGraphicButton: string;
+		shortState: {
+			temperature: ContentMessage<{ temperatureC: DisplayValue }>;
+			liquid: ContentMessage<{ kno3G: DisplayValue; nano3G: DisplayValue }>;
+			solids: ContentMessage<{ summary: string }>;
+		};
+	};
+	scenes: SaltSplitScenes;
+	interactions: SaltSplitInteractionsContent;
+	triView: SaltTriViewContent;
+	edge: {
+		eyebrow: string;
+		heading: SplitHeading;
+		body: string;
+		industryFacts: readonly { label: string; value: string }[];
+		figureCaption: string;
+	};
+	conceptCheck: ConceptQuestionContent;
+	sandbox: {
+		eyebrow: string;
+		title: string;
+		introduction: string;
+		controls: {
+			temperature: string;
+			temperatureAriaLabel: string;
+			evaporate: string;
+			evaporateAriaLabel: string;
+			addWater: string;
+			addWaterAriaLabel: string;
+			filterButton: string;
+			resetButton: string;
+		};
+		harvest: {
+			label: string;
+			kno3: ContentMessage<{ grams: DisplayValue }>;
+			nano3: ContentMessage<{ grams: DisplayValue }>;
+			water: ContentMessage<{ grams: DisplayValue }>;
+		};
+		challengeLabel: string;
+		challenge: string;
+		triViewAriaLabel: string;
+	};
+	modelCard: {
+		eyebrow: string;
+		heading: SplitHeading;
+		items: readonly {
+			title: string;
+			body: InlineText;
+			openByDefault: boolean;
+			links?: readonly {
+				label: string;
+				href: string;
+			}[];
+		}[];
+	};
+	ending: {
+		lead: string;
+		heading: SplitHeading;
+		catalogLink: string;
+		sourceLink: string;
 	};
 }
 
