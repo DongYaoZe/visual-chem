@@ -20,6 +20,9 @@
 	let boilingMapHref = $derived(
 		locale === 'en' ? resolve('/en/stories/boiling-map/') : resolve('/stories/boiling-map/')
 	);
+	let saltSplitHref = $derived(
+		locale === 'en' ? resolve('/en/stories/salt-split/') : resolve('/stories/salt-split/')
+	);
 	let demoComposition = $state(0.1);
 	let demoStage = $state(2);
 	// The hero envelope is computed from the calibrated model, not sketched.
@@ -184,17 +187,15 @@
 				</div>
 				<strong>{site.home.season.stories[1].action}</strong>
 			</a>
-			{#each site.home.season.stories.slice(2) as storyCard (storyCard.number)}
-				<article class="story">
-					<span class="number">{storyCard.number}</span>
-					<div>
-						<small>{storyCard.status}</small>
-						<h3>{storyCard.title}</h3>
-						<p>{storyCard.description}</p>
-					</div>
-					<strong>{storyCard.action}</strong>
-				</article>
-			{/each}
+			<a class="story live" href={saltSplitHref}>
+				<span class="number">{site.home.season.stories[2].number}</span>
+				<div>
+					<small>{site.home.season.stories[2].status}</small>
+					<h3>{site.home.season.stories[2].title}</h3>
+					<p>{site.home.season.stories[2].description}</p>
+				</div>
+				<strong>{site.home.season.stories[2].action}</strong>
+			</a>
 		</div>
 	</section>
 

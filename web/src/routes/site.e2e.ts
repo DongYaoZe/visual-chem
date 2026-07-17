@@ -107,6 +107,36 @@ test('the boiling map story has no serious automated accessibility violations', 
 	await expectNoSeriousAccessibilityViolations(page);
 });
 
+test('the salt split story computes its stage from the reader state', async ({ page }) => {
+	const pageErrors: Error[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error));
+	await gotoHydrated(page, '/stories/salt-split/');
+	await expect(page.getByRole('heading', { name: /一锅盐水的/ })).toBeVisible();
+
+	// The hook: prediction reveals the evidence and cools the staged pot.
+	await page.getByRole('button', { name: '只有硝酸钾' }).click();
+	await expect(page.getByText(/几乎全部是纯硝酸钾/)).toBeVisible();
+	await expect(page.getByTestId('salt-tri-view').first()).toContainText('同一锅汤');
+
+	// Cooling: dragging to 25 °C reads the golden 54.4 g of pure KNO3.
+	await page.locator('[data-scene-id="cooling"]').scrollIntoViewIfNeeded();
+	const cooling = page.locator('[data-scene-id="cooling"] input[type="range"]');
+	await cooling.evaluate((element) => {
+		const input = element as HTMLInputElement;
+		input.value = '25';
+		input.dispatchEvent(new Event('input', { bubbles: true }));
+	});
+	await expect(page.locator('[data-scene-id="cooling"] small')).toContainText(/54\.\d/);
+	expect(pageErrors).toEqual([]);
+});
+
+test('the salt split story has no serious automated accessibility violations', async ({
+	page
+}) => {
+	await page.goto(appPath('/stories/salt-split/'));
+	await expectNoSeriousAccessibilityViolations(page);
+});
+
 test('homepage has no serious automated accessibility violations', async ({ page }) => {
 	await page.goto(appPath('/'));
 	await expectNoSeriousAccessibilityViolations(page);
@@ -188,9 +218,11 @@ test('all public routes load their local production assets without HTTP errors',
 		'/',
 		'/stories/ethanol-distillation/',
 		'/stories/boiling-map/',
+		'/stories/salt-split/',
 		'/en/',
 		'/en/stories/ethanol-distillation/',
-		'/en/stories/boiling-map/'
+		'/en/stories/boiling-map/',
+		'/en/stories/salt-split/'
 	]) {
 		await page.goto(appPath(path));
 		await expect(page.locator('main')).toBeVisible();
