@@ -130,9 +130,7 @@ test('the salt split story computes its stage from the reader state', async ({ p
 	expect(pageErrors).toEqual([]);
 });
 
-test('the salt split story has no serious automated accessibility violations', async ({
-	page
-}) => {
+test('the salt split story has no serious automated accessibility violations', async ({ page }) => {
 	await page.goto(appPath('/stories/salt-split/'));
 	await expectNoSeriousAccessibilityViolations(page);
 });
