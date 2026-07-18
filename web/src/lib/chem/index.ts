@@ -4,6 +4,8 @@ export * from './data/ethanol-water-kamihama-2012';
 export * from './data/ethanol-water-lai-2014';
 export * from './data/salt-solubility';
 export * from './ethanol-water';
+export * from './eutectic';
+export * from './eutectic-frame';
 export * from './monotone-cubic';
 export * from './root';
 export * from './salt-frame';
