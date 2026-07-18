@@ -23,6 +23,9 @@
 	let saltSplitHref = $derived(
 		locale === 'en' ? resolve('/en/stories/salt-split/') : resolve('/stories/salt-split/')
 	);
+	let coolingCurveHref = $derived(
+		locale === 'en' ? resolve('/en/stories/cooling-curve/') : resolve('/stories/cooling-curve/')
+	);
 	let demoComposition = $state(0.1);
 	let demoStage = $state(2);
 	// The hero envelope is computed from the calibrated model, not sketched.
@@ -195,6 +198,15 @@
 					<p>{site.home.season.stories[2].description}</p>
 				</div>
 				<strong>{site.home.season.stories[2].action}</strong>
+			</a>
+			<a class="story live" href={coolingCurveHref}>
+				<span class="number">{site.home.season.stories[3].number}</span>
+				<div>
+					<small>{site.home.season.stories[3].status}</small>
+					<h3>{site.home.season.stories[3].title}</h3>
+					<p>{site.home.season.stories[3].description}</p>
+				</div>
+				<strong>{site.home.season.stories[3].action}</strong>
 			</a>
 		</div>
 	</section>

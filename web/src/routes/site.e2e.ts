@@ -135,6 +135,31 @@ test('the salt split story has no serious automated accessibility violations', a
 	await expectNoSeriousAccessibilityViolations(page);
 });
 
+test('the cooling curve story computes its stage from the reader state', async ({ page }) => {
+	const pageErrors: Error[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error));
+	await gotoHydrated(page, '/stories/cooling-curve/');
+	await expect(page.getByRole('heading', { level: 1, name: /冷却曲线/ })).toBeVisible();
+
+	// The hook: prediction reveals the explanation.
+	await page.getByRole('button', { name: '一个转折 + 一个台阶' }).click();
+	await expect(page.getByText(/非共晶配比先析出一种晶体/)).toBeVisible();
+	await expect(page.getByTestId('cooling-tri-view').first()).toContainText('同一熔体');
+
+	// Read-the-map: plotting the evidence marks the break on the diagram.
+	await page.locator('[data-scene-id="read-the-map"]').scrollIntoViewIfNeeded();
+	await page.getByRole('button', { name: '把证据搬上地图' }).click();
+	await expect(page.getByTestId('cooling-tri-view').first()).toContainText('全液相');
+	expect(pageErrors).toEqual([]);
+});
+
+test('the cooling curve story has no serious automated accessibility violations', async ({
+	page
+}) => {
+	await page.goto(appPath('/stories/cooling-curve/'));
+	await expectNoSeriousAccessibilityViolations(page);
+});
+
 test('homepage has no serious automated accessibility violations', async ({ page }) => {
 	await page.goto(appPath('/'));
 	await expectNoSeriousAccessibilityViolations(page);
@@ -217,10 +242,12 @@ test('all public routes load their local production assets without HTTP errors',
 		'/stories/ethanol-distillation/',
 		'/stories/boiling-map/',
 		'/stories/salt-split/',
+		'/stories/cooling-curve/',
 		'/en/',
 		'/en/stories/ethanol-distillation/',
 		'/en/stories/boiling-map/',
-		'/en/stories/salt-split/'
+		'/en/stories/salt-split/',
+		'/en/stories/cooling-curve/'
 	]) {
 		await page.goto(appPath(path));
 		await expect(page.locator('main')).toBeVisible();
