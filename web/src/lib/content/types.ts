@@ -192,7 +192,12 @@ export interface HomeContent {
 		eyebrow: string;
 		title: string;
 		introduction: string;
-		stories: readonly [HomeStoryCardContent, HomeStoryCardContent, HomeStoryCardContent];
+		stories: readonly [
+			HomeStoryCardContent,
+			HomeStoryCardContent,
+			HomeStoryCardContent,
+			HomeStoryCardContent
+		];
 	};
 	principles: {
 		eyebrow: string;
@@ -846,5 +851,153 @@ export interface BoilingMapStoryContent {
 		heading: SplitHeading;
 		catalogLink: string;
 		sourceLink: string;
+	};
+}
+
+/** Cooling-curve detective story scene IDs, in narrative order. */
+export type CoolingCurveSceneId =
+	| 'hook'
+	| 'pure-metal'
+	| 'first-crystal'
+	| 'eutectic-arrest'
+	| 'read-the-map'
+	| 'phase-rule'
+	| 'real-anchors'
+	| 'cooling-rate'
+	| 'sandbox';
+
+/** One prose-driven scene; blocks are separated by blank lines, display math
+ * lives on its own $$...$$ block, **bold** and inline $...$ are parsed. */
+export interface CoolingSceneContent {
+	id: CoolingCurveSceneId;
+	prose: string;
+}
+
+/** Tri-view content for the cooling-curve story. */
+export interface CoolingTriViewContent {
+	defaultAriaLabel: string;
+	liveSummary: ContentMessage<{ region: string; melt: string }>;
+	synchronizedState: string;
+	crucible: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		temperatureLabel: ContentMessage<{ temperatureC: DisplayValue }>;
+		liquidLabel: ContentMessage<{ percent: DisplayValue }>;
+		solidALabel: ContentMessage<{ percent: DisplayValue }>;
+		solidBLabel: ContentMessage<{ percent: DisplayValue }>;
+		clockLabel: ContentMessage<{ minutes: DisplayValue }>;
+	};
+	melt: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		bismuth: string;
+		cadmium: string;
+		liquidTag: string;
+		crystalTag: string;
+	};
+	diagram: {
+		ariaLabel: ContentMessage<{ temperatureC: DisplayValue; region: string }>;
+		xAxis: string;
+		curveXAxis: string;
+		yAxis: string;
+		bismuthVertex: string;
+		cadmiumVertex: string;
+		liquidusLine: string;
+		eutecticPoint: string;
+		breakMarker: string;
+		arrestMarker: string;
+		caption: {
+			map: string;
+			curve: string;
+		};
+	};
+	regionNames: {
+		liquid: string;
+		'liquid+A': string;
+		'liquid+B': string;
+		'eutectic-arrest': string;
+		'solid-mixture': string;
+	};
+}
+
+export interface CoolingCurveInteractionsContent {
+	hook: {
+		question: string;
+		options: readonly { id: string; label: string; correct?: boolean }[];
+		correctExplanation: string;
+	};
+	firstCrystal: {
+		compositionLabel: string;
+		compositionUnit: string;
+		showLiquidusButton: string;
+	};
+	eutecticArrest: {
+		compositionLabel: string;
+		compositionUnit: string;
+		showSolidusButton: string;
+	};
+	readTheMap: {
+		showCurveButton: string;
+	};
+	sandbox: {
+		compositionLabel: string;
+		compositionUnit: string;
+		playButton: string;
+		pauseButton: string;
+		resetButton: string;
+		challenge: string;
+	};
+}
+
+export interface CoolingCurveStoryContent {
+	locale: LocaleCode;
+	seo: SeoContent;
+	hero: {
+		eyebrow: string;
+		title: readonly string[];
+		subtitle: string;
+	};
+	readingNote: string;
+	stage: {
+		dialogAriaLabel: string;
+		closeGraphicAriaLabel: string;
+		openGraphicButton: string;
+		shortStateAriaLabel: string;
+	};
+	shortState: {
+		temperature: ContentMessage<{ temperatureC: DisplayValue }>;
+		time: ContentMessage<{ timeS: DisplayValue }>;
+		phase: string;
+	};
+	scenes: readonly CoolingSceneContent[];
+	interactions: CoolingCurveInteractionsContent;
+	triView: CoolingTriViewContent;
+	edge: {
+		title: string;
+		facts: readonly { term: string; definition: string }[];
+	};
+	conceptCheck: ConceptQuestionContent;
+	sandbox: {
+		title: string;
+		description: string;
+		compositionLabel: string;
+		compositionUnit: string;
+		controls: {
+			play: string;
+			pause: string;
+			reset: string;
+		};
+		challenge: string;
+	};
+	modelCard: {
+		title: string;
+		items: readonly { term: string; value: string }[];
+	};
+	ending: {
+		summary: string;
+		invitation: string;
+		backToHome: string;
 	};
 }

@@ -156,7 +156,7 @@ export const zhCNSiteContent = {
 		},
 		season: {
 			eyebrow: 'SEASON 01 · PHASE EQUILIBRIUM',
-			title: '相平衡三部曲',
+			title: '相平衡四部曲',
 			introduction: '先从最适合“三角联动”的概念开始。每篇都从反常现象出发，最后抵达可计算的模型。',
 			stories: [
 				{
@@ -178,6 +178,13 @@ export const zhCNSiteContent = {
 					status: '可交互 Alpha · 约 12 分钟',
 					title: '一锅盐水的分身术',
 					description: '两种盐溶进同一锅水，三角地图教你一种一种请出来。',
+					action: '开始阅读 ↗'
+				},
+				{
+					number: '04',
+					status: '可交互 Alpha · 约 10 分钟',
+					title: '冷却曲线侦探',
+					description: '一支合金、一根温度计，从一条降温记录倒推出整张相图。',
 					action: '开始阅读 ↗'
 				}
 			]

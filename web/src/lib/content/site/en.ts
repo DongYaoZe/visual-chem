@@ -160,7 +160,7 @@ export const enSiteContent = {
 		},
 		season: {
 			eyebrow: 'SEASON 01 · PHASE EQUILIBRIUM',
-			title: 'A phase-equilibrium trilogy',
+			title: 'A phase-equilibrium quartet',
 			introduction:
 				'We begin with ideas that benefit most from three-way translation. Each story starts with an anomaly and ends at a model you can calculate with.',
 			stories: [
@@ -186,6 +186,14 @@ export const enSiteContent = {
 					title: 'A pot of brine, split in two',
 					description:
 						'Two salts dissolve into one pot of water; a triangular map shows how to usher them out one at a time.',
+					action: 'Start reading ↗'
+				},
+				{
+					number: '04',
+					status: 'Interactive alpha · about 10 minutes',
+					title: 'The cooling-curve detective',
+					description:
+						'One alloy and one thermometer: reconstruct the whole phase diagram from a temperature log.',
 					action: 'Start reading ↗'
 				}
 			]
