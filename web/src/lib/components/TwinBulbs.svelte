@@ -17,7 +17,7 @@
 	const LEFT_CX = 58;
 	const RIGHT_CX = 162;
 	const BULB_CY = 96;
-	const GOLDEN_ANGLE = 2.3999632297286533;
+	const GOLDEN_ANGLE = 2.399963229728653;
 
 	// Deterministic golden-angle spiral: dots fill each bulb from the center
 	// outward, so any prefix of the slot list stays evenly spread.
