@@ -199,6 +199,12 @@ export interface HomeContent {
 			HomeStoryCardContent
 		];
 	};
+	seasonTwo: {
+		eyebrow: string;
+		title: string;
+		introduction: string;
+		stories: readonly [HomeStoryCardContent, HomeStoryCardContent, HomeStoryCardContent];
+	};
 	principles: {
 		eyebrow: string;
 		heading: SplitHeading;
@@ -1000,4 +1006,289 @@ export interface CoolingCurveStoryContent {
 		invitation: string;
 		backToHome: string;
 	};
+}
+
+/* ------------------------------------------------------------------ */
+/* Season 2 · the prose-driven story format                            */
+/* ------------------------------------------------------------------ */
+
+/** A season-2 scene: prose micro-format (see $lib/stories/prose). */
+export interface ProseSceneContent<Id extends string = string> {
+	id: Id;
+	prose: string;
+}
+
+/**
+ * Season-2 story shell: everything a prose story shares. Stories add their
+ * own `interactions` and `triView` on top of this.
+ */
+export interface ProseStoryContent<Id extends string = string> {
+	locale: LocaleCode;
+	seo: SeoContent;
+	hero: {
+		eyebrow: string;
+		title: readonly string[];
+		subtitle: string;
+		heroTag: string;
+	};
+	readingNote: string;
+	stage: {
+		dialogAriaLabel: string;
+		closeGraphicAriaLabel: string;
+		openGraphicButton: string;
+		shortStateAriaLabel: string;
+	};
+	scenes: readonly ProseSceneContent<Id>[];
+	kickers: Readonly<Record<Id, string>>;
+	edge: {
+		eyebrow: string;
+		title: string;
+		facts: readonly { term: string; definition: string }[];
+	};
+	conceptCheck: ConceptQuestionContent;
+	sandboxIntro: {
+		eyebrow: string;
+		title: string;
+		description: string;
+	};
+	modelCard: {
+		title: string;
+		items: readonly { term: string; value: string }[];
+	};
+	ending: {
+		summary: string;
+		invitation: string;
+		backToHome: string;
+	};
+}
+
+/* --- Story 5 · Entropy is not disorder ----------------------------- */
+
+export type EntropySceneId =
+	| 'hook'
+	| 'count-the-ways'
+	| 'the-spike'
+	| 'boltzmann'
+	| 'irreversible'
+	| 'fluctuations'
+	| 'not-disorder'
+	| 'sandbox';
+
+export interface EntropyTriViewContent {
+	defaultAriaLabel: string;
+	liveSummary: ContentMessage<{ leftCount: DisplayValue; total: DisplayValue }>;
+	synchronizedState: string;
+	bulbs: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		leftLabel: string;
+		rightLabel: string;
+		valveOpen: string;
+		valveClosed: string;
+	};
+	histogram: {
+		ariaLabel: ContentMessage<{ total: DisplayValue }>;
+		viewName: string;
+		caption: string;
+		xAxis: string;
+		yAxis: string;
+		currentMarker: string;
+		allLeftMarker: string;
+	};
+	entropy: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		lnWLabel: string;
+		entropyReadout: ContentMessage<{ lnW: DisplayValue }>;
+		oddsReadout: ContentMessage<{ exponent: DisplayValue }>;
+	};
+}
+
+export interface EntropyInteractionsContent {
+	hook: {
+		question: string;
+		options: readonly { id: string; label: string }[];
+		explanation: string;
+	};
+	countTheWays: {
+		particlesLabel: string;
+	};
+	irreversible: {
+		releaseButton: string;
+		resetButton: string;
+		runningHint: string;
+	};
+	sandbox: {
+		particlesLabel: string;
+		windowLabel: string;
+		windowReadout: ContentMessage<{ percent: DisplayValue; window: DisplayValue }>;
+	};
+}
+
+export interface EntropyStoryContent extends ProseStoryContent<EntropySceneId> {
+	interactions: EntropyInteractionsContent;
+	triView: EntropyTriViewContent;
+}
+
+/* --- Story 6 · The downhill road of a reaction ---------------------- */
+
+export type GibbsSceneId =
+	| 'hook'
+	| 'two-forces'
+	| 'the-valley'
+	| 'slope-is-deltaG'
+	| 'kp-position'
+	| 'squeeze'
+	| 'heat'
+	| 'positive-deltaG0'
+	| 'sandbox';
+
+export interface GibbsTriViewContent {
+	defaultAriaLabel: string;
+	liveSummary: ContentMessage<{ extent: DisplayValue; temperatureC: DisplayValue }>;
+	synchronizedState: string;
+	flask: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		temperatureLabel: ContentMessage<{ temperatureC: DisplayValue }>;
+		no2Label: ContentMessage<{ percent: DisplayValue }>;
+		pressureLabel: ContentMessage<{ pressureBar: DisplayValue }>;
+	};
+	molecules: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		dimerLabel: string;
+		monomerLabel: string;
+	};
+	valley: {
+		ariaLabel: ContentMessage<{ extent: DisplayValue }>;
+		viewName: string;
+		caption: string;
+		xAxis: string;
+		yAxis: string;
+		floorMarker: string;
+		ballMarker: string;
+		slopeReadout: ContentMessage<{ deltaG: DisplayValue }>;
+	};
+}
+
+export interface GibbsInteractionsContent {
+	hook: {
+		question: string;
+		options: readonly { id: string; label: string }[];
+		explanation: string;
+	};
+	valley: {
+		extentLabel: string;
+	};
+	squeeze: {
+		pressureLabel: string;
+		pressureScale: SliderScaleContent;
+	};
+	heat: {
+		temperatureLabel: string;
+		temperatureScale: SliderScaleContent;
+	};
+	sandbox: {
+		temperatureLabel: string;
+		pressureLabel: string;
+		ballButton: string;
+		readout: ContentMessage<{
+			extent: DisplayValue;
+			kp: DisplayValue;
+			deltaG0: DisplayValue;
+		}>;
+	};
+}
+
+export interface GibbsStoryContent extends ProseStoryContent<GibbsSceneId> {
+	interactions: GibbsInteractionsContent;
+	triView: GibbsTriViewContent;
+}
+
+/* --- Story 7 · The potential landscape inside a battery ------------- */
+
+export type NernstSceneId =
+	| 'hook'
+	| 'two-heights'
+	| 'the-ladder'
+	| 'nernst-slope'
+	| 'discharge'
+	| 'dead-battery'
+	| 'concentration-cell'
+	| 'sandbox';
+
+export interface NernstTriViewContent {
+	defaultAriaLabel: string;
+	liveSummary: ContentMessage<{ emf: DisplayValue }>;
+	synchronizedState: string;
+	cell: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		zincLabel: string;
+		copperLabel: string;
+		bridgeLabel: string;
+		voltmeterLabel: ContentMessage<{ emf: DisplayValue }>;
+		zincConcLabel: ContentMessage<{ molar: DisplayValue }>;
+		copperConcLabel: ContentMessage<{ molar: DisplayValue }>;
+	};
+	ions: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		zincIon: string;
+		copperIon: string;
+		electronTag: string;
+		dissolveTag: string;
+		depositTag: string;
+	};
+	ladder: {
+		ariaLabel: ContentMessage<{ emf: DisplayValue }>;
+		viewName: string;
+		caption: string;
+		yAxis: string;
+		zincRung: string;
+		copperRung: string;
+		gapLabel: ContentMessage<{ emf: DisplayValue }>;
+		sheLabel: string;
+	};
+}
+
+export interface NernstInteractionsContent {
+	hook: {
+		question: string;
+		options: readonly { id: string; label: string }[];
+		explanation: string;
+	};
+	nernstSlope: {
+		zincLabel: string;
+		copperLabel: string;
+		readout: ContentMessage<{ emf: DisplayValue; deltaG: DisplayValue }>;
+	};
+	discharge: {
+		playButton: string;
+		pauseButton: string;
+		resetButton: string;
+		readout: ContentMessage<{ depth: DisplayValue; emf: DisplayValue }>;
+	};
+	concentrationCell: {
+		ratioLabel: string;
+		readout: ContentMessage<{ ratio: DisplayValue; emf: DisplayValue }>;
+	};
+	sandbox: {
+		zincLabel: string;
+		copperLabel: string;
+		temperatureLabel: string;
+		readout: ContentMessage<{ emf: DisplayValue; deltaG: DisplayValue }>;
+	};
+}
+
+export interface NernstStoryContent extends ProseStoryContent<NernstSceneId> {
+	interactions: NernstInteractionsContent;
+	triView: NernstTriViewContent;
 }

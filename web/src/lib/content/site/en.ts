@@ -198,6 +198,37 @@ export const enSiteContent = {
 				}
 			]
 		},
+		seasonTwo: {
+			eyebrow: 'SEASON 02 · THERMODYNAMICS',
+			title: 'The skeleton of thermodynamics',
+			introduction:
+				'Phase maps answer where equilibrium sits; season two asks why. Start by counting microstates, descend the Gibbs valley, then wire the downhill road to a meter.',
+			stories: [
+				{
+					number: '05',
+					status: 'Interactive alpha · about 10 minutes',
+					title: 'Entropy is not disorder',
+					description:
+						'No metaphors: count microstates one by one and let the odds pass the verdict.',
+					action: 'Start reading ↗'
+				},
+				{
+					number: '06',
+					status: 'Interactive alpha · about 11 minutes',
+					title: 'The downhill road of a reaction',
+					description: 'ΔG° is positive, yet the reaction runs — the valley and its slope decide.',
+					action: 'Start reading ↗'
+				},
+				{
+					number: '07',
+					status: 'Interactive alpha · about 10 minutes',
+					title: 'The potential landscape inside a battery',
+					description:
+						'1.10 V is the gap between two rungs; plateau and avalanche both live on the Nernst slope.',
+					action: 'Start reading ↗'
+				}
+			]
+		},
 		principles: {
 			eyebrow: 'WHAT COUNTS AS TRUE',
 			heading: {

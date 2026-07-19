@@ -189,6 +189,35 @@ export const zhCNSiteContent = {
 				}
 			]
 		},
+		seasonTwo: {
+			eyebrow: 'SEASON 02 · THERMODYNAMICS',
+			title: '热力学的骨架',
+			introduction:
+				'相图回答"在哪里平衡"；第二季追问"为什么"。从数微观状态开始，到吉布斯山谷，再把下坡路接上导线。',
+			stories: [
+				{
+					number: '05',
+					status: '可交互 Alpha · 约 10 分钟',
+					title: '熵不是混乱',
+					description: '不靠比喻：逐个数微观状态，看赔率宣判不可逆。',
+					action: '开始阅读 ↗'
+				},
+				{
+					number: '06',
+					status: '可交互 Alpha · 约 11 分钟',
+					title: '化学反应的下坡路',
+					description: 'ΔG° 是正的，反应照样发生——山谷与坡度说了算。',
+					action: '开始阅读 ↗'
+				},
+				{
+					number: '07',
+					status: '可交互 Alpha · 约 10 分钟',
+					title: '电池里的势能地形',
+					description: '1.10 V 是两级台阶的差；放电平台与雪崩都在能斯特坡上。',
+					action: '开始阅读 ↗'
+				}
+			]
+		},
 		principles: {
 			eyebrow: 'WHAT COUNTS AS TRUE',
 			heading: {
