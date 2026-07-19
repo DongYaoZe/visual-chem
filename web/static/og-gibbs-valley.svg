@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">化学反应的下坡路 — VisualChem</title>
+  <desc id="desc">N₂O₄ 烧瓶与吉布斯能山谷组成的分享图:G(ξ) 的谷底是平衡。</desc>
+  <defs>
+    <linearGradient id="dusk" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#2b2117"/>
+      <stop offset="1" stop-color="#4a3a24"/>
+    </linearGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.5" fill="#f4efe4" fill-opacity=".08"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#170f08" flood-opacity=".45"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#dusk)"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <g transform="translate(78 52)">
+    <rect width="42" height="42" rx="11" fill="#f4efe4"/>
+    <path d="M8 33C12 17 22 10 32 15C35 17 36 20 36 23" fill="none" stroke="#173f43" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M8 33C14 26 23 21 30 21C33 21 35 22 36 23" fill="none" stroke="#d66b32" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="35" cy="23" r="2.7" fill="#173f43"/>
+    <text x="56" y="29" fill="#f4efe4" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" letter-spacing="-.5">VisualChem</text>
+  </g>
+
+  <text x="78" y="186" fill="#e0c193" font-family="SF Mono, Consolas, monospace" font-size="24" font-weight="700" letter-spacing="6">THERMODYNAMICS · STORY 06</text>
+  <text x="74" y="278" fill="#f4efe4" font-family="Georgia, Songti SC, serif" font-size="78" font-weight="600" letter-spacing="-2">化学反应的</text>
+  <text x="74" y="372" fill="#e0c193" font-family="Georgia, Songti SC, serif" font-size="78" font-weight="600" letter-spacing="-2">下坡路</text>
+  <text x="78" y="434" fill="#e6dbc8" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="30">ΔG° 是正的,烧瓶却染上棕色 —</text>
+  <text x="78" y="478" fill="#e6dbc8" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="30">混合熵挖出山谷,平衡是谷底</text>
+
+  <!-- valley card -->
+  <g transform="translate(700 118)" filter="url(#shadow)">
+    <rect width="430" height="430" rx="26" fill="#f7f2e6"/>
+    <g transform="translate(38 40)">
+      <!-- the valley curve: steep drop from left, floor, rise to right -->
+      <path d="M6 40 C30 150 60 236 108 268 C150 296 210 282 262 226 C304 182 336 118 350 58"
+            fill="none" stroke="#8a5a2c" stroke-width="7" stroke-linecap="round"/>
+      <!-- floor marker -->
+      <line x1="128" y1="279" x2="128" y2="330" stroke="#bf3d30" stroke-width="2.5" stroke-dasharray="5 6"/>
+      <circle cx="128" cy="277" r="11" fill="#f7f2e6" stroke="#bf3d30" stroke-width="5"/>
+      <text x="146" y="322" fill="#bf3d30" font-family="SF Mono, Consolas, monospace" font-size="16" font-weight="700">ξ_eq</text>
+      <!-- rolling ball above the slope -->
+      <circle cx="272" cy="212" r="13" fill="#d66b32"/>
+      <path d="M262 190 C270 182 282 182 290 190" fill="none" stroke="#d66b32" stroke-width="3" stroke-linecap="round"/>
+      <!-- axes -->
+      <line x1="0" y1="340" x2="356" y2="340" stroke="#233532" stroke-width="3"/>
+      <text x="178" y="368" fill="#233532" font-family="SF Mono, Consolas, monospace" font-size="16" font-weight="700" text-anchor="middle">G(ξ) — 谷底即平衡</text>
+    </g>
+  </g>
+
+  <g transform="translate(78 520)">
+    <rect width="330" height="58" rx="29" fill="#f4efe4" fill-opacity=".1" stroke="#f4efe4" stroke-opacity=".35"/>
+    <text x="165" y="37" fill="#f4efe4" font-family="SF Mono, Consolas, monospace" font-size="21" font-weight="700" text-anchor="middle">the map is computed</text>
+  </g>
+</svg>

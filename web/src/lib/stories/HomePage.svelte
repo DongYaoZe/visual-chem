@@ -23,6 +23,15 @@
 	let saltSplitHref = $derived(
 		locale === 'en' ? resolve('/en/stories/salt-split/') : resolve('/stories/salt-split/')
 	);
+	let entropyHref = $derived(
+		locale === 'en' ? resolve('/en/stories/entropy/') : resolve('/stories/entropy/')
+	);
+	let gibbsHref = $derived(
+		locale === 'en' ? resolve('/en/stories/gibbs-valley/') : resolve('/stories/gibbs-valley/')
+	);
+	let nernstHref = $derived(
+		locale === 'en' ? resolve('/en/stories/nernst/') : resolve('/stories/nernst/')
+	);
 	let coolingCurveHref = $derived(
 		locale === 'en' ? resolve('/en/stories/cooling-curve/') : resolve('/stories/cooling-curve/')
 	);
@@ -207,6 +216,46 @@
 					<p>{site.home.season.stories[3].description}</p>
 				</div>
 				<strong>{site.home.season.stories[3].action}</strong>
+			</a>
+		</div>
+	</section>
+
+	<section class="season season-two shell">
+		<header>
+			<div>
+				<p class="eyebrow">{site.home.seasonTwo.eyebrow}</p>
+				<h2>{site.home.seasonTwo.title}</h2>
+			</div>
+			<p>{site.home.seasonTwo.introduction}</p>
+		</header>
+
+		<div class="story-list">
+			<a class="story live" href={entropyHref}>
+				<span class="number">{site.home.seasonTwo.stories[0].number}</span>
+				<div>
+					<small>{site.home.seasonTwo.stories[0].status}</small>
+					<h3>{site.home.seasonTwo.stories[0].title}</h3>
+					<p>{site.home.seasonTwo.stories[0].description}</p>
+				</div>
+				<strong>{site.home.seasonTwo.stories[0].action}</strong>
+			</a>
+			<a class="story live" href={gibbsHref}>
+				<span class="number">{site.home.seasonTwo.stories[1].number}</span>
+				<div>
+					<small>{site.home.seasonTwo.stories[1].status}</small>
+					<h3>{site.home.seasonTwo.stories[1].title}</h3>
+					<p>{site.home.seasonTwo.stories[1].description}</p>
+				</div>
+				<strong>{site.home.seasonTwo.stories[1].action}</strong>
+			</a>
+			<a class="story live" href={nernstHref}>
+				<span class="number">{site.home.seasonTwo.stories[2].number}</span>
+				<div>
+					<small>{site.home.seasonTwo.stories[2].status}</small>
+					<h3>{site.home.seasonTwo.stories[2].title}</h3>
+					<p>{site.home.seasonTwo.stories[2].description}</p>
+				</div>
+				<strong>{site.home.seasonTwo.stories[2].action}</strong>
 			</a>
 		</div>
 	</section>
@@ -538,6 +587,10 @@
 		color: #b9bcb5;
 		font-size: 0.68rem;
 		line-height: 1.7;
+	}
+
+	.season-two {
+		padding-top: 0;
 	}
 
 	.season {

@@ -18,8 +18,15 @@
 </script>
 
 <!-- KaTeX escapes formula text and produces the trusted markup locally. -->
-<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-<span class:display>{@html markup}</span>
+<!-- Display formulas can overflow-scroll on narrow screens, so they must be
+     keyboard-reachable (axe: scrollable-region-focusable). -->
+{#if display}
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+	<span class="display" tabindex="0" role="math" aria-label={formula}>{@html markup}</span>
+{:else}
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+	<span>{@html markup}</span>
+{/if}
 
 <style>
 	span {

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">电池里的势能地形 — VisualChem</title>
+  <desc id="desc">丹尼尔电池与电极电势天梯组成的分享图:1.10 V 是两级台阶的高度差。</desc>
+  <defs>
+    <linearGradient id="dusk" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#14243a"/>
+      <stop offset="1" stop-color="#264a6e"/>
+    </linearGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.5" fill="#f4efe4" fill-opacity=".08"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#0a1420" flood-opacity=".45"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#dusk)"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <g transform="translate(78 52)">
+    <rect width="42" height="42" rx="11" fill="#f4efe4"/>
+    <path d="M8 33C12 17 22 10 32 15C35 17 36 20 36 23" fill="none" stroke="#173f43" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M8 33C14 26 23 21 30 21C33 21 35 22 36 23" fill="none" stroke="#d66b32" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="35" cy="23" r="2.7" fill="#173f43"/>
+    <text x="56" y="29" fill="#f4efe4" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" letter-spacing="-.5">VisualChem</text>
+  </g>
+
+  <text x="78" y="186" fill="#9fc0e8" font-family="SF Mono, Consolas, monospace" font-size="24" font-weight="700" letter-spacing="6">THERMODYNAMICS · STORY 07</text>
+  <text x="74" y="278" fill="#f4efe4" font-family="Georgia, Songti SC, serif" font-size="78" font-weight="600" letter-spacing="-2">电池里的</text>
+  <text x="74" y="372" fill="#9fc0e8" font-family="Georgia, Songti SC, serif" font-size="78" font-weight="600" letter-spacing="-2">势能地形</text>
+  <text x="78" y="434" fill="#d5e2f1" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="30">1.10 V 不是魔法 —</text>
+  <text x="78" y="478" fill="#d5e2f1" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="30">它是天梯上两级台阶的高度差</text>
+
+  <!-- ladder card -->
+  <g transform="translate(700 118)" filter="url(#shadow)">
+    <rect width="430" height="430" rx="26" fill="#f7f2e6"/>
+    <g transform="translate(50 34)">
+      <!-- rail -->
+      <line x1="120" y1="6" x2="120" y2="356" stroke="#233532" stroke-opacity=".4" stroke-width="4"/>
+      <!-- context rungs -->
+      <line x1="88" y1="36" x2="152" y2="36" stroke="#233532" stroke-opacity=".28" stroke-width="4"/>
+      <line x1="88" y1="330" x2="152" y2="330" stroke="#233532" stroke-opacity=".28" stroke-width="4"/>
+      <!-- SHE dashed zero -->
+      <line x1="76" y1="196" x2="164" y2="196" stroke="#52625f" stroke-width="3" stroke-dasharray="7 6"/>
+      <text x="170" y="201" fill="#52625f" font-family="SF Mono, Consolas, monospace" font-size="14">0 V</text>
+      <!-- Cu rung -->
+      <line x1="66" y1="150" x2="174" y2="150" stroke="#a3702a" stroke-width="7" stroke-linecap="round"/>
+      <text x="56" y="155" fill="#a3702a" font-family="SF Mono, Consolas, monospace" font-size="16" font-weight="800" text-anchor="end">Cu²⁺/Cu</text>
+      <!-- Zn rung -->
+      <line x1="66" y1="296" x2="174" y2="296" stroke="#5f6398" stroke-width="7" stroke-linecap="round"/>
+      <text x="56" y="301" fill="#4c4f7c" font-family="SF Mono, Consolas, monospace" font-size="16" font-weight="800" text-anchor="end">Zn²⁺/Zn</text>
+      <!-- gap brace -->
+      <line x1="226" y1="150" x2="226" y2="296" stroke="#bf3d30" stroke-width="4"/>
+      <line x1="216" y1="150" x2="236" y2="150" stroke="#bf3d30" stroke-width="4"/>
+      <line x1="216" y1="296" x2="236" y2="296" stroke="#bf3d30" stroke-width="4"/>
+      <text x="244" y="230" fill="#bf3d30" font-family="SF Mono, Consolas, monospace" font-size="22" font-weight="800">1.10 V</text>
+      <!-- electron arrow -->
+      <path d="M198 288 L198 166 M190 176 L198 162 L206 176" fill="none" stroke="#207f8c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="120" y="392" fill="#233532" font-family="SF Mono, Consolas, monospace" font-size="16" font-weight="700" text-anchor="middle">E = E° − (RT/nF)·ln Q</text>
+    </g>
+  </g>
+
+  <g transform="translate(78 520)">
+    <rect width="330" height="58" rx="29" fill="#f4efe4" fill-opacity=".1" stroke="#f4efe4" stroke-opacity=".35"/>
+    <text x="165" y="37" fill="#f4efe4" font-family="SF Mono, Consolas, monospace" font-size="21" font-weight="700" text-anchor="middle">the map is computed</text>
+  </g>
+</svg>

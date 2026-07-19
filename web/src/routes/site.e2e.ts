@@ -160,6 +160,34 @@ test('the cooling curve story has no serious automated accessibility violations'
 	await expectNoSeriousAccessibilityViolations(page);
 });
 
+test('the entropy story computes its census from the reader state', async ({ page }) => {
+	const pageErrors: Error[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error));
+	await gotoHydrated(page, '/stories/entropy/');
+	await expect(page.getByRole('heading', { level: 1, name: /熵不是/ })).toBeVisible();
+	await page.getByRole('button', { name: '纯粹的概率' }).click();
+	await expect(page.getByText(/把这句话数出来/)).toBeVisible();
+	await expect(page.getByTestId('entropy-tri-view').first()).toContainText('同一组粒子');
+	expect(pageErrors).toEqual([]);
+});
+
+test('the entropy story has no serious automated accessibility violations', async ({ page }) => {
+	await page.goto(appPath('/stories/entropy/'));
+	await expectNoSeriousAccessibilityViolations(page);
+});
+
+test('the gibbs valley story has no serious automated accessibility violations', async ({
+	page
+}) => {
+	await page.goto(appPath('/stories/gibbs-valley/'));
+	await expectNoSeriousAccessibilityViolations(page);
+});
+
+test('the nernst story has no serious automated accessibility violations', async ({ page }) => {
+	await page.goto(appPath('/stories/nernst/'));
+	await expectNoSeriousAccessibilityViolations(page);
+});
+
 test('homepage has no serious automated accessibility violations', async ({ page }) => {
 	await page.goto(appPath('/'));
 	await expectNoSeriousAccessibilityViolations(page);
@@ -243,11 +271,17 @@ test('all public routes load their local production assets without HTTP errors',
 		'/stories/boiling-map/',
 		'/stories/salt-split/',
 		'/stories/cooling-curve/',
+		'/stories/entropy/',
+		'/stories/gibbs-valley/',
+		'/stories/nernst/',
 		'/en/',
 		'/en/stories/ethanol-distillation/',
 		'/en/stories/boiling-map/',
 		'/en/stories/salt-split/',
-		'/en/stories/cooling-curve/'
+		'/en/stories/cooling-curve/',
+		'/en/stories/entropy/',
+		'/en/stories/gibbs-valley/',
+		'/en/stories/nernst/'
 	]) {
 		await page.goto(appPath(path));
 		await expect(page.locator('main')).toBeVisible();
