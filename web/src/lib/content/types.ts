@@ -205,6 +205,12 @@ export interface HomeContent {
 		introduction: string;
 		stories: readonly [HomeStoryCardContent, HomeStoryCardContent, HomeStoryCardContent];
 	};
+	seasonThree: {
+		eyebrow: string;
+		title: string;
+		introduction: string;
+		stories: readonly [HomeStoryCardContent, HomeStoryCardContent, HomeStoryCardContent];
+	};
 	principles: {
 		eyebrow: string;
 		heading: SplitHeading;
@@ -1291,4 +1297,272 @@ export interface NernstInteractionsContent {
 export interface NernstStoryContent extends ProseStoryContent<NernstSceneId> {
 	interactions: NernstInteractionsContent;
 	triView: NernstTriViewContent;
+}
+
+/* --- Story 8 · The concentration countdown -------------------------- */
+
+export type KineticsSceneId =
+	| 'hook'
+	| 'watch-it-fall'
+	| 'half-life'
+	| 'fingerprints'
+	| 'rate-law'
+	| 'carbon-clock'
+	| 'not-all-equal'
+	| 'sandbox';
+
+export interface KineticsTriViewContent {
+	defaultAriaLabel: string;
+	liveSummary: ContentMessage<{ concentration: DisplayValue; timeS: DisplayValue }>;
+	synchronizedState: string;
+	beaker: {
+		ariaLabel: ContentMessage<{
+			concentration: DisplayValue;
+			normalizedRate: DisplayValue;
+		}>;
+		viewName: string;
+		caption: string;
+		bubbleTag: string;
+		concentrationLabel: ContentMessage<{ concentration: DisplayValue }>;
+		timeLabel: ContentMessage<{ timeS: DisplayValue }>;
+	};
+	molecules: {
+		ariaLabel: ContentMessage<{
+			reactantCount: DisplayValue;
+			waterCount: DisplayValue;
+			oxygenCount: DisplayValue;
+		}>;
+		viewName: string;
+		caption: string;
+		reactantLabel: string;
+		waterLabel: string;
+		oxygenLabel: string;
+	};
+	clock: {
+		ariaLabel: ContentMessage<{ order: DisplayValue }>;
+		viewName: string;
+		caption: string;
+		xAxis: string;
+		yAxis: string;
+		halfLifeMarker: string;
+		currentMarker: string;
+		orderTag: ContentMessage<{ order: DisplayValue }>;
+	};
+}
+
+export interface KineticsInteractionsContent {
+	hook: {
+		question: string;
+		options: readonly { id: string; label: string }[];
+		explanation: string;
+	};
+	watchItFall: {
+		playButton: string;
+		pauseButton: string;
+		resetButton: string;
+	};
+	fingerprints: {
+		orderLabel: string;
+		orderNames: readonly [string, string, string];
+		readout: ContentMessage<{ first: DisplayValue; second: DisplayValue; third: DisplayValue }>;
+	};
+	carbonClock: {
+		fractionLabel: string;
+		readout: ContentMessage<{ percent: DisplayValue; years: DisplayValue }>;
+	};
+	sandbox: {
+		orderLabel: string;
+		kLabel: string;
+		kUnit: ContentMessage<{ order: DisplayValue }>;
+		c0Label: string;
+		readout: ContentMessage<{ halfLife: DisplayValue }>;
+	};
+}
+
+export interface KineticsStoryContent extends ProseStoryContent<KineticsSceneId> {
+	interactions: KineticsInteractionsContent;
+	triView: KineticsTriViewContent;
+}
+
+/* --- Story 9 · Molecules over the mountain --------------------------- */
+
+export type ArrheniusSceneId =
+	| 'hook'
+	| 'two-populations'
+	| 'the-tail'
+	| 'arrhenius-law'
+	| 'rule-of-thumb'
+	| 'life-runs-on-it'
+	| 'two-point'
+	| 'sandbox';
+
+export interface ArrheniusTriViewContent {
+	defaultAriaLabel: string;
+	liveSummary: ContentMessage<{
+		temperatureC: DisplayValue;
+		eaKJPerMol: DisplayValue;
+		tailShare: DisplayValue;
+	}>;
+	synchronizedState: string;
+	scene: {
+		ariaLabel: ContentMessage<{
+			coldTemperatureC: DisplayValue;
+			hotTemperatureC: DisplayValue;
+		}>;
+		viewName: string;
+		caption: string;
+		coldTag: string;
+		hotTag: string;
+		temperatureLabel: ContentMessage<{ temperatureC: DisplayValue }>;
+	};
+	collisions: {
+		ariaLabel: ContentMessage<{
+			temperatureC: DisplayValue;
+			eaKJPerMol: DisplayValue;
+			tailShare: DisplayValue;
+			highlighted: DisplayValue;
+			total: DisplayValue;
+		}>;
+		viewName: string;
+		caption: string;
+		slowLabel: string;
+		fastLabel: string;
+		barrierTag: string;
+		crossingReadout: ContentMessage<{
+			tailShare: DisplayValue;
+			highlighted: DisplayValue;
+			total: DisplayValue;
+		}>;
+	};
+	distribution: {
+		ariaLabel: ContentMessage<{ temperatureC: DisplayValue }>;
+		viewName: string;
+		caption: string;
+		xAxis: string;
+		yAxis: string;
+		tailLabel: string;
+		thresholdLabel: string;
+		coldCurve: string;
+		hotCurve: string;
+	};
+}
+
+export interface ArrheniusInteractionsContent {
+	hook: {
+		question: string;
+		options: readonly { id: string; label: string }[];
+		explanation: string;
+	};
+	theTail: {
+		temperatureLabel: string;
+		temperatureScale: SliderScaleContent;
+		readout: ContentMessage<{ tailShare: DisplayValue; boost: DisplayValue }>;
+	};
+	ruleOfThumb: {
+		eaLabel: string;
+		readout: ContentMessage<{ ea: DisplayValue; rise: DisplayValue }>;
+	};
+	twoPoint: {
+		readout: ContentMessage<{ ea: DisplayValue }>;
+	};
+	sandbox: {
+		temperatureLabel: string;
+		eaLabel: string;
+		readout: ContentMessage<{
+			tailShare: DisplayValue;
+			doubling: DisplayValue;
+			chirps: DisplayValue;
+		}>;
+	};
+}
+
+export interface ArrheniusStoryContent extends ProseStoryContent<ArrheniusSceneId> {
+	interactions: ArrheniusInteractionsContent;
+	triView: ArrheniusTriViewContent;
+}
+
+/* --- Story 10 · The shortcut that moves no valley --------------------- */
+
+export type CatalystSceneId =
+	| 'hook'
+	| 'the-pass'
+	| 'lower-pass'
+	| 'both-ways'
+	| 'unconsumed'
+	| 'enzymes'
+	| 'no-free-lunch'
+	| 'sandbox';
+
+export type CatalystKind = 'none' | 'iodide' | 'catalase';
+
+export interface CatalystTriViewContent {
+	defaultAriaLabel: string;
+	liveSummary: ContentMessage<{ ea: DisplayValue; boost: DisplayValue }>;
+	synchronizedState: string;
+	bench: {
+		ariaLabel: string;
+		viewName: string;
+		caption: string;
+		plainTag: string;
+		catalyzedTag: string;
+		bubbleRate: ContentMessage<{ boost: DisplayValue }>;
+	};
+	surface: {
+		viewName: string;
+		states: Readonly<
+			Record<
+				CatalystKind,
+				{
+					ariaLabel: string;
+					caption: string;
+					catalystLabel: string;
+					reactantLabel: string;
+					productLabel: string;
+					cycleTag: string;
+				}
+			>
+		>;
+	};
+	profile: {
+		ariaLabel: ContentMessage<{ ea: DisplayValue }>;
+		viewName: string;
+		caption: string;
+		xAxis: string;
+		yAxis: string;
+		plainCurve: string;
+		catalyzedCurve: string;
+		eaMarker: string;
+		deltaHMarker: string;
+	};
+}
+
+export interface CatalystInteractionsContent {
+	hook: {
+		question: string;
+		options: readonly { id: string; label: string }[];
+		explanation: string;
+	};
+	lowerPass: {
+		catalystLabel: string;
+		catalystNames: readonly [string, string, string];
+		readout: ContentMessage<{ ea: DisplayValue; boost: DisplayValue }>;
+	};
+	bothWays: {
+		readout: ContentMessage<{ forwardBoost: DisplayValue; reverseBoost: DisplayValue }>;
+	};
+	sandbox: {
+		eaLabel: string;
+		temperatureLabel: string;
+		readout: ContentMessage<{
+			boost: DisplayValue;
+			ea: DisplayValue;
+			uncatalyzedFactor: DisplayValue;
+			catalyzedFactor: DisplayValue;
+		}>;
+	};
+}
+
+export interface CatalystStoryContent extends ProseStoryContent<CatalystSceneId> {
+	interactions: CatalystInteractionsContent;
+	triView: CatalystTriViewContent;
 }
