@@ -114,7 +114,7 @@ export const enSiteContent = {
 			image: '/og-home.png',
 			imageAlt:
 				'VisualChem home: macroscopic, particulate, and symbolic views synchronized around an ethanol–water phase diagram',
-			modifiedTime: '2026-07-16'
+			modifiedTime: '2026-07-23'
 		},
 		hero: {
 			eyebrow: 'OPEN CHEMISTRY · EXPLORABLE STORIES',
@@ -225,6 +225,38 @@ export const enSiteContent = {
 					title: 'The potential landscape inside a battery',
 					description:
 						'1.10 V is the gap between two rungs; plateau and avalanche both live on the Nernst slope.',
+					action: 'Start reading ↗'
+				}
+			]
+		},
+		seasonThree: {
+			eyebrow: 'SEASON 03 · KINETICS',
+			title: 'Put a stopwatch on the reaction',
+			introduction:
+				'Thermodynamics tells us which way is downhill; kinetics asks how long the walk takes. Hear concentration count down, watch heat swell the reactive tail, then let a catalyst change the route without moving the destination.',
+			stories: [
+				{
+					number: '08',
+					status: 'Interactive alpha · about 10 minutes',
+					title: 'The concentration countdown',
+					description:
+						'Rate is the slope right now; successive half-lives drum reaction order into a visible fingerprint.',
+					action: 'Start reading ↗'
+				},
+				{
+					number: '09',
+					status: 'Interactive alpha · about 11 minutes',
+					title: 'Molecules over the mountain',
+					description:
+						'Heating does not nudge every molecule equally; it magnifies the sparse tail able to cross the barrier.',
+					action: 'Start reading ↗'
+				},
+				{
+					number: '10',
+					status: 'Interactive alpha · about 10 minutes',
+					title: 'The shortcut that moves no valley',
+					description:
+						'A catalyst lowers the pass but moves neither valley: both directions speed up while equilibrium stays put.',
 					action: 'Start reading ↗'
 				}
 			]

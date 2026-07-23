@@ -1,15 +1,22 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { centralFraction, ehrenfestTrajectory, multiplicityDistribution } from '$lib/chem';
+	import {
+		c14AgeYears,
+		concentrationAt,
+		decayCurve,
+		halfLife,
+		successiveHalfLives,
+		type ReactionOrder
+	} from '$lib/chem';
 	import ConceptCheck from '$lib/components/ConceptCheck.svelte';
-	import EntropyTriView from '$lib/components/EntropyTriView.svelte';
+	import KineticsTriView from '$lib/components/KineticsTriView.svelte';
 	import Formula from '$lib/components/Math.svelte';
 	import Seo from '$lib/components/Seo.svelte';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import StoryStage from '$lib/components/StoryStage.svelte';
-	import { getEntropyContent, getSiteContent, type LocaleCode } from '$lib/content';
+	import { getKineticsContent, getSiteContent, type LocaleCode } from '$lib/content';
 	import { parseProse, type InlineSegment } from './prose';
-	import { entropySceneDefinition } from './season2-scenes';
+	import { kineticsSceneDefinition } from './season3-scenes';
 	import { scrolly } from './scrolly';
 
 	interface Props {
@@ -18,101 +25,103 @@
 
 	let { locale = 'zh-CN' }: Props = $props();
 	let site = $derived(getSiteContent(locale));
-	let story = $derived(getEntropyContent(locale));
+	let story = $derived(getKineticsContent(locale));
 
 	let activeIndex = $state(0);
 	let hookPrediction = $state<string | null>(null);
-	let countN = $state(4);
 
-	// The release scene walks a precomputed Ehrenfest trajectory.
-	const RELEASE = ehrenfestTrajectory(100, 1400);
-	let releaseIndex = $state(0);
-	let releasePlaying = $state(false);
+	const watchDefaults = kineticsSceneDefinition('watch-it-fall');
+	const fingerprintDefaults = kineticsSceneDefinition('fingerprints');
+	const sandboxDefaults = kineticsSceneDefinition('sandbox');
+
+	const watchTotalTimeS = watchDefaults.totalTimeS;
+	let watchTimeS = $state(watchDefaults.timeS);
+	let watchPlaying = $state(false);
 
 	$effect(() => {
-		if (!releasePlaying) return;
+		if (!watchPlaying) return;
 		const id = setInterval(() => {
-			releaseIndex = Math.min(RELEASE.length - 1, releaseIndex + 6);
-			if (releaseIndex >= RELEASE.length - 1) releasePlaying = false;
-		}, 40);
+			watchTimeS = Math.min(watchTotalTimeS, watchTimeS + 1.5);
+			if (watchTimeS >= watchTotalTimeS) watchPlaying = false;
+		}, 50);
 		return () => clearInterval(id);
 	});
 
-	function releaseReset() {
-		releasePlaying = false;
-		releaseIndex = 0;
+	function resetWatch(): void {
+		watchPlaying = false;
+		watchTimeS = 0;
 	}
 
-	// The fluctuation scene idles along an equilibrium walk while active.
-	const JITTER = ehrenfestTrajectory(100, 4000, 50, 7);
-	let jitterIndex = $state(0);
+	let fingerprintOrder = $state<ReactionOrder>(fingerprintDefaults.order);
+	let carbonFraction = $state(0.53);
+	let labOrder = $state<ReactionOrder>(sandboxDefaults.order);
+	let labK = $state(sandboxDefaults.k);
+	let labC0 = $state(sandboxDefaults.c0);
+	const labTimeS = sandboxDefaults.timeS;
+	const labTotalTimeS = sandboxDefaults.totalTimeS;
 
-	let activeScene = $derived(entropySceneDefinition(story.scenes[activeIndex].id));
+	let activeScene = $derived(kineticsSceneDefinition(story.scenes[activeIndex].id));
 	let activeSceneId = $derived(activeScene.id);
 
-	$effect(() => {
-		if (activeSceneId !== 'fluctuations') return;
-		const id = setInterval(() => {
-			jitterIndex = (jitterIndex + 3) % JITTER.length;
-		}, 90);
-		return () => clearInterval(id);
+	let visualOrder = $derived.by(() => {
+		if (activeSceneId === 'fingerprints') return fingerprintOrder;
+		if (activeSceneId === 'sandbox') return labOrder;
+		return activeScene.order;
 	});
-
-	// Sandbox counter shared by the last scene and the free-play section.
-	let labN = $state(100);
-	let labWindow = $state(10);
-
-	// Which census the stage shows: scene defaults, overridden by whichever
-	// control the active scene hands to the reader.
-	let visualTotal = $derived.by(() => {
-		switch (activeSceneId) {
-			case 'count-the-ways':
-				return countN;
-			case 'irreversible':
-				return 100;
-			case 'fluctuations':
-				return 100;
-			case 'sandbox':
-				return labN;
-			default:
-				return activeScene.total;
-		}
+	let visualC0 = $derived(activeSceneId === 'sandbox' ? labC0 : activeScene.c0);
+	let visualK = $derived(activeSceneId === 'sandbox' ? labK : activeScene.k);
+	let visualTimeS = $derived.by(() => {
+		if (activeSceneId === 'watch-it-fall') return watchTimeS;
+		if (activeSceneId === 'sandbox') return labTimeS;
+		return activeScene.timeS;
 	});
-	let visualLeft = $derived.by(() => {
-		switch (activeSceneId) {
-			case 'count-the-ways':
-				return Math.round(countN / 2);
-			case 'irreversible':
-				return RELEASE[releaseIndex];
-			case 'fluctuations':
-				return JITTER[jitterIndex];
-			case 'sandbox':
-				return Math.round(labN / 2);
-			default:
-				return activeScene.leftCount ?? Math.round(activeScene.total / 2);
-		}
-	});
-	let visualValveOpen = $derived(
-		activeSceneId === 'irreversible' ? releaseIndex > 0 : activeScene.valveOpen
+	let visualTotalTimeS = $derived(
+		activeSceneId === 'watch-it-fall'
+			? watchTotalTimeS
+			: activeSceneId === 'sandbox'
+				? labTotalTimeS
+				: activeScene.totalTimeS
 	);
-	let visualWindow = $derived(activeSceneId === 'sandbox' ? labWindow : null);
+	let visualConcentration = $derived(concentrationAt(visualOrder, visualC0, visualK, visualTimeS));
+	let visualFraction = $derived(visualConcentration / visualC0);
+	let visualFocus = $derived.by(() => {
+		switch (activeSceneId) {
+			case 'half-life':
+			case 'fingerprints':
+			case 'rate-law':
+				return 'clock' as const;
+			case 'watch-it-fall':
+				return 'beaker' as const;
+			case 'carbon-clock':
+				return 'molecules' as const;
+			default:
+				return 'all' as const;
+		}
+	});
 
+	let fingerprintSpans = $derived(
+		successiveHalfLives(fingerprintOrder, fingerprintDefaults.c0, fingerprintDefaults.k)
+	);
+	let carbonAge = $derived(c14AgeYears(carbonFraction));
+	let labHalfLife = $derived(halfLife(labOrder, labC0, labK));
 	let progress = $derived(((activeIndex + 1) / story.scenes.length) * 100);
 	let catalogHref = $derived(locale === 'en' ? resolve('/en/') : resolve('/'));
-	let windowPercent = $derived((centralFraction(labN, labWindow) * 100).toFixed(1));
 
-	// The hero backdrop sketches the computed N = 100 multiplicity spike.
-	const HERO = multiplicityDistribution(100);
-	const heroPeak = Math.max(...HERO.probabilities);
-	const heroPath = HERO.probabilities
-		.map(
-			(probability, index) =>
-				`${index === 0 ? 'M' : 'L'}${(30 + (index / 100) * 940).toFixed(1)},${(
-					285 -
-					(probability / heroPeak) * 250
-				).toFixed(1)}`
-		)
+	// The hero line is sampled from the same integrated-rate-law kernel as the stage.
+	const HERO = decayCurve(1, 1, 0.012, 300, 120);
+	const heroPath = HERO.times
+		.map((timeS, index) => {
+			const fraction = HERO.concentrations[index] / HERO.c0;
+			return `${index === 0 ? 'M' : 'L'}${(30 + (timeS / 300) * 940).toFixed(1)},${(
+				35 +
+				(1 - fraction) * 230
+			).toFixed(1)}`;
+		})
 		.join(' ');
+
+	function formatSpan(value: number): string {
+		return value >= 100 ? value.toFixed(0) : value.toFixed(1);
+	}
 </script>
 
 {#snippet inline(segments: InlineSegment[])}
@@ -145,17 +154,11 @@
 
 <main>
 	<section class="story-hero shell">
-		<div class="hero-meta">
-			<p class="eyebrow">{story.hero.eyebrow}</p>
-		</div>
+		<div class="hero-meta"><p class="eyebrow">{story.hero.eyebrow}</p></div>
 		<h1>{story.hero.title[0]}<br /><em>{story.hero.title[1]}</em></h1>
-		<div class="hero-bottom">
-			<p>{story.hero.subtitle}</p>
-		</div>
+		<div class="hero-bottom"><p>{story.hero.subtitle}</p></div>
 		<div class="hero-curve" aria-hidden="true">
-			<svg viewBox="0 0 1000 300">
-				<path d={heroPath} />
-			</svg>
+			<svg viewBox="0 0 1000 300"><path d={heroPath} /></svg>
 			<span>{story.hero.heroTag}</span>
 		</div>
 	</section>
@@ -175,19 +178,23 @@
 			statusAriaLabel={story.stage.shortStateAriaLabel}
 		>
 			{#snippet stage()}
-				<EntropyTriView
-					total={visualTotal}
-					leftCount={visualLeft}
-					valveOpen={visualValveOpen}
-					markAllLeft={activeScene.markAllLeft}
-					window={visualWindow}
+				<KineticsTriView
+					order={visualOrder}
+					c0={visualC0}
+					k={visualK}
+					totalTimeS={visualTotalTimeS}
+					currentTimeS={visualTimeS}
+					running={activeSceneId === 'watch-it-fall' && watchPlaying}
+					showHalfLives={activeScene.showHalfLives}
+					focus={visualFocus}
 					label={story.triView.defaultAriaLabel}
 					content={story.triView}
 				/>
 			{/snippet}
 			{#snippet status()}
-				<span>N {visualTotal}</span>
-				<span>n {Math.round(visualLeft)}</span>
+				<span>t {visualTimeS.toFixed(0)} s</span>
+				<span>c/c₀ {visualFraction.toFixed(3)}</span>
+				<span>m {visualOrder}</span>
 			{/snippet}
 		</StoryStage>
 
@@ -196,7 +203,10 @@
 				<article
 					class="step"
 					class:active={activeIndex === index}
-					class:symbol-step={scene.id === 'the-spike' || scene.id === 'sandbox'}
+					class:symbol-step={scene.id === 'half-life' ||
+						scene.id === 'fingerprints' ||
+						scene.id === 'rate-law' ||
+						scene.id === 'sandbox'}
 					data-scene-index={index}
 					data-scene-id={scene.id}
 				>
@@ -235,70 +245,66 @@
 							{/if}
 						{/if}
 
-						{#if scene.id === 'count-the-ways'}
-							<label class="range-control">
-								<span>{story.interactions.countTheWays.particlesLabel}</span>
-								<strong>N = {countN}</strong>
-								<input
-									type="range"
-									min="4"
-									max="400"
-									step="4"
-									aria-label={story.interactions.countTheWays.particlesLabel}
-									bind:value={countN}
-								/>
-							</label>
+						{#if scene.id === 'watch-it-fall'}
+							<div class="inline-control watch-controls">
+								<button type="button" onclick={() => (watchPlaying = !watchPlaying)}>
+									{watchPlaying
+										? story.interactions.watchItFall.pauseButton
+										: story.interactions.watchItFall.playButton}
+								</button>
+								<button type="button" onclick={resetWatch}
+									>{story.interactions.watchItFall.resetButton}</button
+								>
+								<output aria-live="polite">t = {watchTimeS.toFixed(0)} s</output>
+							</div>
 						{/if}
 
-						{#if scene.id === 'irreversible'}
-							<div class="inline-control">
-								<button
-									type="button"
-									onclick={() => {
-										releaseIndex = 0;
-										releasePlaying = true;
-									}}>{story.interactions.irreversible.releaseButton}</button
-								>
-								<button type="button" onclick={releaseReset}
-									>{story.interactions.irreversible.resetButton}</button
-								>
+						{#if scene.id === 'fingerprints'}
+							<div class="choice-control">
+								<span>{story.interactions.fingerprints.orderLabel}</span>
+								<div>
+									{#each story.interactions.fingerprints.orderNames as name, order (order)}
+										<button
+											type="button"
+											aria-pressed={fingerprintOrder === order}
+											class:selected={fingerprintOrder === order}
+											onclick={() => (fingerprintOrder = order as ReactionOrder)}>{name}</button
+										>
+									{/each}
+								</div>
 							</div>
-							{#if releasePlaying}
-								<p class="evidence">{story.interactions.irreversible.runningHint}</p>
-							{/if}
+							<p class="evidence">
+								{story.interactions.fingerprints.readout({
+									first: formatSpan(fingerprintSpans[0]),
+									second: formatSpan(fingerprintSpans[1]),
+									third: formatSpan(fingerprintSpans[2])
+								})}
+							</p>
+						{/if}
+
+						{#if scene.id === 'carbon-clock'}
+							<label class="range-control">
+								<span>{story.interactions.carbonClock.fractionLabel}</span>
+								<strong>{(carbonFraction * 100).toFixed(0)}%</strong>
+								<input
+									type="range"
+									min="0.1"
+									max="1"
+									step="0.01"
+									aria-label={story.interactions.carbonClock.fractionLabel}
+									bind:value={carbonFraction}
+								/>
+								<small>
+									{story.interactions.carbonClock.readout({
+										percent: (carbonFraction * 100).toFixed(0),
+										years: carbonAge.toFixed(0)
+									})}
+								</small>
+							</label>
 						{/if}
 
 						{#if scene.id === 'sandbox'}
-							<label class="range-control">
-								<span>{story.interactions.sandbox.particlesLabel}</span>
-								<strong>N = {labN}</strong>
-								<input
-									type="range"
-									min="10"
-									max="400"
-									step="2"
-									aria-label={story.interactions.sandbox.particlesLabel}
-									bind:value={labN}
-								/>
-							</label>
-							<label class="range-control">
-								<span>{story.interactions.sandbox.windowLabel}</span>
-								<strong>±{labWindow}</strong>
-								<input
-									type="range"
-									min="1"
-									max="50"
-									step="1"
-									aria-label={story.interactions.sandbox.windowLabel}
-									bind:value={labWindow}
-								/>
-								<small
-									>{story.interactions.sandbox.windowReadout({
-										percent: windowPercent,
-										window: labWindow
-									})}</small
-								>
-							</label>
+							{@render sandboxControls(false)}
 						{/if}
 					</div>
 				</article>
@@ -314,10 +320,7 @@
 			</div>
 			<figure class="edge-facts">
 				{#each story.edge.facts as fact (fact.term)}
-					<div>
-						<span>{fact.term}</span>
-						<strong class="fact-definition">{fact.definition}</strong>
-					</div>
+					<div><span>{fact.term}</span><strong>{fact.definition}</strong></div>
 				{/each}
 			</figure>
 		</div>
@@ -342,43 +345,13 @@
 			<p>{story.sandboxIntro.description}</p>
 		</div>
 		<div class="shell sandbox-grid">
-			<div class="sandbox-controls">
-				<label>
-					<span>{story.interactions.sandbox.particlesLabel}</span><strong>N = {labN}</strong>
-					<input
-						type="range"
-						min="10"
-						max="400"
-						step="2"
-						aria-label={story.interactions.sandbox.particlesLabel}
-						bind:value={labN}
-					/>
-				</label>
-				<label>
-					<span>{story.interactions.sandbox.windowLabel}</span><strong>±{labWindow}</strong>
-					<input
-						type="range"
-						min="1"
-						max="50"
-						step="1"
-						aria-label={story.interactions.sandbox.windowLabel}
-						bind:value={labWindow}
-					/>
-				</label>
-				<div class="challenge">
-					<p>
-						{story.interactions.sandbox.windowReadout({
-							percent: windowPercent,
-							window: labWindow
-						})}
-					</p>
-				</div>
-			</div>
-			<EntropyTriView
-				total={labN}
-				leftCount={Math.round(labN / 2)}
-				valveOpen
-				window={labWindow}
+			<div class="sandbox-controls">{@render sandboxControls(true)}</div>
+			<KineticsTriView
+				order={labOrder}
+				c0={labC0}
+				k={labK}
+				totalTimeS={labTotalTimeS}
+				currentTimeS={labTimeS}
 				label={story.sandboxIntro.title}
 				content={story.triView}
 			/>
@@ -412,6 +385,52 @@
 	</section>
 </main>
 
+{#snippet sandboxControls(showChallenge: boolean)}
+	<div class="choice-control compact">
+		<span>{story.interactions.sandbox.orderLabel}</span>
+		<div>
+			{#each story.interactions.fingerprints.orderNames as name, order (order)}
+				<button
+					type="button"
+					aria-pressed={labOrder === order}
+					class:selected={labOrder === order}
+					onclick={() => (labOrder = order as ReactionOrder)}>{name}</button
+				>
+			{/each}
+		</div>
+	</div>
+	<label class="range-control">
+		<span>{story.interactions.sandbox.kLabel}</span><strong
+			>{labK.toFixed(3)} {story.interactions.sandbox.kUnit({ order: labOrder })}</strong
+		>
+		<input
+			type="range"
+			min="0.002"
+			max="0.03"
+			step="0.001"
+			aria-label={story.interactions.sandbox.kLabel}
+			bind:value={labK}
+		/>
+	</label>
+	<label class="range-control">
+		<span>{story.interactions.sandbox.c0Label}</span><strong>{labC0.toFixed(1)} mol L⁻¹</strong>
+		<input
+			type="range"
+			min="0.2"
+			max="2"
+			step="0.1"
+			aria-label={story.interactions.sandbox.c0Label}
+			bind:value={labC0}
+		/>
+		<small>{story.interactions.sandbox.readout({ halfLife: formatSpan(labHalfLife) })}</small>
+	</label>
+	{#if showChallenge}
+		<div class="challenge">
+			<p>{story.interactions.sandbox.readout({ halfLife: formatSpan(labHalfLife) })}</p>
+		</div>
+	{/if}
+{/snippet}
+
 <style>
 	.progress {
 		position: fixed;
@@ -444,7 +463,7 @@
 		z-index: 2;
 		margin: 1.2rem 0 2.5rem;
 		font-family: var(--serif);
-		font-size: clamp(3.4rem, 9vw, 8.6rem);
+		font-size: clamp(3.2rem, 8.4vw, 8rem);
 		font-weight: 500;
 		letter-spacing: -0.075em;
 		line-height: 0.85;
@@ -452,7 +471,7 @@
 
 	.story-hero h1 em {
 		display: inline-block;
-		margin-left: 18%;
+		margin-left: 14%;
 		color: #207f8c;
 		font-weight: 500;
 		transform: rotate(-2deg);
@@ -467,7 +486,7 @@
 		justify-content: space-between;
 	}
 
-	.hero-bottom > p {
+	.hero-bottom p {
 		margin: 0;
 		font-family: var(--serif);
 		font-size: clamp(1.1rem, 2vw, 1.4rem);
@@ -479,7 +498,7 @@
 		right: -4%;
 		bottom: 4%;
 		width: 62%;
-		opacity: 0.3;
+		opacity: 0.32;
 	}
 
 	.hero-curve svg {
@@ -490,6 +509,7 @@
 	.hero-curve path {
 		fill: none;
 		stroke: #207f8c;
+		stroke-linecap: round;
 		stroke-width: 4;
 	}
 
@@ -515,14 +535,15 @@
 		gap: 3rem;
 	}
 
-	.reading-note .eyebrow {
-		color: #9fd0d8;
+	.reading-note .eyebrow,
+	.edge .eyebrow {
+		color: #83cbd2;
 	}
 
 	.reading-note p:last-child {
 		max-width: 800px;
 		margin: 0;
-		color: rgba(244, 239, 228, 0.72);
+		color: rgba(244, 239, 228, 0.76);
 		font-family: var(--serif);
 		font-size: clamp(1.1rem, 2vw, 1.35rem);
 		line-height: 1.9;
@@ -595,17 +616,19 @@
 		text-align: center;
 	}
 
-	.prediction {
+	.prediction,
+	.choice-control {
 		margin-top: 1rem;
 		padding: 0.85rem;
 		border-radius: 10px;
 		background: rgba(32, 127, 140, 0.08);
 	}
 
-	.prediction > span {
+	.prediction > span,
+	.choice-control > span {
 		display: block;
 		margin-bottom: 0.55rem;
-		color: #207f8c;
+		color: #175d66;
 		font-family: var(--mono);
 		font-size: 0.6rem;
 		font-weight: 800;
@@ -614,6 +637,7 @@
 	}
 
 	.prediction > div,
+	.choice-control > div,
 	.inline-control {
 		display: flex;
 		flex-wrap: wrap;
@@ -621,6 +645,7 @@
 	}
 
 	.prediction button,
+	.choice-control button,
 	.inline-control button {
 		padding: 0.52rem 0.68rem;
 		border: 1px solid rgba(31, 40, 38, 0.18);
@@ -632,7 +657,8 @@
 		font-weight: 700;
 	}
 
-	.prediction button.selected {
+	.prediction button.selected,
+	.choice-control button.selected {
 		border-color: #207f8c;
 		background: #207f8c;
 		color: white;
@@ -641,6 +667,14 @@
 	.inline-control {
 		align-items: center;
 		margin-top: 0.8rem;
+	}
+
+	.watch-controls output {
+		margin-left: auto;
+		color: #175d66;
+		font-family: var(--mono);
+		font-size: 0.68rem;
+		font-weight: 800;
 	}
 
 	.evidence {
@@ -652,8 +686,7 @@
 		line-height: 1.65;
 	}
 
-	.range-control,
-	.sandbox-controls label {
+	.range-control {
 		display: grid;
 		grid-template-columns: 1fr auto;
 		gap: 0.5rem;
@@ -664,13 +697,11 @@
 		font-size: 0.7rem;
 	}
 
-	.range-control strong,
-	.sandbox-controls label strong {
+	.range-control strong {
 		font-family: var(--mono);
 	}
 
-	.range-control input,
-	.sandbox-controls input {
+	.range-control input {
 		width: 100%;
 		grid-column: 1 / -1;
 		accent-color: #207f8c;
@@ -684,7 +715,7 @@
 
 	.edge {
 		padding-block: clamp(6rem, 12vw, 10rem);
-		background: #1d2e30;
+		background: #193136;
 		color: var(--paper);
 	}
 
@@ -693,10 +724,6 @@
 		grid-template-columns: 0.7fr 1.3fr;
 		gap: 5rem;
 		align-items: start;
-	}
-
-	.edge .eyebrow {
-		color: #9fd0d8;
 	}
 
 	.edge h2,
@@ -726,14 +753,14 @@
 	}
 
 	.edge-facts span {
-		color: #9fd0d8;
+		color: #83cbd2;
 		font-family: var(--mono);
 		font-size: 0.68rem;
 		font-weight: 800;
 		letter-spacing: 0.08em;
 	}
 
-	.fact-definition {
+	.edge-facts strong {
 		color: rgba(244, 239, 228, 0.82);
 		font-size: 0.82rem;
 		font-weight: 500;
@@ -746,11 +773,11 @@
 
 	.sandbox {
 		padding-block: clamp(5rem, 10vw, 9rem);
-		background: #c9d8d6;
+		background: #d5e1de;
 	}
 
 	.sandbox .eyebrow {
-		color: #16565f;
+		color: #175d66;
 	}
 
 	.sandbox-head {
@@ -783,15 +810,20 @@
 		background: rgba(244, 239, 228, 0.35);
 	}
 
-	.sandbox-controls label {
+	.sandbox-controls :global(.choice-control),
+	.sandbox-controls :global(.range-control) {
 		margin: 0 0 0.7rem;
 		background: rgba(255, 255, 255, 0.25);
+	}
+
+	.choice-control.compact {
+		padding: 0.7rem;
 	}
 
 	.challenge {
 		padding: 0.8rem;
 		border-left: 3px solid #207f8c;
-		background: rgba(32, 127, 140, 0.06);
+		background: rgba(32, 127, 140, 0.07);
 	}
 
 	.challenge p {
@@ -833,8 +865,8 @@
 
 	.ending {
 		padding-block: clamp(7rem, 15vw, 13rem);
-		background: #163f46;
-		color: #e8f5f4;
+		background: #17383d;
+		color: #f2fbf9;
 		text-align: center;
 	}
 
@@ -860,12 +892,19 @@
 
 	.ending a {
 		padding: 0.75rem 1rem;
-		border: 1px solid rgba(232, 245, 244, 0.65);
+		border: 1px solid rgba(242, 251, 249, 0.65);
 		border-radius: 999px;
 		color: inherit;
 		font-size: 0.72rem;
 		font-weight: 800;
 		text-decoration: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.progress,
+		.step {
+			transition: none;
+		}
 	}
 
 	@media (max-width: 1050px) {
@@ -900,8 +939,8 @@
 
 		.step {
 			min-height: 92vh;
-			align-items: end;
 			padding-bottom: 8vh;
+			align-items: end;
 		}
 
 		.step.symbol-step {
@@ -926,12 +965,8 @@
 	}
 
 	@media (max-width: 620px) {
-		.hero-meta {
-			flex-wrap: wrap;
-		}
-
 		.story-hero h1 {
-			font-size: clamp(3rem, 17vw, 5.6rem);
+			font-size: clamp(2.8rem, 15vw, 5.2rem);
 		}
 
 		.hero-bottom {

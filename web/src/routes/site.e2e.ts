@@ -33,6 +33,22 @@ test('homepage presents the project and a working story entry', async ({ page })
 	expect(pageErrors).toEqual([]);
 });
 
+test('both catalogues expose the complete season-three trilogy', async ({ page }) => {
+	await page.goto(appPath('/'));
+	const chineseCards = page.locator('.season-three a.story');
+	await expect(chineseCards).toHaveCount(3);
+	await expect(chineseCards.nth(0)).toHaveAttribute('href', `${basePath}/stories/kinetics/`);
+	await expect(chineseCards.nth(1)).toHaveAttribute('href', `${basePath}/stories/arrhenius/`);
+	await expect(chineseCards.nth(2)).toHaveAttribute('href', `${basePath}/stories/catalyst/`);
+
+	await page.goto(appPath('/en/'));
+	const englishCards = page.locator('.season-three a.story');
+	await expect(englishCards).toHaveCount(3);
+	await expect(englishCards.nth(0)).toHaveAttribute('href', `${basePath}/en/stories/kinetics/`);
+	await expect(englishCards.nth(1)).toHaveAttribute('href', `${basePath}/en/stories/arrhenius/`);
+	await expect(englishCards.nth(2)).toHaveAttribute('href', `${basePath}/en/stories/catalyst/`);
+});
+
 test('story keeps the prediction and synchronized apparatus interactive', async ({ page }) => {
 	const pageErrors: Error[] = [];
 	page.on('pageerror', (error) => pageErrors.push(error));
@@ -274,6 +290,9 @@ test('all public routes load their local production assets without HTTP errors',
 		'/stories/entropy/',
 		'/stories/gibbs-valley/',
 		'/stories/nernst/',
+		'/stories/kinetics/',
+		'/stories/arrhenius/',
+		'/stories/catalyst/',
 		'/en/',
 		'/en/stories/ethanol-distillation/',
 		'/en/stories/boiling-map/',
@@ -281,7 +300,10 @@ test('all public routes load their local production assets without HTTP errors',
 		'/en/stories/cooling-curve/',
 		'/en/stories/entropy/',
 		'/en/stories/gibbs-valley/',
-		'/en/stories/nernst/'
+		'/en/stories/nernst/',
+		'/en/stories/kinetics/',
+		'/en/stories/arrhenius/',
+		'/en/stories/catalyst/'
 	]) {
 		await page.goto(appPath(path));
 		await expect(page.locator('main')).toBeVisible();

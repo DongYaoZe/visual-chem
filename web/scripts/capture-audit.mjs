@@ -75,4 +75,28 @@ await capture(
 	chooseLiteratureSamples
 );
 
+// Season-three visual regression set: every story gets a hero and its most
+// explanatory linked-view scene at desktop and phone widths.
+for (const story of [
+	{ slug: 'kinetics', scene: 'fingerprints' },
+	{ slug: 'arrhenius', scene: 'the-tail' },
+	{ slug: 'catalyst', scene: 'lower-pass' }
+]) {
+	const path = `/stories/${story.slug}`;
+	await capture(`${story.slug}-hero-desktop`, path, { width: 1440, height: 1000 });
+	await capture(
+		`${story.slug}-stage-desktop`,
+		path,
+		{ width: 1440, height: 1000 },
+		`[data-scene-id="${story.scene}"]`
+	);
+	await capture(`${story.slug}-hero-mobile`, path, { width: 390, height: 844 });
+	await capture(
+		`${story.slug}-stage-mobile`,
+		path,
+		{ width: 390, height: 844 },
+		`[data-scene-id="${story.scene}"]`
+	);
+}
+
 await browser.close();

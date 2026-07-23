@@ -1,118 +1,170 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { centralFraction, ehrenfestTrajectory, multiplicityDistribution } from '$lib/chem';
+	import {
+		accelerationFactor,
+		arrheniusFactor,
+		catalyzedProfile,
+		H2O2_BARRIERS_KJ,
+		H2O2_DELTA_H_KJ,
+		uncatalyzedProfile,
+		type ProfilePoint
+	} from '$lib/chem';
+	import CatalystTriView from '$lib/components/CatalystTriView.svelte';
 	import ConceptCheck from '$lib/components/ConceptCheck.svelte';
-	import EntropyTriView from '$lib/components/EntropyTriView.svelte';
 	import Formula from '$lib/components/Math.svelte';
 	import Seo from '$lib/components/Seo.svelte';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import StoryStage from '$lib/components/StoryStage.svelte';
-	import { getEntropyContent, getSiteContent, type LocaleCode } from '$lib/content';
+	import {
+		getCatalystContent,
+		getSiteContent,
+		type CatalystKind,
+		type LocaleCode
+	} from '$lib/content';
 	import { parseProse, type InlineSegment } from './prose';
-	import { entropySceneDefinition } from './season2-scenes';
+	import {
+		catalystSceneDefinition,
+		type CatalystPath,
+		type CatalystSceneDefinition
+	} from './season3-scenes';
 	import { scrolly } from './scrolly';
 
 	interface Props {
 		locale?: LocaleCode;
 	}
 
+	type TriFocus = 'bench' | 'surface' | 'profile' | 'all';
+
 	let { locale = 'zh-CN' }: Props = $props();
 	let site = $derived(getSiteContent(locale));
-	let story = $derived(getEntropyContent(locale));
+	let story = $derived(getCatalystContent(locale));
+
+	const pathDefaults = catalystSceneDefinition('lower-pass');
+	const sandboxDefaults = catalystSceneDefinition('sandbox');
 
 	let activeIndex = $state(0);
 	let hookPrediction = $state<string | null>(null);
-	let countN = $state(4);
+	let selectedPath = $state<CatalystPath>(pathDefaults.catalyst);
+	const labEa = sandboxDefaults.eaKJPerMol;
+	let labTemperatureC = $state(sandboxDefaults.temperatureC);
 
-	// The release scene walks a precomputed Ehrenfest trajectory.
-	const RELEASE = ehrenfestTrajectory(100, 1400);
-	let releaseIndex = $state(0);
-	let releasePlaying = $state(false);
-
-	$effect(() => {
-		if (!releasePlaying) return;
-		const id = setInterval(() => {
-			releaseIndex = Math.min(RELEASE.length - 1, releaseIndex + 6);
-			if (releaseIndex >= RELEASE.length - 1) releasePlaying = false;
-		}, 40);
-		return () => clearInterval(id);
-	});
-
-	function releaseReset() {
-		releasePlaying = false;
-		releaseIndex = 0;
-	}
-
-	// The fluctuation scene idles along an equilibrium walk while active.
-	const JITTER = ehrenfestTrajectory(100, 4000, 50, 7);
-	let jitterIndex = $state(0);
-
-	let activeScene = $derived(entropySceneDefinition(story.scenes[activeIndex].id));
+	let activeScene = $derived(catalystSceneDefinition(story.scenes[activeIndex].id));
 	let activeSceneId = $derived(activeScene.id);
 
-	$effect(() => {
-		if (activeSceneId !== 'fluctuations') return;
-		const id = setInterval(() => {
-			jitterIndex = (jitterIndex + 3) % JITTER.length;
-		}, 90);
-		return () => clearInterval(id);
-	});
+	function barrierFor(path: CatalystPath): number {
+		switch (path) {
+			case 'none':
+				return H2O2_BARRIERS_KJ.uncatalyzed;
+			case 'iodide':
+				return H2O2_BARRIERS_KJ.iodide;
+			case 'catalase':
+				return H2O2_BARRIERS_KJ.catalase;
+		}
+	}
 
-	// Sandbox counter shared by the last scene and the free-play section.
-	let labN = $state(100);
-	let labWindow = $state(10);
+	function pathFor(index: number): CatalystPath {
+		return (['none', 'iodide', 'catalase'] as const)[index];
+	}
 
-	// Which census the stage shows: scene defaults, overridden by whichever
-	// control the active scene hands to the reader.
-	let visualTotal = $derived.by(() => {
-		switch (activeSceneId) {
-			case 'count-the-ways':
-				return countN;
-			case 'irreversible':
-				return 100;
-			case 'fluctuations':
-				return 100;
-			case 'sandbox':
-				return labN;
+	function displayBoost(value: number): string {
+		if (value < 10) return value.toFixed(1);
+		if (value < 1000) return value.toFixed(0);
+		return value.toExponential(1);
+	}
+
+	function focusFor(scene: CatalystSceneDefinition): TriFocus {
+		switch (scene.id) {
+			case 'the-pass':
+			case 'both-ways':
+				return 'profile';
+			case 'unconsumed':
+			case 'enzymes':
+				return 'surface';
+			case 'hook':
+				return 'bench';
 			default:
-				return activeScene.total;
+				return 'all';
+		}
+	}
+
+	let selectedEa = $derived(barrierFor(selectedPath));
+	let visualEa = $derived.by(() => {
+		switch (activeSceneId) {
+			case 'lower-pass':
+			case 'both-ways':
+				return selectedEa;
+			case 'sandbox':
+				return labEa;
+			default:
+				return activeScene.eaKJPerMol;
 		}
 	});
-	let visualLeft = $derived.by(() => {
-		switch (activeSceneId) {
-			case 'count-the-ways':
-				return Math.round(countN / 2);
-			case 'irreversible':
-				return RELEASE[releaseIndex];
-			case 'fluctuations':
-				return JITTER[jitterIndex];
-			case 'sandbox':
-				return Math.round(labN / 2);
-			default:
-				return activeScene.leftCount ?? Math.round(activeScene.total / 2);
-		}
-	});
-	let visualValveOpen = $derived(
-		activeSceneId === 'irreversible' ? releaseIndex > 0 : activeScene.valveOpen
+	let visualTemperatureC = $derived(
+		activeSceneId === 'sandbox' ? labTemperatureC : activeScene.temperatureC
 	);
-	let visualWindow = $derived(activeSceneId === 'sandbox' ? labWindow : null);
-
+	let visualShowCatalyzed = $derived.by(() => {
+		switch (activeSceneId) {
+			case 'lower-pass':
+			case 'both-ways':
+				return selectedPath !== 'none';
+			case 'sandbox':
+				return labEa < H2O2_BARRIERS_KJ.uncatalyzed;
+			default:
+				return activeScene.showCatalyzedPath;
+		}
+	});
+	let visualCatalystKind = $derived.by((): CatalystKind => {
+		switch (activeSceneId) {
+			case 'lower-pass':
+			case 'both-ways':
+				return selectedPath;
+			case 'sandbox':
+				return 'iodide';
+			default:
+				return activeScene.catalyst;
+		}
+	});
+	let visualActive = $derived(
+		(activeScene.active || activeSceneId === 'lower-pass') && visualCatalystKind !== 'none'
+	);
+	let visualFocus = $derived(focusFor(activeScene));
+	let visualBoost = $derived(
+		accelerationFactor(
+			H2O2_BARRIERS_KJ.uncatalyzed,
+			visualShowCatalyzed ? visualEa : H2O2_BARRIERS_KJ.uncatalyzed,
+			visualTemperatureC + 273.15
+		)
+	);
+	let selectedBoost = $derived(
+		accelerationFactor(H2O2_BARRIERS_KJ.uncatalyzed, selectedEa, 298.15)
+	);
+	let labBoost = $derived(
+		accelerationFactor(H2O2_BARRIERS_KJ.uncatalyzed, labEa, labTemperatureC + 273.15)
+	);
+	let labUncatalyzedFactor = $derived(
+		arrheniusFactor(H2O2_BARRIERS_KJ.uncatalyzed, labTemperatureC + 273.15)
+	);
+	let labCatalyzedFactor = $derived(arrheniusFactor(labEa, labTemperatureC + 273.15));
 	let progress = $derived(((activeIndex + 1) / story.scenes.length) * 100);
 	let catalogHref = $derived(locale === 'en' ? resolve('/en/') : resolve('/'));
-	let windowPercent = $derived((centralFraction(labN, labWindow) * 100).toFixed(1));
 
-	// The hero backdrop sketches the computed N = 100 multiplicity spike.
-	const HERO = multiplicityDistribution(100);
-	const heroPeak = Math.max(...HERO.probabilities);
-	const heroPath = HERO.probabilities
-		.map(
-			(probability, index) =>
-				`${index === 0 ? 'M' : 'L'}${(30 + (index / 100) * 940).toFixed(1)},${(
-					285 -
-					(probability / heroPeak) * 250
-				).toFixed(1)}`
-		)
-		.join(' ');
+	function energyPath(points: readonly ProfilePoint[]): string {
+		return points
+			.map((point, index) => {
+				const x = 30 + ((point.x + 0.02) / 1.04) * 940;
+				const y = 30 + ((80 - point.e) / 185) * 240;
+				return (index === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+			})
+			.join(' ');
+	}
+
+	// Both hero paths come from the same numerical kernel as the story diagram.
+	const heroUncatalyzedPath = energyPath(
+		uncatalyzedProfile(H2O2_BARRIERS_KJ.uncatalyzed, H2O2_DELTA_H_KJ, 40)
+	);
+	const heroCatalyzedPath = energyPath(
+		catalyzedProfile(H2O2_BARRIERS_KJ.iodide, H2O2_DELTA_H_KJ, 24)
+	);
 </script>
 
 {#snippet inline(segments: InlineSegment[])}
@@ -140,21 +192,18 @@
 	modifiedTime={story.seo.modifiedTime}
 />
 
-<div class="progress" style:width={`${progress}%`} aria-hidden="true"></div>
+<div class="progress" style:width={progress + '%'} aria-hidden="true"></div>
 <SiteHeader compact {locale} content={site.shared.header} />
 
 <main>
 	<section class="story-hero shell">
-		<div class="hero-meta">
-			<p class="eyebrow">{story.hero.eyebrow}</p>
-		</div>
+		<div class="hero-meta"><p class="eyebrow">{story.hero.eyebrow}</p></div>
 		<h1>{story.hero.title[0]}<br /><em>{story.hero.title[1]}</em></h1>
-		<div class="hero-bottom">
-			<p>{story.hero.subtitle}</p>
-		</div>
+		<div class="hero-bottom"><p>{story.hero.subtitle}</p></div>
 		<div class="hero-curve" aria-hidden="true">
 			<svg viewBox="0 0 1000 300">
-				<path d={heroPath} />
+				<path class="uncatalyzed" d={heroUncatalyzedPath} />
+				<path class="catalyzed" d={heroCatalyzedPath} />
 			</svg>
 			<span>{story.hero.heroTag}</span>
 		</div>
@@ -175,19 +224,24 @@
 			statusAriaLabel={story.stage.shortStateAriaLabel}
 		>
 			{#snippet stage()}
-				<EntropyTriView
-					total={visualTotal}
-					leftCount={visualLeft}
-					valveOpen={visualValveOpen}
-					markAllLeft={activeScene.markAllLeft}
-					window={visualWindow}
+				<CatalystTriView
+					uncatalyzedEaKJPerMol={H2O2_BARRIERS_KJ.uncatalyzed}
+					catalyzedEaKJPerMol={visualEa}
+					deltaHKJPerMol={H2O2_DELTA_H_KJ}
+					catalystKind={visualCatalystKind}
+					temperatureK={visualTemperatureC + 273.15}
+					progress={0.18 + activeIndex * 0.085}
+					showCatalyzedPath={visualShowCatalyzed}
+					active={visualActive}
+					focus={visualFocus}
 					label={story.triView.defaultAriaLabel}
 					content={story.triView}
 				/>
 			{/snippet}
 			{#snippet status()}
-				<span>N {visualTotal}</span>
-				<span>n {Math.round(visualLeft)}</span>
+				<span>Ea {visualEa.toFixed(0)} kJ/mol</span>
+				<span>{visualTemperatureC.toFixed(0)} °C</span>
+				<span>×{displayBoost(visualBoost)}</span>
 			{/snippet}
 		</StoryStage>
 
@@ -196,7 +250,10 @@
 				<article
 					class="step"
 					class:active={activeIndex === index}
-					class:symbol-step={scene.id === 'the-spike' || scene.id === 'sandbox'}
+					class:symbol-step={scene.id === 'the-pass' ||
+						scene.id === 'lower-pass' ||
+						scene.id === 'both-ways' ||
+						scene.id === 'sandbox'}
 					data-scene-index={index}
 					data-scene-id={scene.id}
 				>
@@ -235,70 +292,61 @@
 							{/if}
 						{/if}
 
-						{#if scene.id === 'count-the-ways'}
-							<label class="range-control">
-								<span>{story.interactions.countTheWays.particlesLabel}</span>
-								<strong>N = {countN}</strong>
-								<input
-									type="range"
-									min="4"
-									max="400"
-									step="4"
-									aria-label={story.interactions.countTheWays.particlesLabel}
-									bind:value={countN}
-								/>
-							</label>
-						{/if}
-
-						{#if scene.id === 'irreversible'}
-							<div class="inline-control">
-								<button
-									type="button"
-									onclick={() => {
-										releaseIndex = 0;
-										releasePlaying = true;
-									}}>{story.interactions.irreversible.releaseButton}</button
-								>
-								<button type="button" onclick={releaseReset}
-									>{story.interactions.irreversible.resetButton}</button
-								>
+						{#if scene.id === 'lower-pass' || scene.id === 'both-ways'}
+							<div class="path-selector">
+								<span>{story.interactions.lowerPass.catalystLabel}</span>
+								<div>
+									{#each story.interactions.lowerPass.catalystNames as name, choiceIndex (name)}
+										{@const choice = pathFor(choiceIndex)}
+										<button
+											type="button"
+											aria-pressed={selectedPath === choice}
+											class:selected={selectedPath === choice}
+											onclick={() => (selectedPath = choice)}>{name}</button
+										>
+									{/each}
+								</div>
 							</div>
-							{#if releasePlaying}
-								<p class="evidence">{story.interactions.irreversible.runningHint}</p>
-							{/if}
+							<p class="evidence" aria-live="polite">
+								{#if scene.id === 'both-ways'}
+									{story.interactions.bothWays.readout({
+										forwardBoost: displayBoost(selectedBoost),
+										reverseBoost: displayBoost(selectedBoost)
+									})}
+								{:else}
+									{story.interactions.lowerPass.readout({
+										ea: selectedEa.toFixed(0),
+										boost: displayBoost(selectedBoost)
+									})}
+								{/if}
+							</p>
 						{/if}
 
 						{#if scene.id === 'sandbox'}
+							<div class="fixed-parameter">
+								<span>{story.interactions.sandbox.eaLabel}</span>
+								<strong>{labEa.toFixed(0)} kJ/mol</strong>
+							</div>
 							<label class="range-control">
-								<span>{story.interactions.sandbox.particlesLabel}</span>
-								<strong>N = {labN}</strong>
+								<span>{story.interactions.sandbox.temperatureLabel}</span>
+								<strong>{labTemperatureC.toFixed(0)} °C</strong>
 								<input
 									type="range"
-									min="10"
-									max="400"
-									step="2"
-									aria-label={story.interactions.sandbox.particlesLabel}
-									bind:value={labN}
-								/>
-							</label>
-							<label class="range-control">
-								<span>{story.interactions.sandbox.windowLabel}</span>
-								<strong>±{labWindow}</strong>
-								<input
-									type="range"
-									min="1"
-									max="50"
+									min="0"
+									max="100"
 									step="1"
-									aria-label={story.interactions.sandbox.windowLabel}
-									bind:value={labWindow}
+									aria-label={story.interactions.sandbox.temperatureLabel}
+									bind:value={labTemperatureC}
 								/>
-								<small
-									>{story.interactions.sandbox.windowReadout({
-										percent: windowPercent,
-										window: labWindow
-									})}</small
-								>
 							</label>
+							<p class="evidence" aria-live="polite">
+								{story.interactions.sandbox.readout({
+									ea: labEa.toFixed(0),
+									boost: displayBoost(labBoost),
+									uncatalyzedFactor: labUncatalyzedFactor.toExponential(2),
+									catalyzedFactor: labCatalyzedFactor.toExponential(2)
+								})}
+							</p>
 						{/if}
 					</div>
 				</article>
@@ -343,42 +391,42 @@
 		</div>
 		<div class="shell sandbox-grid">
 			<div class="sandbox-controls">
+				<div class="fixed-parameter">
+					<span>{story.interactions.sandbox.eaLabel}</span>
+					<strong>{labEa.toFixed(0)} kJ/mol</strong>
+				</div>
 				<label>
-					<span>{story.interactions.sandbox.particlesLabel}</span><strong>N = {labN}</strong>
+					<span>{story.interactions.sandbox.temperatureLabel}</span>
+					<strong>{labTemperatureC.toFixed(0)} °C</strong>
 					<input
 						type="range"
-						min="10"
-						max="400"
-						step="2"
-						aria-label={story.interactions.sandbox.particlesLabel}
-						bind:value={labN}
-					/>
-				</label>
-				<label>
-					<span>{story.interactions.sandbox.windowLabel}</span><strong>±{labWindow}</strong>
-					<input
-						type="range"
-						min="1"
-						max="50"
+						min="0"
+						max="100"
 						step="1"
-						aria-label={story.interactions.sandbox.windowLabel}
-						bind:value={labWindow}
+						aria-label={story.interactions.sandbox.temperatureLabel}
+						bind:value={labTemperatureC}
 					/>
 				</label>
-				<div class="challenge">
+				<div class="challenge" aria-live="polite">
 					<p>
-						{story.interactions.sandbox.windowReadout({
-							percent: windowPercent,
-							window: labWindow
+						{story.interactions.sandbox.readout({
+							ea: labEa.toFixed(0),
+							boost: displayBoost(labBoost),
+							uncatalyzedFactor: labUncatalyzedFactor.toExponential(2),
+							catalyzedFactor: labCatalyzedFactor.toExponential(2)
 						})}
 					</p>
 				</div>
 			</div>
-			<EntropyTriView
-				total={labN}
-				leftCount={Math.round(labN / 2)}
-				valveOpen
-				window={labWindow}
+			<CatalystTriView
+				uncatalyzedEaKJPerMol={H2O2_BARRIERS_KJ.uncatalyzed}
+				catalyzedEaKJPerMol={labEa}
+				deltaHKJPerMol={H2O2_DELTA_H_KJ}
+				catalystKind="iodide"
+				temperatureK={labTemperatureC + 273.15}
+				progress={0.55}
+				showCatalyzedPath={labEa < H2O2_BARRIERS_KJ.uncatalyzed}
+				active
 				label={story.sandboxIntro.title}
 				content={story.triView}
 			/>
@@ -419,7 +467,7 @@
 		left: 0;
 		z-index: 100;
 		height: 3px;
-		background: #207f8c;
+		background: #a3702a;
 		transition: width 450ms ease;
 	}
 
@@ -444,7 +492,7 @@
 		z-index: 2;
 		margin: 1.2rem 0 2.5rem;
 		font-family: var(--serif);
-		font-size: clamp(3.4rem, 9vw, 8.6rem);
+		font-size: clamp(3.2rem, 8.4vw, 8rem);
 		font-weight: 500;
 		letter-spacing: -0.075em;
 		line-height: 0.85;
@@ -452,8 +500,8 @@
 
 	.story-hero h1 em {
 		display: inline-block;
-		margin-left: 18%;
-		color: #207f8c;
+		margin-left: 14%;
+		color: #a3702a;
 		font-weight: 500;
 		transform: rotate(-2deg);
 	}
@@ -477,9 +525,9 @@
 	.hero-curve {
 		position: absolute;
 		right: -4%;
-		bottom: 4%;
+		bottom: 2%;
 		width: 62%;
-		opacity: 0.3;
+		opacity: 0.48;
 	}
 
 	.hero-curve svg {
@@ -489,15 +537,26 @@
 
 	.hero-curve path {
 		fill: none;
-		stroke: #207f8c;
-		stroke-width: 4;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.hero-curve .uncatalyzed {
+		stroke: rgba(54, 45, 32, 0.45);
+		stroke-width: 3;
+		stroke-dasharray: 10 8;
+	}
+
+	.hero-curve .catalyzed {
+		stroke: #a3702a;
+		stroke-width: 5;
 	}
 
 	.hero-curve span {
 		position: absolute;
 		right: 8%;
 		bottom: -0.5rem;
-		color: var(--acid);
+		color: #725020;
 		font-family: var(--mono);
 		font-size: 0.65rem;
 		font-weight: 800;
@@ -515,14 +574,15 @@
 		gap: 3rem;
 	}
 
-	.reading-note .eyebrow {
-		color: #9fd0d8;
+	.reading-note .eyebrow,
+	.edge .eyebrow {
+		color: #e7c98f;
 	}
 
 	.reading-note p:last-child {
 		max-width: 800px;
 		margin: 0;
-		color: rgba(244, 239, 228, 0.72);
+		color: rgba(244, 239, 228, 0.75);
 		font-family: var(--serif);
 		font-size: clamp(1.1rem, 2vw, 1.35rem);
 		line-height: 1.9;
@@ -557,8 +617,8 @@
 		padding: 1.4rem;
 		border: 1px solid rgba(31, 40, 38, 0.15);
 		border-radius: 16px;
-		background: rgba(250, 247, 239, 0.94);
-		box-shadow: 0 18px 45px rgba(36, 40, 34, 0.08);
+		background: rgba(250, 247, 239, 0.95);
+		box-shadow: 0 18px 45px rgba(50, 40, 23, 0.09);
 	}
 
 	.step-card > p:not(.eyebrow):not(.evidence) {
@@ -589,23 +649,26 @@
 	.formula {
 		margin: 1rem 0;
 		padding: 0.7rem;
+		overflow-x: auto;
 		border-block: 1px solid var(--line);
 		color: var(--ink);
 		font-size: 1.02rem;
 		text-align: center;
 	}
 
-	.prediction {
+	.prediction,
+	.path-selector {
 		margin-top: 1rem;
 		padding: 0.85rem;
 		border-radius: 10px;
-		background: rgba(32, 127, 140, 0.08);
+		background: rgba(163, 112, 42, 0.09);
 	}
 
-	.prediction > span {
+	.prediction > span,
+	.path-selector > span {
 		display: block;
 		margin-bottom: 0.55rem;
-		color: #207f8c;
+		color: #725020;
 		font-family: var(--mono);
 		font-size: 0.6rem;
 		font-weight: 800;
@@ -614,45 +677,42 @@
 	}
 
 	.prediction > div,
-	.inline-control {
+	.path-selector > div {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.45rem;
 	}
 
 	.prediction button,
-	.inline-control button {
+	.path-selector button {
 		padding: 0.52rem 0.68rem;
 		border: 1px solid rgba(31, 40, 38, 0.18);
 		border-radius: 999px;
-		background: rgba(255, 255, 255, 0.65);
+		background: rgba(255, 255, 255, 0.68);
 		color: var(--ink);
 		cursor: pointer;
 		font-size: 0.7rem;
 		font-weight: 700;
 	}
 
-	.prediction button.selected {
-		border-color: #207f8c;
-		background: #207f8c;
+	.prediction button.selected,
+	.path-selector button.selected {
+		border-color: #80551f;
+		background: #80551f;
 		color: white;
-	}
-
-	.inline-control {
-		align-items: center;
-		margin-top: 0.8rem;
 	}
 
 	.evidence {
 		margin: 0.75rem 0 0;
 		padding-left: 0.7rem;
-		border-left: 2px solid #207f8c;
+		border-left: 2px solid #a3702a;
 		color: var(--ink-muted);
 		font-size: 0.75rem;
 		line-height: 1.65;
 	}
 
 	.range-control,
+	.fixed-parameter,
 	.sandbox-controls label {
 		display: grid;
 		grid-template-columns: 1fr auto;
@@ -665,6 +725,7 @@
 	}
 
 	.range-control strong,
+	.fixed-parameter strong,
 	.sandbox-controls label strong {
 		font-family: var(--mono);
 	}
@@ -673,18 +734,12 @@
 	.sandbox-controls input {
 		width: 100%;
 		grid-column: 1 / -1;
-		accent-color: #207f8c;
-	}
-
-	.range-control small {
-		grid-column: 1 / -1;
-		color: var(--ink-muted);
-		font-family: var(--mono);
+		accent-color: #a3702a;
 	}
 
 	.edge {
 		padding-block: clamp(6rem, 12vw, 10rem);
-		background: #1d2e30;
+		background: #2b2419;
 		color: var(--paper);
 	}
 
@@ -693,10 +748,6 @@
 		grid-template-columns: 0.7fr 1.3fr;
 		gap: 5rem;
 		align-items: start;
-	}
-
-	.edge .eyebrow {
-		color: #9fd0d8;
 	}
 
 	.edge h2,
@@ -726,7 +777,7 @@
 	}
 
 	.edge-facts span {
-		color: #9fd0d8;
+		color: #e7c98f;
 		font-family: var(--mono);
 		font-size: 0.68rem;
 		font-weight: 800;
@@ -746,11 +797,11 @@
 
 	.sandbox {
 		padding-block: clamp(5rem, 10vw, 9rem);
-		background: #c9d8d6;
+		background: #e3d5bd;
 	}
 
 	.sandbox .eyebrow {
-		color: #16565f;
+		color: #725020;
 	}
 
 	.sandbox-head {
@@ -780,18 +831,23 @@
 		padding: 0.85rem;
 		border: 1px solid rgba(31, 40, 38, 0.17);
 		border-radius: 16px;
-		background: rgba(244, 239, 228, 0.35);
+		background: rgba(244, 239, 228, 0.38);
 	}
 
 	.sandbox-controls label {
 		margin: 0 0 0.7rem;
-		background: rgba(255, 255, 255, 0.25);
+		background: rgba(255, 255, 255, 0.3);
+	}
+
+	.sandbox-controls .fixed-parameter {
+		margin: 0 0 0.7rem;
+		background: rgba(255, 255, 255, 0.3);
 	}
 
 	.challenge {
 		padding: 0.8rem;
-		border-left: 3px solid #207f8c;
-		background: rgba(32, 127, 140, 0.06);
+		border-left: 3px solid #a3702a;
+		background: rgba(163, 112, 42, 0.08);
 	}
 
 	.challenge p {
@@ -833,8 +889,8 @@
 
 	.ending {
 		padding-block: clamp(7rem, 15vw, 13rem);
-		background: #163f46;
-		color: #e8f5f4;
+		background: #3a2b18;
+		color: #f5ead6;
 		text-align: center;
 	}
 
@@ -860,7 +916,7 @@
 
 	.ending a {
 		padding: 0.75rem 1rem;
-		border: 1px solid rgba(232, 245, 244, 0.65);
+		border: 1px solid rgba(245, 234, 214, 0.68);
 		border-radius: 999px;
 		color: inherit;
 		font-size: 0.72rem;
@@ -910,7 +966,7 @@
 		}
 
 		.step-card {
-			box-shadow: 0 20px 65px rgba(36, 40, 34, 0.2);
+			box-shadow: 0 20px 65px rgba(50, 40, 23, 0.2);
 		}
 
 		.sandbox-head,
@@ -931,7 +987,7 @@
 		}
 
 		.story-hero h1 {
-			font-size: clamp(3rem, 17vw, 5.6rem);
+			font-size: clamp(2.8rem, 15vw, 5.2rem);
 		}
 
 		.hero-bottom {
@@ -942,7 +998,7 @@
 
 		.hero-curve {
 			right: -24%;
-			bottom: 11%;
+			bottom: 10%;
 			width: 120%;
 		}
 
@@ -966,9 +1022,17 @@
 	}
 
 	@media (max-width: 850px) and (max-height: 650px) {
-		.step {
+		.step,
+		.step.symbol-step {
 			min-height: auto;
 			padding-block: 2rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.progress,
+		.step {
+			transition: none;
 		}
 	}
 </style>

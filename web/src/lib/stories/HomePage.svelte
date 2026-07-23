@@ -35,6 +35,15 @@
 	let coolingCurveHref = $derived(
 		locale === 'en' ? resolve('/en/stories/cooling-curve/') : resolve('/stories/cooling-curve/')
 	);
+	let kineticsHref = $derived(
+		locale === 'en' ? resolve('/en/stories/kinetics/') : resolve('/stories/kinetics/')
+	);
+	let arrheniusHref = $derived(
+		locale === 'en' ? resolve('/en/stories/arrhenius/') : resolve('/stories/arrhenius/')
+	);
+	let catalystHref = $derived(
+		locale === 'en' ? resolve('/en/stories/catalyst/') : resolve('/stories/catalyst/')
+	);
 	let demoComposition = $state(0.1);
 	let demoStage = $state(2);
 	// The hero envelope is computed from the calibrated model, not sketched.
@@ -256,6 +265,46 @@
 					<p>{site.home.seasonTwo.stories[2].description}</p>
 				</div>
 				<strong>{site.home.seasonTwo.stories[2].action}</strong>
+			</a>
+		</div>
+	</section>
+
+	<section class="season season-three shell">
+		<header>
+			<div>
+				<p class="eyebrow">{site.home.seasonThree.eyebrow}</p>
+				<h2>{site.home.seasonThree.title}</h2>
+			</div>
+			<p>{site.home.seasonThree.introduction}</p>
+		</header>
+
+		<div class="story-list">
+			<a class="story live" href={kineticsHref}>
+				<span class="number">{site.home.seasonThree.stories[0].number}</span>
+				<div>
+					<small>{site.home.seasonThree.stories[0].status}</small>
+					<h3>{site.home.seasonThree.stories[0].title}</h3>
+					<p>{site.home.seasonThree.stories[0].description}</p>
+				</div>
+				<strong>{site.home.seasonThree.stories[0].action}</strong>
+			</a>
+			<a class="story live" href={arrheniusHref}>
+				<span class="number">{site.home.seasonThree.stories[1].number}</span>
+				<div>
+					<small>{site.home.seasonThree.stories[1].status}</small>
+					<h3>{site.home.seasonThree.stories[1].title}</h3>
+					<p>{site.home.seasonThree.stories[1].description}</p>
+				</div>
+				<strong>{site.home.seasonThree.stories[1].action}</strong>
+			</a>
+			<a class="story live" href={catalystHref}>
+				<span class="number">{site.home.seasonThree.stories[2].number}</span>
+				<div>
+					<small>{site.home.seasonThree.stories[2].status}</small>
+					<h3>{site.home.seasonThree.stories[2].title}</h3>
+					<p>{site.home.seasonThree.stories[2].description}</p>
+				</div>
+				<strong>{site.home.seasonThree.stories[2].action}</strong>
 			</a>
 		</div>
 	</section>

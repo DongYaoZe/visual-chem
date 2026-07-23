@@ -5,6 +5,7 @@ VisualChem accepts code, scientific review, translation, teaching feedback, and 
 ## Local setup
 
 ```powershell
+$env:NODE_OPTIONS = '--max-old-space-size=768 --max-semi-space-size=8'
 npm --prefix web install
 npx --prefix web playwright install chromium
 npm --prefix web run validate
@@ -58,9 +59,19 @@ Keep calibration and validation datasets separate. Never merge measurements from
 Before opening a pull request:
 
 ```powershell
+$env:BASE_PATH = '/visual-chem'
+$env:NODE_OPTIONS = '--max-old-space-size=768 --max-semi-space-size=8'
 npm --prefix web run format
 npm --prefix web run validate
 npm --prefix web run test:e2e
+npm --prefix web audit --omit=dev --audit-level=high
+```
+
+Then inspect the production artifact visually. Start `npm --prefix web run serve:pages` in
+one terminal and run the following in another:
+
+```powershell
+$env:VISUAL_CHEM_ORIGIN = 'http://127.0.0.1:4173/visual-chem'
 npm --prefix web run audit:visual
 ```
 

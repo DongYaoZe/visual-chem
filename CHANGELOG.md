@@ -16,7 +16,11 @@ All notable public changes to VisualChem are recorded here. Versions follow Sema
 - selective molecular-sieve dehydration balance, concept check, and free-play laboratory;
 - keyboard-accessible controls, reduced-motion support, global animation pause, short-screen graphic dialog, and automated Axe coverage;
 - GitHub Pages static deployment, production subpath support, branded share assets, citation metadata, PWA cache, no-JavaScript notice, and static 404 page;
-- typed Chinese and English content layers with shared interaction logic.
+- typed Chinese and English content layers with shared interaction logic;
+- season one phase-equilibrium stories covering boiling maps, ternary salt separation, and eutectic cooling-curve reconstruction;
+- season two stories connecting microstate counting, Gibbs-energy landscapes, and the Nernst equation;
+- season three kinetics stories linking integrated rate laws, Arrhenius/Maxwell–Boltzmann reasoning, and catalytic energy pathways;
+- ten bilingual story routes, each with synchronized macroscopic, particulate, and symbolic views, prediction prompts, concept checks, and a free-play bench.
 
 ### Evidence boundaries
 

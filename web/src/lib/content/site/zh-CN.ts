@@ -110,7 +110,7 @@ export const zhCNSiteContent = {
 			type: 'website',
 			image: '/og-home.png',
 			imageAlt: 'VisualChem 首页：宏观、微观与符号三重表征围绕乙醇—水相图同步',
-			modifiedTime: '2026-07-16'
+			modifiedTime: '2026-07-23'
 		},
 		hero: {
 			eyebrow: 'OPEN CHEMISTRY · EXPLORABLE STORIES',
@@ -214,6 +214,35 @@ export const zhCNSiteContent = {
 					status: '可交互 Alpha · 约 10 分钟',
 					title: '电池里的势能地形',
 					description: '1.10 V 是两级台阶的差；放电平台与雪崩都在能斯特坡上。',
+					action: '开始阅读 ↗'
+				}
+			]
+		},
+		seasonThree: {
+			eyebrow: 'SEASON 03 · KINETICS',
+			title: '给反应装上秒表',
+			introduction:
+				'热力学告诉我们路往哪边下坡，动力学追问要走多久。先听浓度的倒计时，再看温度怎样放大分布尾巴，最后让催化剂改路、不改终点。',
+			stories: [
+				{
+					number: '08',
+					status: '可交互 Alpha · 约 10 分钟',
+					title: '浓度的倒计时',
+					description: '速率是曲线此刻的坡度；连续半衰期把反应级数敲成可听见的指纹。',
+					action: '开始阅读 ↗'
+				},
+				{
+					number: '09',
+					status: '可交互 Alpha · 约 11 分钟',
+					title: '翻山的分子',
+					description: '升温没有把每个分子都推快一点；真正被放大的，是越过能垒的那条稀薄尾巴。',
+					action: '开始阅读 ↗'
+				},
+				{
+					number: '10',
+					status: '可交互 Alpha · 约 10 分钟',
+					title: '捷径不改终点',
+					description: '催化剂削低山口，却不搬动两侧山谷：正逆一起加速，平衡位置纹丝不动。',
 					action: '开始阅读 ↗'
 				}
 			]

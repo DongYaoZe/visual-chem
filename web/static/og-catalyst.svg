@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">捷径不改终点 — VisualChem</title>
+  <desc id="desc">相同反应物与产物山谷之间，一条高能垒路径和一条双峰催化路径。</desc>
+  <defs>
+    <linearGradient id="ore" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#282316"/><stop offset="1" stop-color="#5c4921"/></linearGradient>
+    <pattern id="grain" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#f4efe4" stroke-opacity=".045"/></pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#171207" flood-opacity=".52"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#ore)"/><rect width="1200" height="630" fill="url(#grain)"/>
+  <g transform="translate(78 52)"><rect width="42" height="42" rx="11" fill="#f4efe4"/><path d="M8 33C12 17 22 10 32 15C35 17 36 20 36 23" fill="none" stroke="#173f43" stroke-width="3.5" stroke-linecap="round"/><path d="M8 33C14 26 23 21 30 21C33 21 35 22 36 23" fill="none" stroke="#d66b32" stroke-width="3.5" stroke-linecap="round"/><circle cx="35" cy="23" r="2.7" fill="#173f43"/><text x="56" y="29" fill="#f4efe4" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="26" font-weight="700">VisualChem</text></g>
+  <text x="78" y="186" fill="#e1b96e" font-family="SF Mono, Consolas, monospace" font-size="24" font-weight="700" letter-spacing="6">KINETICS · STORY 10</text>
+  <text x="74" y="278" fill="#f4efe4" font-family="Georgia, Songti SC, serif" font-size="82" font-weight="600" letter-spacing="-2">捷径不改</text>
+  <text x="74" y="372" fill="#e1b96e" font-family="Georgia, Songti SC, serif" font-size="82" font-weight="600" letter-spacing="-2">终点</text>
+  <text x="78" y="432" fill="#e7dfce" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="29">催化剂降低山口，不搬动山谷 —</text>
+  <text x="78" y="474" fill="#e7dfce" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="29">正逆一起加速，平衡位置不变</text>
+  <g transform="translate(690 120)" filter="url(#shadow)">
+    <rect width="440" height="420" rx="28" fill="#f7f2e6"/>
+    <g transform="translate(42 42)">
+      <path d="M0 306H356" stroke="#352f23" stroke-width="3"/>
+      <path d="M0 254C50 254 75 244 99 194S151 32 180 31S233 187 258 236S316 306 356 306" fill="none" stroke="#6e6654" stroke-width="6" stroke-linecap="round"/>
+      <path d="M0 254C35 254 56 242 78 198S113 118 141 133S160 200 183 201S211 139 237 147S266 239 294 271S330 306 356 306" fill="none" stroke="#a3702a" stroke-width="7" stroke-linecap="round"/>
+      <path d="M12 254V306M4 254H20M4 306H20" stroke="#bf3d30" stroke-width="2.5"/>
+      <text x="27" y="286" fill="#bf3d30" font-family="SF Mono, Consolas, monospace" font-size="15" font-weight="800">ΔH</text>
+      <path d="M106 249V119M98 249H114M98 119H114" stroke="#8a601f" stroke-width="2.5"/>
+      <text x="108" y="105" fill="#8a601f" font-family="SF Mono, Consolas, monospace" font-size="15" font-weight="800" text-anchor="middle">lower Eₐ</text>
+      <circle cx="141" cy="133" r="9" fill="#d66b32" stroke="#f7f2e6" stroke-width="4"/>
+      <text x="4" y="334" fill="#352f23" font-family="SF Mono, Consolas, monospace" font-size="15" font-weight="700">reactants</text>
+      <text x="356" y="334" fill="#352f23" font-family="SF Mono, Consolas, monospace" font-size="15" font-weight="700" text-anchor="end">products</text>
+    </g>
+  </g>
+  <g transform="translate(78 520)"><rect width="420" height="58" rx="29" fill="#f4efe4" fill-opacity=".1" stroke="#f4efe4" stroke-opacity=".35"/><text x="210" y="37" fill="#f4efe4" font-family="SF Mono, Consolas, monospace" font-size="21" font-weight="700" text-anchor="middle">the pathway is computed</text></g>
+</svg>

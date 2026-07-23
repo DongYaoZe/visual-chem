@@ -423,14 +423,6 @@
 		line-height: 1.4;
 	}
 
-	figcaption span {
-		margin-right: 0.35rem;
-		color: var(--ink);
-		font-family: var(--mono);
-		font-weight: 800;
-		letter-spacing: 0.12em;
-	}
-
 	@media (max-width: 540px) {
 		.tick {
 			font-size: 18px;

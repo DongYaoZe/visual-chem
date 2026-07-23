@@ -678,8 +678,7 @@
 		font-weight: 700;
 	}
 
-	.prediction button.selected,
-	.inline-control button.selected {
+	.prediction button.selected {
 		border-color: #2563a8;
 		background: #2563a8;
 		color: white;

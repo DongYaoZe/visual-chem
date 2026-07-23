@@ -21,6 +21,7 @@
 <!-- Display formulas can overflow-scroll on narrow screens, so they must be
      keyboard-reachable (axe: scrollable-region-focusable). -->
 {#if display}
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex (keyboard users need to pan overflowing display math) -->
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	<span class="display" tabindex="0" role="math" aria-label={formula}>{@html markup}</span>
 {:else}

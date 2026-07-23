@@ -1,118 +1,145 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { centralFraction, ehrenfestTrajectory, multiplicityDistribution } from '$lib/chem';
+	import {
+		dolbearChirpsPerMinute,
+		doublingRiseK,
+		mbDistribution,
+		rateRatio,
+		tailFraction
+	} from '$lib/chem';
+	import ArrheniusTriView from '$lib/components/ArrheniusTriView.svelte';
 	import ConceptCheck from '$lib/components/ConceptCheck.svelte';
-	import EntropyTriView from '$lib/components/EntropyTriView.svelte';
 	import Formula from '$lib/components/Math.svelte';
 	import Seo from '$lib/components/Seo.svelte';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import StoryStage from '$lib/components/StoryStage.svelte';
-	import { getEntropyContent, getSiteContent, type LocaleCode } from '$lib/content';
+	import {
+		getArrheniusContent,
+		getSiteContent,
+		type ArrheniusSceneId,
+		type LocaleCode
+	} from '$lib/content';
 	import { parseProse, type InlineSegment } from './prose';
-	import { entropySceneDefinition } from './season2-scenes';
+	import { ARRHENIUS_TWO_POINT_EA_KJ_PER_MOL, arrheniusSceneDefinition } from './season3-scenes';
 	import { scrolly } from './scrolly';
 
 	interface Props {
 		locale?: LocaleCode;
 	}
 
+	type StageFocus = 'scene' | 'collisions' | 'distribution' | 'all';
+
+	const tailDefaults = arrheniusSceneDefinition('the-tail');
+	const ruleDefaults = arrheniusSceneDefinition('rule-of-thumb');
+	const sandboxDefaults = arrheniusSceneDefinition('sandbox');
+	const REFERENCE_TEMPERATURE_C = tailDefaults.referenceTemperatureC;
+	const TAIL_EA_KJ_PER_MOL = tailDefaults.eaKJPerMol;
+	const TWO_POINT_EA = ARRHENIUS_TWO_POINT_EA_KJ_PER_MOL;
+
+	// Both hero curves are produced by the same MB kernel as the live diagram.
+	const HERO_COLD = mbDistribution(0.86, 150);
+	const HERO_HOT = mbDistribution(1.2, 150);
+	const HERO_PEAK = Math.max(...HERO_COLD.ys, ...HERO_HOT.ys) * 1.05;
+
+	function heroDistributionPath(curve: { xs: readonly number[]; ys: readonly number[] }): string {
+		return curve.xs
+			.map((value, index) => {
+				const x = 28 + (value / 3.4) * 944;
+				const y = 278 - (curve.ys[index] / HERO_PEAK) * 246;
+				return (index === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+			})
+			.join(' ');
+	}
+
+	const heroColdPath = heroDistributionPath(HERO_COLD);
+	const heroHotPath = heroDistributionPath(HERO_HOT);
+
+	function sceneFocus(id: ArrheniusSceneId): StageFocus {
+		switch (id) {
+			case 'hook':
+			case 'life-runs-on-it':
+				return 'scene';
+			case 'two-populations':
+				return 'collisions';
+			case 'the-tail':
+			case 'arrhenius-law':
+			case 'rule-of-thumb':
+			case 'two-point':
+				return 'distribution';
+			default:
+				return 'all';
+		}
+	}
+
+	function formatRatio(value: number): string {
+		if (value >= 100 || value < 0.01) return value.toExponential(2);
+		if (value >= 10) return value.toFixed(1);
+		return value.toFixed(2);
+	}
+
+	function isSymbolScene(id: ArrheniusSceneId): boolean {
+		return sceneFocus(id) === 'distribution';
+	}
+
 	let { locale = 'zh-CN' }: Props = $props();
 	let site = $derived(getSiteContent(locale));
-	let story = $derived(getEntropyContent(locale));
+	let story = $derived(getArrheniusContent(locale));
 
 	let activeIndex = $state(0);
 	let hookPrediction = $state<string | null>(null);
-	let countN = $state(4);
+	let tailTemperatureC = $state(tailDefaults.temperatureC);
+	let ruleEaKJPerMol = $state(ruleDefaults.eaKJPerMol);
+	let labTemperatureC = $state(sandboxDefaults.temperatureC);
+	let labEaKJPerMol = $state(sandboxDefaults.eaKJPerMol);
 
-	// The release scene walks a precomputed Ehrenfest trajectory.
-	const RELEASE = ehrenfestTrajectory(100, 1400);
-	let releaseIndex = $state(0);
-	let releasePlaying = $state(false);
-
-	$effect(() => {
-		if (!releasePlaying) return;
-		const id = setInterval(() => {
-			releaseIndex = Math.min(RELEASE.length - 1, releaseIndex + 6);
-			if (releaseIndex >= RELEASE.length - 1) releasePlaying = false;
-		}, 40);
-		return () => clearInterval(id);
-	});
-
-	function releaseReset() {
-		releasePlaying = false;
-		releaseIndex = 0;
-	}
-
-	// The fluctuation scene idles along an equilibrium walk while active.
-	const JITTER = ehrenfestTrajectory(100, 4000, 50, 7);
-	let jitterIndex = $state(0);
-
-	let activeScene = $derived(entropySceneDefinition(story.scenes[activeIndex].id));
+	let activeScene = $derived(arrheniusSceneDefinition(story.scenes[activeIndex].id));
 	let activeSceneId = $derived(activeScene.id);
 
-	$effect(() => {
-		if (activeSceneId !== 'fluctuations') return;
-		const id = setInterval(() => {
-			jitterIndex = (jitterIndex + 3) % JITTER.length;
-		}, 90);
-		return () => clearInterval(id);
-	});
-
-	// Sandbox counter shared by the last scene and the free-play section.
-	let labN = $state(100);
-	let labWindow = $state(10);
-
-	// Which census the stage shows: scene defaults, overridden by whichever
-	// control the active scene hands to the reader.
-	let visualTotal = $derived.by(() => {
+	let visualTemperatureC = $derived.by(() => {
 		switch (activeSceneId) {
-			case 'count-the-ways':
-				return countN;
-			case 'irreversible':
-				return 100;
-			case 'fluctuations':
-				return 100;
+			case 'the-tail':
+				return tailTemperatureC;
 			case 'sandbox':
-				return labN;
+				return labTemperatureC;
 			default:
-				return activeScene.total;
+				return activeScene.temperatureC;
 		}
 	});
-	let visualLeft = $derived.by(() => {
+
+	let visualReferenceTemperatureC = $derived(activeScene.referenceTemperatureC);
+
+	let visualEaKJPerMol = $derived.by(() => {
 		switch (activeSceneId) {
-			case 'count-the-ways':
-				return Math.round(countN / 2);
-			case 'irreversible':
-				return RELEASE[releaseIndex];
-			case 'fluctuations':
-				return JITTER[jitterIndex];
+			case 'rule-of-thumb':
+				return ruleEaKJPerMol;
 			case 'sandbox':
-				return Math.round(labN / 2);
+				return labEaKJPerMol;
 			default:
-				return activeScene.leftCount ?? Math.round(activeScene.total / 2);
+				return activeScene.eaKJPerMol;
 		}
 	});
-	let visualValveOpen = $derived(
-		activeSceneId === 'irreversible' ? releaseIndex > 0 : activeScene.valveOpen
+
+	let visualTemperatureK = $derived(visualTemperatureC + 273.15);
+	let visualReferenceTemperatureK = $derived(visualReferenceTemperatureC + 273.15);
+	let visualTailShare = $derived(tailFraction(visualEaKJPerMol, visualTemperatureK));
+	let visualFocus = $derived(sceneFocus(activeSceneId));
+	let visualActive = $derived(
+		activeScene.active ||
+			activeSceneId === 'the-tail' ||
+			activeSceneId === 'rule-of-thumb' ||
+			activeSceneId === 'sandbox'
 	);
-	let visualWindow = $derived(activeSceneId === 'sandbox' ? labWindow : null);
+
+	let tailBoost = $derived(
+		rateRatio(TAIL_EA_KJ_PER_MOL, REFERENCE_TEMPERATURE_C + 273.15, tailTemperatureC + 273.15)
+	);
+	let ruleDoublingRise = $derived(doublingRiseK(ruleEaKJPerMol, 298.15));
+	let labTailShare = $derived(tailFraction(labEaKJPerMol, labTemperatureC + 273.15));
+	let labDoublingRise = $derived(doublingRiseK(labEaKJPerMol, labTemperatureC + 273.15));
+	let labChirps = $derived(dolbearChirpsPerMinute(labTemperatureC));
 
 	let progress = $derived(((activeIndex + 1) / story.scenes.length) * 100);
 	let catalogHref = $derived(locale === 'en' ? resolve('/en/') : resolve('/'));
-	let windowPercent = $derived((centralFraction(labN, labWindow) * 100).toFixed(1));
-
-	// The hero backdrop sketches the computed N = 100 multiplicity spike.
-	const HERO = multiplicityDistribution(100);
-	const heroPeak = Math.max(...HERO.probabilities);
-	const heroPath = HERO.probabilities
-		.map(
-			(probability, index) =>
-				`${index === 0 ? 'M' : 'L'}${(30 + (index / 100) * 940).toFixed(1)},${(
-					285 -
-					(probability / heroPeak) * 250
-				).toFixed(1)}`
-		)
-		.join(' ');
 </script>
 
 {#snippet inline(segments: InlineSegment[])}
@@ -140,7 +167,7 @@
 	modifiedTime={story.seo.modifiedTime}
 />
 
-<div class="progress" style:width={`${progress}%`} aria-hidden="true"></div>
+<div class="progress" style:width={progress + '%'} aria-hidden="true"></div>
 <SiteHeader compact {locale} content={site.shared.header} />
 
 <main>
@@ -154,7 +181,8 @@
 		</div>
 		<div class="hero-curve" aria-hidden="true">
 			<svg viewBox="0 0 1000 300">
-				<path d={heroPath} />
+				<path class="cold-path" d={heroColdPath} />
+				<path class="hot-path" d={heroHotPath} />
 			</svg>
 			<span>{story.hero.heroTag}</span>
 		</div>
@@ -175,19 +203,20 @@
 			statusAriaLabel={story.stage.shortStateAriaLabel}
 		>
 			{#snippet stage()}
-				<EntropyTriView
-					total={visualTotal}
-					leftCount={visualLeft}
-					valveOpen={visualValveOpen}
-					markAllLeft={activeScene.markAllLeft}
-					window={visualWindow}
+				<ArrheniusTriView
+					temperatureK={visualTemperatureK}
+					referenceTemperatureK={visualReferenceTemperatureK}
+					eaKJPerMol={visualEaKJPerMol}
+					active={visualActive}
+					focus={visualFocus}
 					label={story.triView.defaultAriaLabel}
 					content={story.triView}
 				/>
 			{/snippet}
 			{#snippet status()}
-				<span>N {visualTotal}</span>
-				<span>n {Math.round(visualLeft)}</span>
+				<span>T {visualTemperatureC.toFixed(0)} °C</span>
+				<span>Ea {visualEaKJPerMol.toFixed(0)} kJ/mol</span>
+				<span>k/A {visualTailShare.toExponential(1)}</span>
 			{/snippet}
 		</StoryStage>
 
@@ -196,7 +225,7 @@
 				<article
 					class="step"
 					class:active={activeIndex === index}
-					class:symbol-step={scene.id === 'the-spike' || scene.id === 'sandbox'}
+					class:symbol-step={isSymbolScene(scene.id)}
 					data-scene-index={index}
 					data-scene-id={scene.id}
 				>
@@ -235,69 +264,103 @@
 							{/if}
 						{/if}
 
-						{#if scene.id === 'count-the-ways'}
+						{#if scene.id === 'the-tail'}
 							<label class="range-control">
-								<span>{story.interactions.countTheWays.particlesLabel}</span>
-								<strong>N = {countN}</strong>
+								<span>{story.interactions.theTail.temperatureLabel}</span>
+								<strong>{tailTemperatureC.toFixed(0)} °C</strong>
 								<input
 									type="range"
-									min="4"
-									max="400"
-									step="4"
-									aria-label={story.interactions.countTheWays.particlesLabel}
-									bind:value={countN}
+									min="0"
+									max="80"
+									step="1"
+									aria-label={story.interactions.theTail.temperatureLabel}
+									bind:value={tailTemperatureC}
 								/>
+								<span class="slider-scale">
+									<span>{story.interactions.theTail.temperatureScale.start}</span>
+									<span>{story.interactions.theTail.temperatureScale.end}</span>
+								</span>
+								<small>
+									{story.interactions.theTail.readout({
+										tailShare: tailFraction(
+											TAIL_EA_KJ_PER_MOL,
+											tailTemperatureC + 273.15
+										).toExponential(2),
+										boost: formatRatio(tailBoost)
+									})}
+								</small>
 							</label>
 						{/if}
 
-						{#if scene.id === 'irreversible'}
-							<div class="inline-control">
-								<button
-									type="button"
-									onclick={() => {
-										releaseIndex = 0;
-										releasePlaying = true;
-									}}>{story.interactions.irreversible.releaseButton}</button
-								>
-								<button type="button" onclick={releaseReset}
-									>{story.interactions.irreversible.resetButton}</button
-								>
+						{#if scene.id === 'rule-of-thumb'}
+							<label class="range-control">
+								<span>{story.interactions.ruleOfThumb.eaLabel}</span>
+								<strong>{ruleEaKJPerMol.toFixed(0)} kJ/mol</strong>
+								<input
+									type="range"
+									min="20"
+									max="120"
+									step="1"
+									aria-label={story.interactions.ruleOfThumb.eaLabel}
+									bind:value={ruleEaKJPerMol}
+								/>
+								<small>
+									{story.interactions.ruleOfThumb.readout({
+										ea: ruleEaKJPerMol.toFixed(0),
+										rise: ruleDoublingRise.toFixed(1)
+									})}
+								</small>
+							</label>
+						{/if}
+
+						{#if scene.id === 'two-point'}
+							<div
+								class="measurement-grid"
+								aria-label={story.interactions.twoPoint.readout({
+									ea: TWO_POINT_EA.toFixed(1)
+								})}
+							>
+								<div><span>T₁</span><strong>293.15 K</strong></div>
+								<div><span>k₁</span><strong>1.20×10⁻³ s⁻¹</strong></div>
+								<div><span>T₂</span><strong>313.15 K</strong></div>
+								<div><span>k₂</span><strong>6.09×10⁻³ s⁻¹</strong></div>
 							</div>
-							{#if releasePlaying}
-								<p class="evidence">{story.interactions.irreversible.runningHint}</p>
-							{/if}
+							<p class="evidence">
+								{story.interactions.twoPoint.readout({ ea: TWO_POINT_EA.toFixed(1) })}
+							</p>
 						{/if}
 
 						{#if scene.id === 'sandbox'}
 							<label class="range-control">
-								<span>{story.interactions.sandbox.particlesLabel}</span>
-								<strong>N = {labN}</strong>
+								<span>{story.interactions.sandbox.temperatureLabel}</span>
+								<strong>{labTemperatureC.toFixed(0)} °C</strong>
 								<input
 									type="range"
-									min="10"
-									max="400"
-									step="2"
-									aria-label={story.interactions.sandbox.particlesLabel}
-									bind:value={labN}
+									min="0"
+									max="80"
+									step="1"
+									aria-label={story.interactions.sandbox.temperatureLabel}
+									bind:value={labTemperatureC}
 								/>
 							</label>
 							<label class="range-control">
-								<span>{story.interactions.sandbox.windowLabel}</span>
-								<strong>±{labWindow}</strong>
+								<span>{story.interactions.sandbox.eaLabel}</span>
+								<strong>{labEaKJPerMol.toFixed(0)} kJ/mol</strong>
 								<input
 									type="range"
-									min="1"
-									max="50"
+									min="20"
+									max="120"
 									step="1"
-									aria-label={story.interactions.sandbox.windowLabel}
-									bind:value={labWindow}
+									aria-label={story.interactions.sandbox.eaLabel}
+									bind:value={labEaKJPerMol}
 								/>
-								<small
-									>{story.interactions.sandbox.windowReadout({
-										percent: windowPercent,
-										window: labWindow
-									})}</small
-								>
+								<small>
+									{story.interactions.sandbox.readout({
+										tailShare: labTailShare.toExponential(2),
+										doubling: labDoublingRise.toFixed(1),
+										chirps: labChirps.toFixed(0)
+									})}
+								</small>
 							</label>
 						{/if}
 					</div>
@@ -344,41 +407,44 @@
 		<div class="shell sandbox-grid">
 			<div class="sandbox-controls">
 				<label>
-					<span>{story.interactions.sandbox.particlesLabel}</span><strong>N = {labN}</strong>
+					<span>{story.interactions.sandbox.temperatureLabel}</span>
+					<strong>{labTemperatureC.toFixed(0)} °C</strong>
 					<input
 						type="range"
-						min="10"
-						max="400"
-						step="2"
-						aria-label={story.interactions.sandbox.particlesLabel}
-						bind:value={labN}
+						min="0"
+						max="80"
+						step="1"
+						aria-label={story.interactions.sandbox.temperatureLabel}
+						bind:value={labTemperatureC}
 					/>
 				</label>
 				<label>
-					<span>{story.interactions.sandbox.windowLabel}</span><strong>±{labWindow}</strong>
+					<span>{story.interactions.sandbox.eaLabel}</span>
+					<strong>{labEaKJPerMol.toFixed(0)} kJ/mol</strong>
 					<input
 						type="range"
-						min="1"
-						max="50"
+						min="20"
+						max="120"
 						step="1"
-						aria-label={story.interactions.sandbox.windowLabel}
-						bind:value={labWindow}
+						aria-label={story.interactions.sandbox.eaLabel}
+						bind:value={labEaKJPerMol}
 					/>
 				</label>
 				<div class="challenge">
 					<p>
-						{story.interactions.sandbox.windowReadout({
-							percent: windowPercent,
-							window: labWindow
+						{story.interactions.sandbox.readout({
+							tailShare: labTailShare.toExponential(2),
+							doubling: labDoublingRise.toFixed(1),
+							chirps: labChirps.toFixed(0)
 						})}
 					</p>
 				</div>
 			</div>
-			<EntropyTriView
-				total={labN}
-				leftCount={Math.round(labN / 2)}
-				valveOpen
-				window={labWindow}
+			<ArrheniusTriView
+				temperatureK={labTemperatureC + 273.15}
+				referenceTemperatureK={REFERENCE_TEMPERATURE_C + 273.15}
+				eaKJPerMol={labEaKJPerMol}
+				active
 				label={story.sandboxIntro.title}
 				content={story.triView}
 			/>
@@ -419,7 +485,7 @@
 		left: 0;
 		z-index: 100;
 		height: 3px;
-		background: #207f8c;
+		background: #a34428;
 		transition: width 450ms ease;
 	}
 
@@ -444,7 +510,7 @@
 		z-index: 2;
 		margin: 1.2rem 0 2.5rem;
 		font-family: var(--serif);
-		font-size: clamp(3.4rem, 9vw, 8.6rem);
+		font-size: clamp(3.2rem, 8.4vw, 8rem);
 		font-weight: 500;
 		letter-spacing: -0.075em;
 		line-height: 0.85;
@@ -452,8 +518,8 @@
 
 	.story-hero h1 em {
 		display: inline-block;
-		margin-left: 18%;
-		color: #207f8c;
+		margin-left: 14%;
+		color: #a34428;
 		font-weight: 500;
 		transform: rotate(-2deg);
 	}
@@ -479,7 +545,7 @@
 		right: -4%;
 		bottom: 4%;
 		width: 62%;
-		opacity: 0.3;
+		opacity: 0.34;
 	}
 
 	.hero-curve svg {
@@ -489,7 +555,17 @@
 
 	.hero-curve path {
 		fill: none;
-		stroke: #207f8c;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.hero-curve .cold-path {
+		stroke: #17636d;
+		stroke-width: 3;
+	}
+
+	.hero-curve .hot-path {
+		stroke: #a34428;
 		stroke-width: 4;
 	}
 
@@ -497,7 +573,7 @@
 		position: absolute;
 		right: 8%;
 		bottom: -0.5rem;
-		color: var(--acid);
+		color: #78321f;
 		font-family: var(--mono);
 		font-size: 0.65rem;
 		font-weight: 800;
@@ -516,13 +592,13 @@
 	}
 
 	.reading-note .eyebrow {
-		color: #9fd0d8;
+		color: #efb49c;
 	}
 
 	.reading-note p:last-child {
 		max-width: 800px;
 		margin: 0;
-		color: rgba(244, 239, 228, 0.72);
+		color: rgba(244, 239, 228, 0.74);
 		font-family: var(--serif);
 		font-size: clamp(1.1rem, 2vw, 1.35rem);
 		line-height: 1.9;
@@ -557,8 +633,8 @@
 		padding: 1.4rem;
 		border: 1px solid rgba(31, 40, 38, 0.15);
 		border-radius: 16px;
-		background: rgba(250, 247, 239, 0.94);
-		box-shadow: 0 18px 45px rgba(36, 40, 34, 0.08);
+		background: rgba(250, 247, 239, 0.95);
+		box-shadow: 0 18px 45px rgba(50, 28, 20, 0.09);
 	}
 
 	.step-card > p:not(.eyebrow):not(.evidence) {
@@ -579,7 +655,7 @@
 	}
 
 	.step-card li {
-		margin-block: 0.3rem;
+		margin-block: 0.36rem;
 	}
 
 	.step-card :global(strong) {
@@ -599,13 +675,13 @@
 		margin-top: 1rem;
 		padding: 0.85rem;
 		border-radius: 10px;
-		background: rgba(32, 127, 140, 0.08);
+		background: rgba(163, 68, 40, 0.08);
 	}
 
 	.prediction > span {
 		display: block;
 		margin-bottom: 0.55rem;
-		color: #207f8c;
+		color: #843722;
 		font-family: var(--mono);
 		font-size: 0.6rem;
 		font-weight: 800;
@@ -613,40 +689,45 @@
 		text-transform: uppercase;
 	}
 
-	.prediction > div,
-	.inline-control {
+	.prediction > div {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.45rem;
 	}
 
-	.prediction button,
-	.inline-control button {
+	.prediction button {
 		padding: 0.52rem 0.68rem;
-		border: 1px solid rgba(31, 40, 38, 0.18);
+		border: 1px solid rgba(31, 40, 38, 0.2);
 		border-radius: 999px;
-		background: rgba(255, 255, 255, 0.65);
+		background: rgba(255, 255, 255, 0.7);
 		color: var(--ink);
 		cursor: pointer;
 		font-size: 0.7rem;
 		font-weight: 700;
 	}
 
+	.prediction button:hover {
+		border-color: #a34428;
+	}
+
 	.prediction button.selected {
-		border-color: #207f8c;
-		background: #207f8c;
+		border-color: #a34428;
+		background: #a34428;
 		color: white;
 	}
 
-	.inline-control {
-		align-items: center;
-		margin-top: 0.8rem;
+	.prediction button:focus-visible,
+	input:focus-visible,
+	summary:focus-visible,
+	.ending a:focus-visible {
+		outline: 3px solid #17636d;
+		outline-offset: 3px;
 	}
 
 	.evidence {
 		margin: 0.75rem 0 0;
 		padding-left: 0.7rem;
-		border-left: 2px solid #207f8c;
+		border-left: 2px solid #a34428;
 		color: var(--ink-muted);
 		font-size: 0.75rem;
 		line-height: 1.65;
@@ -673,18 +754,57 @@
 	.sandbox-controls input {
 		width: 100%;
 		grid-column: 1 / -1;
-		accent-color: #207f8c;
+		accent-color: #a34428;
 	}
 
 	.range-control small {
 		grid-column: 1 / -1;
 		color: var(--ink-muted);
 		font-family: var(--mono);
+		line-height: 1.55;
+	}
+
+	.slider-scale {
+		display: flex;
+		grid-column: 1 / -1;
+		justify-content: space-between;
+		margin-top: -0.2rem;
+		color: var(--ink-muted);
+		font-family: var(--mono);
+		font-size: 0.6rem;
+	}
+
+	.measurement-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.45rem;
+		margin-top: 1rem;
+	}
+
+	.measurement-grid div {
+		display: grid;
+		gap: 0.2rem;
+		padding: 0.65rem;
+		border: 1px solid var(--line);
+		border-radius: 9px;
+		background: rgba(163, 68, 40, 0.045);
+	}
+
+	.measurement-grid span {
+		color: #843722;
+		font-family: var(--mono);
+		font-size: 0.58rem;
+		font-weight: 800;
+	}
+
+	.measurement-grid strong {
+		font-family: var(--mono);
+		font-size: 0.7rem;
 	}
 
 	.edge {
 		padding-block: clamp(6rem, 12vw, 10rem);
-		background: #1d2e30;
+		background: #2b201d;
 		color: var(--paper);
 	}
 
@@ -696,7 +816,7 @@
 	}
 
 	.edge .eyebrow {
-		color: #9fd0d8;
+		color: #efb49c;
 	}
 
 	.edge h2,
@@ -726,7 +846,7 @@
 	}
 
 	.edge-facts span {
-		color: #9fd0d8;
+		color: #efb49c;
 		font-family: var(--mono);
 		font-size: 0.68rem;
 		font-weight: 800;
@@ -734,7 +854,7 @@
 	}
 
 	.fact-definition {
-		color: rgba(244, 239, 228, 0.82);
+		color: rgba(244, 239, 228, 0.84);
 		font-size: 0.82rem;
 		font-weight: 500;
 		line-height: 1.6;
@@ -746,11 +866,11 @@
 
 	.sandbox {
 		padding-block: clamp(5rem, 10vw, 9rem);
-		background: #c9d8d6;
+		background: #ead6cc;
 	}
 
 	.sandbox .eyebrow {
-		color: #16565f;
+		color: #78321f;
 	}
 
 	.sandbox-head {
@@ -780,18 +900,18 @@
 		padding: 0.85rem;
 		border: 1px solid rgba(31, 40, 38, 0.17);
 		border-radius: 16px;
-		background: rgba(244, 239, 228, 0.35);
+		background: rgba(244, 239, 228, 0.42);
 	}
 
 	.sandbox-controls label {
 		margin: 0 0 0.7rem;
-		background: rgba(255, 255, 255, 0.25);
+		background: rgba(255, 255, 255, 0.28);
 	}
 
 	.challenge {
 		padding: 0.8rem;
-		border-left: 3px solid #207f8c;
-		background: rgba(32, 127, 140, 0.06);
+		border-left: 3px solid #a34428;
+		background: rgba(163, 68, 40, 0.07);
 	}
 
 	.challenge p {
@@ -833,8 +953,8 @@
 
 	.ending {
 		padding-block: clamp(7rem, 15vw, 13rem);
-		background: #163f46;
-		color: #e8f5f4;
+		background: #371d18;
+		color: #fff0e9;
 		text-align: center;
 	}
 
@@ -860,7 +980,7 @@
 
 	.ending a {
 		padding: 0.75rem 1rem;
-		border: 1px solid rgba(232, 245, 244, 0.65);
+		border: 1px solid rgba(255, 240, 233, 0.68);
 		border-radius: 999px;
 		color: inherit;
 		font-size: 0.72rem;
@@ -910,7 +1030,7 @@
 		}
 
 		.step-card {
-			box-shadow: 0 20px 65px rgba(36, 40, 34, 0.2);
+			box-shadow: 0 20px 65px rgba(50, 28, 20, 0.2);
 		}
 
 		.sandbox-head,
@@ -931,7 +1051,7 @@
 		}
 
 		.story-hero h1 {
-			font-size: clamp(3rem, 17vw, 5.6rem);
+			font-size: clamp(2.8rem, 15vw, 5.2rem);
 		}
 
 		.hero-bottom {
@@ -944,6 +1064,15 @@
 			right: -24%;
 			bottom: 11%;
 			width: 120%;
+		}
+
+		.hero-curve span {
+			right: 24%;
+			bottom: -1.6rem;
+			width: 72vw;
+			line-height: 1.35;
+			text-align: right;
+			white-space: normal;
 		}
 
 		.reading-note .shell {
@@ -959,6 +1088,10 @@
 			padding: 1rem;
 		}
 
+		.measurement-grid {
+			grid-template-columns: 1fr;
+		}
+
 		.ending div div {
 			align-items: center;
 			flex-direction: column;
@@ -969,6 +1102,13 @@
 		.step {
 			min-height: auto;
 			padding-block: 2rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.progress,
+		.step {
+			transition: none;
 		}
 	}
 </style>
