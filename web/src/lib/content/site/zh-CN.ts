@@ -5,11 +5,11 @@ export const zhCNSiteContent = {
 	htmlLang: 'zh-CN',
 	shared: {
 		seo: {
-			defaultImageAlt: 'VisualChem：把大学化学原理讲成可以走进去的故事'
+			defaultImageAlt: 'VisualChem：用图和计算一起学化学'
 		},
 		header: {
 			brand: 'VisualChem',
-			tagline: '化学叙事可视化',
+			tagline: '把化学现象讲清楚',
 			homeAriaLabel: 'VisualChem 首页',
 			navigationAriaLabel: '主导航',
 			storyLink: '开始第一篇故事',
@@ -104,7 +104,7 @@ export const zhCNSiteContent = {
 		seo: {
 			title: 'VisualChem — 用故事看懂化学',
 			description:
-				'把宏观现象、微观粒子与化学符号锁进同一个可操纵故事。VisualChem 是面向大学化学的开源叙事可视化项目。',
+				'把实验现象、粒子变化和公式放在同一页里，边看边算。VisualChem 是一个面向大学化学的开源学习网站。',
 			path: '/',
 			alternateLocalePath: '/en/',
 			type: 'website',
@@ -113,17 +113,17 @@ export const zhCNSiteContent = {
 			modifiedTime: '2026-07-24'
 		},
 		hero: {
-			eyebrow: 'OPEN CHEMISTRY · EXPLORABLE STORIES',
+			eyebrow: 'OPEN CHEMISTRY · 从现象开始',
 			heading: {
-				lines: ['不是把相图', '画出来。'],
-				emphasis: '是让它开口。'
+				lines: ['先看现象，', '再把它算出来。'],
+				emphasis: ''
 			},
-			lead: '宏观现象、微观粒子、符号图景不再各讲各的。滚动是一架摄影机，手指是实验旋钮；每一张图都在论证链里出现。',
+			lead: '先看到烧杯、放电管或一条曲线，再把它和粒子、公式对上。页面里的图会跟着你的操作一起变，算出来的数也会显示出来。',
 			primaryAction: {
 				label: '进入第一篇故事',
 				symbol: '↗'
 			},
-			methodAction: '我们的讲法',
+			methodAction: '怎么学',
 			proofs: [
 				{ value: '3', label: '种表征同步' },
 				{ value: '0', label: '服务器计算依赖' },
@@ -144,20 +144,20 @@ export const zhCNSiteContent = {
 			heading: {
 				lines: ['同一个状态，', '从三个尺度看。']
 			},
-			body: '教材常把烧杯、分子和公式分散在三页。学生真正困难的不是“看见”三幅图，而是在它们之间完成转译。VisualChem 用一个状态源同时驱动三幅图：当组成改变，装置、粒子比例和相图状态点必须一起改变。',
+			body: '课本可能把装置图、粒子图和公式分开讲。这里让它们共用一个状态：你改乙醇组成，烧瓶里的标记、粒子比例和相图上的点会一起换位置。这样可以直接检查三幅图是不是在说同一件事。',
 			controls: {
 				initialComposition: '初始釜液 · 乙醇摩尔分数',
 				initialCompositionAriaLabel: '初始釜液乙醇摩尔分数',
 				equilibriumStages: '重复平衡级',
 				equilibriumStagesAriaLabel: '重复平衡级数',
-				hint: '拖动任一旋钮，观察三幅图是否讲出同一件事。',
+				hint: '拖动旋钮，看看三幅图怎样同时改变。',
 				triViewAriaLabel: '首页三重表征同步演示'
 			}
 		},
 		season: {
 			eyebrow: 'SEASON 01 · PHASE EQUILIBRIUM',
 			title: '相平衡四部曲',
-			introduction: '先从最适合“三角联动”的概念开始。每篇都从反常现象出发，最后抵达可计算的模型。',
+			introduction: '先从相平衡开始。每篇都先给一个现象，再用数据和计算把它解释清楚。',
 			stories: [
 				{
 					number: '01',
@@ -193,7 +193,7 @@ export const zhCNSiteContent = {
 			eyebrow: 'SEASON 02 · THERMODYNAMICS',
 			title: '热力学的骨架',
 			introduction:
-				'相图回答"在哪里平衡"；第二季追问"为什么"。从数微观状态开始，到吉布斯山谷，再把下坡路接上导线。',
+				'相图告诉你平衡在哪里，热力学继续问它为什么在那里。从微观状态数起，再看反应的自由能和电池电压。',
 			stories: [
 				{
 					number: '05',
@@ -222,7 +222,7 @@ export const zhCNSiteContent = {
 			eyebrow: 'SEASON 03 · KINETICS',
 			title: '给反应装上秒表',
 			introduction:
-				'热力学告诉我们路往哪边下坡，动力学追问要走多久。先听浓度的倒计时，再看温度怎样放大分布尾巴，最后让催化剂改路、不改终点。',
+				'热力学告诉你反应愿不愿意发生，动力学告诉你它要等多久。这里从浓度、温度和催化剂三个实验读数入手。',
 			stories: [
 				{
 					number: '08',
@@ -249,44 +249,45 @@ export const zhCNSiteContent = {
 		},
 		seasonFour: {
 			eyebrow: 'SEASON 04 · STRUCTURE & SPECTRA',
-			title: '让物质开口唱歌',
+			title: '用光认出物质',
 			introduction:
-				'第四季从光追问结构：先把氢原子的几根亮线还原成量子化能级，再走向分子的红外振动与核磁共振。光谱不是条形码图库，而是物质内部运动留下的证词。',
+				'光谱能告诉我们原子和分子内部发生了什么。第一篇先看氢原子的可见谱线，后面再谈红外振动和核磁共振。',
 			stories: [
 				{
 					number: '11',
 					status: '可交互 Alpha · 约 11 分钟',
-					title: '原子为什么只唱几颗音',
-					description: '氢放电管没有铺开彩虹；四根 Balmer 线把量子化能级写成一张可计算的原子指纹。',
+					title: '氢原子为什么只发出几根线',
+					description:
+						'氢气发光时只出现几根线。调节能级，算出它们的波长，再看这些线怎样对应原子的能量差。',
 					action: '开始阅读 ↗'
 				}
 			]
 		},
 		principles: {
-			eyebrow: 'WHAT COUNTS AS TRUE',
+			eyebrow: '我们怎样检查结果',
 			heading: {
-				lines: ['图可以有诗意，', '数字不能靠想象。']
+				lines: ['图用来帮助理解，', '数字必须算得出来。']
 			},
 			items: [
 				{
 					number: '01',
-					title: '计算可核验',
-					body: '相界、速率、能量路径与谱线位置都由浏览器内核计算，并用单元测试锁住数据锚点、守恒关系和模型边界。'
+					title: '每个读数都有来处',
+					body: '相界、速率、能量路径和谱线位置都由浏览器里的计算代码给出。测试会检查关键数值、守恒关系和模型适用范围。'
 				},
 				{
 					number: '02',
-					title: '隐喻有边界',
-					body: '粒子比例可以定量同步，粒子轨迹则明确标成示意；我们不把动画包装成分子动力学。'
+					title: '示意图不冒充实验',
+					body: '粒子数量和比例会跟着计算变化，位置和运动只是帮助你读图的示意。页面不会把动画说成真实的分子轨迹。'
 				},
 				{
 					number: '03',
-					title: '先预测后验证',
-					body: '读者先留下判断，再操纵模型，最后从三个尺度寻找共同证据，而不是被动观看答案。'
+					title: '先猜一次，再动手试',
+					body: '每篇先让你选一个答案，再拖动控制器。你可以从装置、粒子和公式三处核对自己的判断。'
 				}
 			]
 		},
 		footer: {
-			tagline: 'VisualChem · 让化学原理成为可以走进去的故事。',
+			tagline: 'VisualChem · 用图、数字和操作把化学讲清楚。',
 			sourceCodeLink: '源代码',
 			firstStoryLink: '第一篇故事'
 		}

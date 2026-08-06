@@ -33,7 +33,7 @@ test('hydrogen-spectrum story exposes complete Chinese and English editions', as
 
 	await gotoHydrated(page, '/stories/hydrogen-spectrum/');
 	await expect(
-		page.getByRole('heading', { level: 1, name: /原子为什么\s*只唱几颗音/ })
+		page.getByRole('heading', { level: 1, name: /氢原子为什么\s*只发出几根线/ })
 	).toBeVisible();
 	await expect(page.getByTestId('hydrogen-spectrum-tri-view').first()).toBeVisible();
 	await expect(page.locator('.katex-error')).toHaveCount(0);
