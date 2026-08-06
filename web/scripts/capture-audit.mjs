@@ -18,6 +18,13 @@ async function capture(name, path, viewport, selector, interact) {
 		await page.waitForTimeout(900);
 	}
 	if (interact) await interact(page);
+	const horizontalOverflow = await page.evaluate(() => {
+		const root = document.documentElement;
+		return root.scrollWidth - root.clientWidth;
+	});
+	if (horizontalOverflow > 1) {
+		throw new Error(`${name} overflows the viewport horizontally by ${horizontalOverflow}px.`);
+	}
 	await page.screenshot({ path: fileURLToPath(new URL(`${name}.png`, output)) });
 	await context.close();
 }
@@ -98,5 +105,42 @@ for (const story of [
 		`[data-scene-id="${story.scene}"]`
 	);
 }
+
+// Season-four opening story: inspect the spectral hook and the linked family
+// switch at both target widths.
+await capture('hydrogen-spectrum-hero-desktop', '/stories/hydrogen-spectrum', {
+	width: 1440,
+	height: 1000
+});
+await capture(
+	'hydrogen-spectrum-stage-desktop',
+	'/stories/hydrogen-spectrum',
+	{ width: 1440, height: 1000 },
+	'[data-scene-id="three-families"]',
+	async (page) => {
+		await page
+			.locator('[data-scene-id="three-families"]')
+			.getByRole('button', { name: 'n=3', exact: true })
+			.click();
+		await page.waitForTimeout(400);
+	}
+);
+await capture('hydrogen-spectrum-hero-mobile', '/stories/hydrogen-spectrum', {
+	width: 390,
+	height: 844
+});
+await capture(
+	'hydrogen-spectrum-stage-mobile',
+	'/stories/hydrogen-spectrum',
+	{ width: 390, height: 844 },
+	'[data-scene-id="three-families"]',
+	async (page) => {
+		await page
+			.locator('[data-scene-id="three-families"]')
+			.getByRole('button', { name: 'n=3', exact: true })
+			.click();
+		await page.waitForTimeout(400);
+	}
+);
 
 await browser.close();

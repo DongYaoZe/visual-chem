@@ -44,6 +44,11 @@
 	let catalystHref = $derived(
 		locale === 'en' ? resolve('/en/stories/catalyst/') : resolve('/stories/catalyst/')
 	);
+	let hydrogenSpectrumHref = $derived(
+		locale === 'en'
+			? resolve('/en/stories/hydrogen-spectrum/')
+			: resolve('/stories/hydrogen-spectrum/')
+	);
 	let demoComposition = $state(0.1);
 	let demoStage = $state(2);
 	// The hero envelope is computed from the calibrated model, not sketched.
@@ -305,6 +310,28 @@
 					<p>{site.home.seasonThree.stories[2].description}</p>
 				</div>
 				<strong>{site.home.seasonThree.stories[2].action}</strong>
+			</a>
+		</div>
+	</section>
+
+	<section class="season season-four shell">
+		<header>
+			<div>
+				<p class="eyebrow">{site.home.seasonFour.eyebrow}</p>
+				<h2>{site.home.seasonFour.title}</h2>
+			</div>
+			<p>{site.home.seasonFour.introduction}</p>
+		</header>
+
+		<div class="story-list">
+			<a class="story live" href={hydrogenSpectrumHref}>
+				<span class="number">{site.home.seasonFour.stories[0].number}</span>
+				<div>
+					<small>{site.home.seasonFour.stories[0].status}</small>
+					<h3>{site.home.seasonFour.stories[0].title}</h3>
+					<p>{site.home.seasonFour.stories[0].description}</p>
+				</div>
+				<strong>{site.home.seasonFour.stories[0].action}</strong>
 			</a>
 		</div>
 	</section>
@@ -638,7 +665,8 @@
 		line-height: 1.7;
 	}
 
-	.season-two {
+	.season-two,
+	.season-four {
 		padding-top: 0;
 	}
 

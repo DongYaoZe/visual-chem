@@ -49,6 +49,24 @@ test('both catalogues expose the complete season-three trilogy', async ({ page }
 	await expect(englishCards.nth(2)).toHaveAttribute('href', `${basePath}/en/stories/catalyst/`);
 });
 
+test('both catalogues expose the season-four opening story', async ({ page }) => {
+	await page.goto(appPath('/'));
+	const chineseCards = page.locator('.season-four a.story');
+	await expect(chineseCards).toHaveCount(1);
+	await expect(chineseCards.first()).toHaveAttribute(
+		'href',
+		`${basePath}/stories/hydrogen-spectrum/`
+	);
+
+	await page.goto(appPath('/en/'));
+	const englishCards = page.locator('.season-four a.story');
+	await expect(englishCards).toHaveCount(1);
+	await expect(englishCards.first()).toHaveAttribute(
+		'href',
+		`${basePath}/en/stories/hydrogen-spectrum/`
+	);
+});
+
 test('story keeps the prediction and synchronized apparatus interactive', async ({ page }) => {
 	const pageErrors: Error[] = [];
 	page.on('pageerror', (error) => pageErrors.push(error));
@@ -88,6 +106,9 @@ test('the reader can rebuild the phase envelope from literature measurements', a
 	await expect(page.locator('.graphic .literature-point')).toHaveCount(32);
 	await expect(page.locator('.graphic .bubble-line')).toHaveCount(0);
 
+	// This is a new reader navigation, not a script-only viewport jump: the
+	// wheel intent releases the interaction pin before the next scene enters.
+	await page.mouse.wheel(0, 1);
 	await page.locator('[data-scene-id="nonideal-model"]').scrollIntoViewIfNeeded();
 	await expect(page.locator('.graphic .bubble-line')).toHaveCount(1);
 });
@@ -293,6 +314,7 @@ test('all public routes load their local production assets without HTTP errors',
 		'/stories/kinetics/',
 		'/stories/arrhenius/',
 		'/stories/catalyst/',
+		'/stories/hydrogen-spectrum/',
 		'/en/',
 		'/en/stories/ethanol-distillation/',
 		'/en/stories/boiling-map/',
@@ -303,7 +325,8 @@ test('all public routes load their local production assets without HTTP errors',
 		'/en/stories/nernst/',
 		'/en/stories/kinetics/',
 		'/en/stories/arrhenius/',
-		'/en/stories/catalyst/'
+		'/en/stories/catalyst/',
+		'/en/stories/hydrogen-spectrum/'
 	]) {
 		await page.goto(appPath(path));
 		await expect(page.locator('main')).toBeVisible();

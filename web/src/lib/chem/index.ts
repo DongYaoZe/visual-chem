@@ -10,6 +10,7 @@ export * from './kinetics';
 export * from './eutectic';
 export * from './eutectic-frame';
 export * from './gibbs-valley';
+export * from './hydrogen-spectrum';
 export * from './microstates';
 export * from './nernst';
 export * from './monotone-cubic';

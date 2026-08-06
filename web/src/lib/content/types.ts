@@ -211,6 +211,12 @@ export interface HomeContent {
 		introduction: string;
 		stories: readonly [HomeStoryCardContent, HomeStoryCardContent, HomeStoryCardContent];
 	};
+	seasonFour: {
+		eyebrow: string;
+		title: string;
+		introduction: string;
+		stories: readonly [HomeStoryCardContent];
+	};
 	principles: {
 		eyebrow: string;
 		heading: SplitHeading;
@@ -1565,4 +1571,107 @@ export interface CatalystInteractionsContent {
 export interface CatalystStoryContent extends ProseStoryContent<CatalystSceneId> {
 	interactions: CatalystInteractionsContent;
 	triView: CatalystTriViewContent;
+}
+
+/* --- Story 11 · The atomic fingerprint ------------------------------ */
+
+export type HydrogenSpectrumSceneId =
+	| 'hook'
+	| 'split-the-light'
+	| 'measure-the-lines'
+	| 'energy-steps'
+	| 'rydberg-key'
+	| 'three-families'
+	| 'fingerprint'
+	| 'sandbox';
+
+export interface HydrogenSpectrumTriViewContent {
+	defaultAriaLabel: string;
+	liveSummary: ContentMessage<{
+		upperN: DisplayValue;
+		lowerN: DisplayValue;
+		wavelengthNm: DisplayValue;
+		region: DisplayValue;
+	}>;
+	synchronizedState: string;
+	transitionLabel: string;
+	wavelengthLabel: string;
+	photonEnergyLabel: string;
+	regionNames: Record<'ultraviolet' | 'visible' | 'infrared', string>;
+	tube: {
+		ariaLabel: ContentMessage<{ wavelengthNm: DisplayValue; region: DisplayValue }>;
+		viewName: string;
+		caption: string;
+		tubeLabel: string;
+		gratingLabel: string;
+		lightLabel: string;
+	};
+	levels: {
+		ariaLabel: ContentMessage<{
+			upperN: DisplayValue;
+			lowerN: DisplayValue;
+			energyEv: DisplayValue;
+			wavelengthNm: DisplayValue;
+			region: DisplayValue;
+			isVisible: boolean;
+		}>;
+		viewName: string;
+		caption: string;
+		energyAxis: string;
+		electronLabel: string;
+		photonLabel: ContentMessage<{ wavelengthNm: DisplayValue }>;
+	};
+	spectrum: {
+		ariaLabel: ContentMessage<{
+			upperN: DisplayValue;
+			lowerN: DisplayValue;
+			wavelengthNm: DisplayValue;
+			region: DisplayValue;
+			isVisible: boolean;
+		}>;
+		viewName: string;
+		caption: string;
+		xAxis: string;
+		selectedLine: string;
+		seriesNames: Record<'Lyman' | 'Balmer' | 'Paschen' | 'other', string>;
+	};
+}
+
+export interface HydrogenSpectrumInteractionsContent {
+	hook: {
+		question: string;
+		options: readonly { id: string; label: string }[];
+		explanation: string;
+	};
+	measure: {
+		upperLevelLabel: string;
+		readout: ContentMessage<{
+			upperN: DisplayValue;
+			wavelengthNm: DisplayValue;
+			photonEnergyEv: DisplayValue;
+		}>;
+	};
+	series: {
+		lowerLevelLabel: string;
+		readout: ContentMessage<{
+			series: DisplayValue;
+			wavelengthNm: DisplayValue;
+			region: DisplayValue;
+		}>;
+	};
+	sandbox: {
+		upperLevelLabel: string;
+		lowerLevelLabel: string;
+		readout: ContentMessage<{
+			transition: DisplayValue;
+			wavelengthNm: DisplayValue;
+			photonEnergyEv: DisplayValue;
+			region: DisplayValue;
+		}>;
+	};
+}
+
+export interface HydrogenSpectrumStoryContent extends ProseStoryContent<HydrogenSpectrumSceneId> {
+	interactions: HydrogenSpectrumInteractionsContent;
+	triView: HydrogenSpectrumTriViewContent;
 }

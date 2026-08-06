@@ -110,7 +110,7 @@ export const zhCNSiteContent = {
 			type: 'website',
 			image: '/og-home.png',
 			imageAlt: 'VisualChem 首页：宏观、微观与符号三重表征围绕乙醇—水相图同步',
-			modifiedTime: '2026-07-23'
+			modifiedTime: '2026-07-24'
 		},
 		hero: {
 			eyebrow: 'OPEN CHEMISTRY · EXPLORABLE STORIES',
@@ -247,6 +247,21 @@ export const zhCNSiteContent = {
 				}
 			]
 		},
+		seasonFour: {
+			eyebrow: 'SEASON 04 · STRUCTURE & SPECTRA',
+			title: '让物质开口唱歌',
+			introduction:
+				'第四季从光追问结构：先把氢原子的几根亮线还原成量子化能级，再走向分子的红外振动与核磁共振。光谱不是条形码图库，而是物质内部运动留下的证词。',
+			stories: [
+				{
+					number: '11',
+					status: '可交互 Alpha · 约 11 分钟',
+					title: '原子为什么只唱几颗音',
+					description: '氢放电管没有铺开彩虹；四根 Balmer 线把量子化能级写成一张可计算的原子指纹。',
+					action: '开始阅读 ↗'
+				}
+			]
+		},
 		principles: {
 			eyebrow: 'WHAT COUNTS AS TRUE',
 			heading: {
@@ -256,7 +271,7 @@ export const zhCNSiteContent = {
 				{
 					number: '01',
 					title: '计算可核验',
-					body: '所有相界来自浏览器端热力学计算，并用单元测试锁住纯组分沸点、相平衡和共沸点。'
+					body: '相界、速率、能量路径与谱线位置都由浏览器内核计算，并用单元测试锁住数据锚点、守恒关系和模型边界。'
 				},
 				{
 					number: '02',

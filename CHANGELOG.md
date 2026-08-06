@@ -20,7 +20,8 @@ All notable public changes to VisualChem are recorded here. Versions follow Sema
 - season one phase-equilibrium stories covering boiling maps, ternary salt separation, and eutectic cooling-curve reconstruction;
 - season two stories connecting microstate counting, Gibbs-energy landscapes, and the Nernst equation;
 - season three kinetics stories linking integrated rate laws, Arrhenius/Maxwell–Boltzmann reasoning, and catalytic energy pathways;
-- ten bilingual story routes, each with synchronized macroscopic, particulate, and symbolic views, prediction prompts, concept checks, and a free-play bench.
+- the opening season-four story *Why atoms sing only a few notes*, linking a hydrogen discharge tube, one computed energy-level transition, and its Rydberg line spectrum;
+- eleven bilingual story routes, each with synchronized macroscopic, particulate or microscopic, and symbolic views, prediction prompts, concept checks, and a free-play bench.
 
 ### Evidence boundaries
 

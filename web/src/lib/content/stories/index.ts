@@ -4,6 +4,7 @@ export * from './catalyst';
 export * from './cooling-curve';
 export * from './entropy';
 export * from './gibbs-valley';
+export * from './hydrogen-spectrum';
 export * from './nernst';
 export * from './kinetics';
 export * from './ethanol-distillation';

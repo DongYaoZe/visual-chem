@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">原子为什么只唱几颗音 — VisualChem</title>
+  <desc id="desc">氢放电管的 Balmer 谱线与量子化能级跃迁。</desc>
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#17131f"/><stop offset="1" stop-color="#3d2b54"/></linearGradient>
+    <pattern id="grain" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#f4efe4" stroke-opacity=".04"/></pattern>
+    <filter id="glow"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#100b18" flood-opacity=".55"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#night)"/><rect width="1200" height="630" fill="url(#grain)"/>
+  <g transform="translate(78 52)"><rect width="42" height="42" rx="11" fill="#f4efe4"/><path d="M8 33C12 17 22 10 32 15C35 17 36 20 36 23" fill="none" stroke="#173f43" stroke-width="3.5" stroke-linecap="round"/><path d="M8 33C14 26 23 21 30 21C33 21 35 22 36 23" fill="none" stroke="#d66b32" stroke-width="3.5" stroke-linecap="round"/><circle cx="35" cy="23" r="2.7" fill="#173f43"/><text x="56" y="29" fill="#f4efe4" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="26" font-weight="700">VisualChem</text></g>
+  <text x="78" y="186" fill="#c8a9eb" font-family="SF Mono, Consolas, monospace" font-size="24" font-weight="700" letter-spacing="6">ATOMIC STRUCTURE · STORY 11</text>
+  <text x="74" y="278" fill="#f4efe4" font-family="Georgia, Songti SC, serif" font-size="78" font-weight="600" letter-spacing="-2">原子为什么</text>
+  <text x="74" y="370" fill="#c8a9eb" font-family="Georgia, Songti SC, serif" font-size="78" font-weight="600" letter-spacing="-2">只唱几颗音</text>
+  <text x="78" y="432" fill="#e7dfec" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="28">一根谱线是一份能量收据</text>
+  <text x="78" y="474" fill="#e7dfec" font-family="Avenir Next, Microsoft YaHei, sans-serif" font-size="28">一组谱线是一张原子指纹</text>
+  <g transform="translate(690 112)" filter="url(#shadow)">
+    <rect width="440" height="430" rx="28" fill="#f7f2e6"/>
+    <g transform="translate(34 34)">
+      <rect x="0" y="0" width="372" height="126" rx="14" fill="#15131b"/>
+      <path d="M24 64H348" stroke="#716b79" stroke-width="1"/>
+      <g stroke-linecap="round">
+        <path d="M57 16V110" stroke="#8e62da" stroke-width="5"/>
+        <path d="M82 16V110" stroke="#5874e8" stroke-width="6"/>
+        <path d="M136 16V110" stroke="#3eb7d6" stroke-width="7"/>
+        <path d="M318 16V110" stroke="#e34d4d" stroke-width="9"/>
+      </g>
+      <text x="186" y="151" fill="#5f5864" font-family="SF Mono, Consolas, monospace" font-size="15" text-anchor="middle">Balmer line spectrum · vacuum wavelength</text>
+      <g transform="translate(0 185)">
+        <path d="M30 183H330M30 93H330M30 63H330M30 50H330M30 43H330M30 38H330" stroke="#756d7d" stroke-width="2"/>
+        <text x="342" y="188" fill="#5f5864" font-family="SF Mono, Consolas, monospace" font-size="14">n=1</text>
+        <text x="342" y="98" fill="#5f5864" font-family="SF Mono, Consolas, monospace" font-size="14">n=2</text>
+        <text x="342" y="68" fill="#5f5864" font-family="SF Mono, Consolas, monospace" font-size="14">n=3</text>
+        <path d="M210 63V93" stroke="#e34d4d" stroke-width="8" opacity=".45" filter="url(#glow)"/>
+        <path d="M210 63V91" stroke="#e34d4d" stroke-width="4"/><path d="M202 82L210 96L218 82" fill="#e34d4d"/>
+        <text x="226" y="84" fill="#7c3e4b" font-family="SF Mono, Consolas, monospace" font-size="16" font-weight="700">656.5 nm</text>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(78 520)"><rect width="500" height="58" rx="29" fill="#f4efe4" fill-opacity=".08" stroke="#f4efe4" stroke-opacity=".32"/><text x="250" y="37" fill="#f4efe4" font-family="SF Mono, Consolas, monospace" font-size="21" font-weight="700" text-anchor="middle">the spectrum is computed, not drawn</text></g>
+</svg>

@@ -114,7 +114,7 @@ export const enSiteContent = {
 			image: '/og-home.png',
 			imageAlt:
 				'VisualChem home: macroscopic, particulate, and symbolic views synchronized around an ethanol–water phase diagram',
-			modifiedTime: '2026-07-23'
+			modifiedTime: '2026-07-24'
 		},
 		hero: {
 			eyebrow: 'OPEN CHEMISTRY · EXPLORABLE STORIES',
@@ -261,6 +261,22 @@ export const enSiteContent = {
 				}
 			]
 		},
+		seasonFour: {
+			eyebrow: 'SEASON 04 · STRUCTURE & SPECTRA',
+			title: 'Let matter sing',
+			introduction:
+				'Season four reads structure through light: begin by turning a few hydrogen lines back into quantized levels, then move to molecular infrared vibrations and nuclear magnetic resonance. A spectrum is not a gallery of barcodes; it is testimony from motion inside matter.',
+			stories: [
+				{
+					number: '11',
+					status: 'Interactive alpha · about 11 minutes',
+					title: 'Why atoms sing only a few notes',
+					description:
+						'A hydrogen tube does not spread a rainbow; four Balmer lines write quantized energy levels into a computed atomic fingerprint.',
+					action: 'Start reading ↗'
+				}
+			]
+		},
 		principles: {
 			eyebrow: 'WHAT COUNTS AS TRUE',
 			heading: {
@@ -270,7 +286,7 @@ export const enSiteContent = {
 				{
 					number: '01',
 					title: 'Calculations you can verify',
-					body: 'Every phase boundary comes from thermodynamic calculations in the browser. Unit tests lock down pure-component boiling points, phase equilibrium, and the azeotrope.'
+					body: 'Phase boundaries, rates, energy paths, and spectral lines are computed in the browser. Unit tests lock down data anchors, conservation laws, and model boundaries.'
 				},
 				{
 					number: '02',
