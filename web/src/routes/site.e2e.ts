@@ -26,7 +26,7 @@ test('homepage presents the project and a working story entry', async ({ page })
 	page.on('pageerror', (error) => pageErrors.push(error));
 	await gotoHydrated(page, '/');
 	await expect(page).toHaveTitle(/VisualChem/);
-	await expect(page.getByRole('heading', { name: /不是把相图/ })).toBeVisible();
+	await expect(page.getByRole('heading', { name: /先看现象/ })).toBeVisible();
 	await expect(page.getByTestId('tri-view')).toBeVisible();
 	await page.getByRole('link', { name: /进入第一篇故事/ }).click();
 	await expect(page).toHaveURL(/stories\/ethanol-distillation/);
