@@ -61,7 +61,7 @@ Other methods, including Raman spectroscopy, can observe this motion. Infrared-s
 		},
 		{
 			id: 'dipole-rule',
-			prose: `Infrared absorption requires the molecular dipole to change along the normal coordinate:
+			prose: String.raw`Infrared absorption requires the molecular dipole to change along the normal coordinate:
 
 $$\left(\frac{\partial \mu}{\partial Q}\right)_0 \neq 0$$
 
@@ -71,7 +71,7 @@ Atomic motion alone is not enough. The dipole must change.`
 		},
 		{
 			id: 'read-the-spectrum',
-			prose: `Infrared spectra commonly run from high to low wavenumber. Wavenumber and wavelength are reciprocals:
+			prose: String.raw`Infrared spectra commonly run from high to low wavenumber. Wavenumber and wavelength are reciprocals:
 
 $$\lambda(\mu\mathrm m)=\frac{10^4}{\tilde\nu(\mathrm{cm}^{-1})}$$
 

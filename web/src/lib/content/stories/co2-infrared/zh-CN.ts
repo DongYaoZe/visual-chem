@@ -59,7 +59,7 @@ CO₂ 还有约 1333 cm⁻¹ 的对称伸缩。它为什么没有出现在基本
 		},
 		{
 			id: 'dipole-rule',
-			prose: `红外吸收要求振动过程中偶极矩随正常坐标改变：
+			prose: String.raw`红外吸收要求振动过程中偶极矩随正常坐标改变：
 
 $$\left(\frac{\partial \mu}{\partial Q}\right)_0 \neq 0$$
 
@@ -69,7 +69,7 @@ $$\left(\frac{\partial \mu}{\partial Q}\right)_0 \neq 0$$
 		},
 		{
 			id: 'read-the-spectrum',
-			prose: `红外谱常把波数从高到低排列。波数与波长互为倒数：
+			prose: String.raw`红外谱常把波数从高到低排列。波数与波长互为倒数：
 
 $$\lambda(\mu\mathrm m)=\frac{10^4}{\tilde\nu(\mathrm{cm}^{-1})}$$
 
