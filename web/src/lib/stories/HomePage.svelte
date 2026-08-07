@@ -333,6 +333,20 @@
 				</div>
 				<strong>{site.home.seasonFour.stories[0].action}</strong>
 			</a>
+			<a
+				class="story live"
+				href={locale === 'en'
+					? resolve('/en/stories/co2-infrared/')
+					: resolve('/stories/co2-infrared/')}
+			>
+				<span class="number">{site.home.seasonFour.stories[1].number}</span>
+				<div>
+					<small>{site.home.seasonFour.stories[1].status}</small>
+					<h3>{site.home.seasonFour.stories[1].title}</h3>
+					<p>{site.home.seasonFour.stories[1].description}</p>
+				</div>
+				<strong>{site.home.seasonFour.stories[1].action}</strong>
+			</a>
 		</div>
 	</section>
 

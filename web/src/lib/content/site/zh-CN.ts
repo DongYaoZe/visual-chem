@@ -260,6 +260,13 @@ export const zhCNSiteContent = {
 					description:
 						'氢气发光时只出现几根线。调节能级，算出它们的波长，再看这些线怎样对应原子的能量差。',
 					action: '开始阅读 ↗'
+				},
+				{
+					number: '12',
+					status: '可交互 Alpha · 约 10 分钟',
+					title: '为什么有些振动红外光看不见',
+					description: 'CO₂ 的原子一直在动，但只有会改变偶极矩的振动能在基本红外谱上留下吸收带。',
+					action: '开始阅读 ↗'
 				}
 			]
 		},

@@ -11,6 +11,7 @@ export * from './eutectic';
 export * from './eutectic-frame';
 export * from './gibbs-valley';
 export * from './hydrogen-spectrum';
+export * from './co2-infrared';
 export * from './microstates';
 export * from './nernst';
 export * from './monotone-cubic';

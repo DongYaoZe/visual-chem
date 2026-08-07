@@ -263,16 +263,24 @@ export const enSiteContent = {
 		},
 		seasonFour: {
 			eyebrow: 'SEASON 04 · STRUCTURE & SPECTRA',
-			title: 'Let matter sing',
+			title: 'Read matter through light',
 			introduction:
-				'Season four reads structure through light: begin by turning a few hydrogen lines back into quantized levels, then move to molecular infrared vibrations and nuclear magnetic resonance. A spectrum is not a gallery of barcodes; it is testimony from motion inside matter.',
+				'Season four reads structure through light. Hydrogen emission lines lead to molecular infrared vibrations, then nuclear magnetic resonance.',
 			stories: [
 				{
 					number: '11',
 					status: 'Interactive alpha · about 11 minutes',
-					title: 'Why atoms sing only a few notes',
+					title: 'Why hydrogen emits a few lines',
 					description:
-						'A hydrogen tube does not spread a rainbow; four Balmer lines write quantized energy levels into a computed atomic fingerprint.',
+						'Compute the wavelengths of hydrogen lines and connect each one to an energy gap.',
+					action: 'Start reading ↗'
+				},
+				{
+					number: '12',
+					status: 'Interactive alpha · about 10 minutes',
+					title: 'Why infrared misses some vibrations',
+					description:
+						'CO₂ has several fundamental motions, but only the ones that change its dipole leave an infrared band.',
 					action: 'Start reading ↗'
 				}
 			]

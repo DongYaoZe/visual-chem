@@ -49,22 +49,24 @@ test('both catalogues expose the complete season-three trilogy', async ({ page }
 	await expect(englishCards.nth(2)).toHaveAttribute('href', `${basePath}/en/stories/catalyst/`);
 });
 
-test('both catalogues expose the season-four opening story', async ({ page }) => {
+test('both catalogues expose the season-four stories', async ({ page }) => {
 	await page.goto(appPath('/'));
 	const chineseCards = page.locator('.season-four a.story');
-	await expect(chineseCards).toHaveCount(1);
-	await expect(chineseCards.first()).toHaveAttribute(
+	await expect(chineseCards).toHaveCount(2);
+	await expect(chineseCards.nth(0)).toHaveAttribute(
 		'href',
 		`${basePath}/stories/hydrogen-spectrum/`
 	);
+	await expect(chineseCards.nth(1)).toHaveAttribute('href', `${basePath}/stories/co2-infrared/`);
 
 	await page.goto(appPath('/en/'));
 	const englishCards = page.locator('.season-four a.story');
-	await expect(englishCards).toHaveCount(1);
-	await expect(englishCards.first()).toHaveAttribute(
+	await expect(englishCards).toHaveCount(2);
+	await expect(englishCards.nth(0)).toHaveAttribute(
 		'href',
 		`${basePath}/en/stories/hydrogen-spectrum/`
 	);
+	await expect(englishCards.nth(1)).toHaveAttribute('href', `${basePath}/en/stories/co2-infrared/`);
 });
 
 test('story keeps the prediction and synchronized apparatus interactive', async ({ page }) => {
@@ -315,6 +317,7 @@ test('all public routes load their local production assets without HTTP errors',
 		'/stories/arrhenius/',
 		'/stories/catalyst/',
 		'/stories/hydrogen-spectrum/',
+		'/stories/co2-infrared/',
 		'/en/',
 		'/en/stories/ethanol-distillation/',
 		'/en/stories/boiling-map/',
@@ -326,7 +329,8 @@ test('all public routes load their local production assets without HTTP errors',
 		'/en/stories/kinetics/',
 		'/en/stories/arrhenius/',
 		'/en/stories/catalyst/',
-		'/en/stories/hydrogen-spectrum/'
+		'/en/stories/hydrogen-spectrum/',
+		'/en/stories/co2-infrared/'
 	]) {
 		await page.goto(appPath(path));
 		await expect(page.locator('main')).toBeVisible();

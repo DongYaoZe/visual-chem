@@ -5,6 +5,7 @@ export * from './cooling-curve';
 export * from './entropy';
 export * from './gibbs-valley';
 export * from './hydrogen-spectrum';
+export * from './co2-infrared';
 export * from './nernst';
 export * from './kinetics';
 export * from './ethanol-distillation';

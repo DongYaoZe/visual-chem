@@ -215,7 +215,7 @@ export interface HomeContent {
 		eyebrow: string;
 		title: string;
 		introduction: string;
-		stories: readonly [HomeStoryCardContent];
+		stories: readonly [HomeStoryCardContent, HomeStoryCardContent];
 	};
 	principles: {
 		eyebrow: string;
@@ -1584,6 +1584,88 @@ export type HydrogenSpectrumSceneId =
 	| 'three-families'
 	| 'fingerprint'
 	| 'sandbox';
+
+export type CO2InfraredSceneId =
+	| 'hook'
+	| 'three-motions'
+	| 'silent-stretch'
+	| 'dipole-rule'
+	| 'read-the-spectrum'
+	| 'fingerprint-region'
+	| 'sandbox';
+
+export interface CO2InfraredTriViewContent {
+	defaultAriaLabel: string;
+	liveSummary: ContentMessage<{
+		mode: string;
+		wavenumberCm: DisplayValue;
+		wavelengthUm: DisplayValue;
+		irActive: boolean;
+	}>;
+	synchronizedState: string;
+	modeLabel: string;
+	wavenumberLabel: string;
+	wavelengthLabel: string;
+	activityLabel: string;
+	activityNames: { active: string; silent: string };
+	instrument: {
+		ariaLabel: ContentMessage<{ mode: string; wavenumberCm: DisplayValue; irActive: boolean }>;
+		viewName: string;
+		caption: string;
+		beamLabel: string;
+		sampleLabel: string;
+		detectorLabel: string;
+	};
+	molecule: {
+		ariaLabel: ContentMessage<{ mode: string; amplitude: DisplayValue }>;
+		viewName: string;
+		caption: string;
+		carbonLabel: string;
+		oxygenLabel: string;
+		bondLabel: string;
+		modeNames: Record<
+			CO2InfraredSceneId | 'symmetric-stretch' | 'bend' | 'asymmetric-stretch',
+			string
+		>;
+	};
+	spectrum: {
+		ariaLabel: ContentMessage<{ mode: string; wavenumberCm: DisplayValue; irActive: boolean }>;
+		viewName: string;
+		caption: string;
+		xAxis: string;
+		yAxis: string;
+		selectedBand: string;
+		activeBand: string;
+		silentBand: string;
+	};
+}
+
+export interface CO2InfraredInteractionsContent {
+	hook: {
+		question: string;
+		options: readonly { id: string; label: string }[];
+		explanation: string;
+	};
+	mode: {
+		label: string;
+		ariaLabel: string;
+		readout: ContentMessage<{
+			mode: string;
+			wavenumberCm: DisplayValue;
+			wavelengthUm: DisplayValue;
+			irActive: boolean;
+		}>;
+	};
+	amplitude: {
+		label: string;
+		ariaLabel: string;
+	};
+}
+
+export interface CO2InfraredStoryContent extends ProseStoryContent<CO2InfraredSceneId> {
+	interactions: CO2InfraredInteractionsContent;
+	triView: CO2InfraredTriViewContent;
+}
 
 export interface HydrogenSpectrumTriViewContent {
 	defaultAriaLabel: string;
