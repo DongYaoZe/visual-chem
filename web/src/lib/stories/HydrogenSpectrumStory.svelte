@@ -151,6 +151,7 @@
 			closeAriaLabel={story.stage.closeGraphicAriaLabel}
 			openButtonLabel={story.stage.openGraphicButton}
 			statusAriaLabel={story.stage.shortStateAriaLabel}
+			compactMobile
 		>
 			{#snippet stage()}
 				<HydrogenSpectrumTriView
@@ -820,8 +821,14 @@
 			grid-template-columns: 1fr;
 			gap: 1rem;
 		}
-		.step {
-			min-height: 96vh;
+		.step,
+		.step.symbol-step {
+			min-height: auto;
+			padding-block: 2.2rem;
+			align-items: stretch;
+		}
+		.step.symbol-step {
+			padding-top: 2.2rem;
 		}
 		.step-card {
 			padding: 1rem;

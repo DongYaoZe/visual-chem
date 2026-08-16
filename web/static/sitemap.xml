@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://dongyaoze.github.io/visual-chem/</loc>
-    <lastmod>2026-07-24</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -31,8 +31,56 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://dongyaoze.github.io/visual-chem/en/</loc>
+    <loc>https://dongyaoze.github.io/visual-chem/stories/entropy/</loc>
+    <lastmod>2026-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://dongyaoze.github.io/visual-chem/stories/gibbs-valley/</loc>
+    <lastmod>2026-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://dongyaoze.github.io/visual-chem/stories/nernst/</loc>
+    <lastmod>2026-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://dongyaoze.github.io/visual-chem/stories/kinetics/</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://dongyaoze.github.io/visual-chem/stories/arrhenius/</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://dongyaoze.github.io/visual-chem/stories/catalyst/</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://dongyaoze.github.io/visual-chem/stories/hydrogen-spectrum/</loc>
     <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://dongyaoze.github.io/visual-chem/stories/co2-infrared/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://dongyaoze.github.io/visual-chem/en/</loc>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -61,19 +109,7 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://dongyaoze.github.io/visual-chem/stories/entropy/</loc>
-    <lastmod>2026-07-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://dongyaoze.github.io/visual-chem/en/stories/entropy/</loc>
-    <lastmod>2026-07-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://dongyaoze.github.io/visual-chem/stories/gibbs-valley/</loc>
     <lastmod>2026-07-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -85,31 +121,13 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://dongyaoze.github.io/visual-chem/stories/nernst/</loc>
-    <lastmod>2026-07-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://dongyaoze.github.io/visual-chem/en/stories/nernst/</loc>
     <lastmod>2026-07-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://dongyaoze.github.io/visual-chem/stories/kinetics/</loc>
-    <lastmod>2026-07-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://dongyaoze.github.io/visual-chem/en/stories/kinetics/</loc>
-    <lastmod>2026-07-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://dongyaoze.github.io/visual-chem/stories/arrhenius/</loc>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -121,32 +139,14 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://dongyaoze.github.io/visual-chem/stories/catalyst/</loc>
-    <lastmod>2026-07-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://dongyaoze.github.io/visual-chem/en/stories/catalyst/</loc>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://dongyaoze.github.io/visual-chem/stories/hydrogen-spectrum/</loc>
-    <lastmod>2026-07-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://dongyaoze.github.io/visual-chem/en/stories/hydrogen-spectrum/</loc>
     <lastmod>2026-07-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://dongyaoze.github.io/visual-chem/stories/co2-infrared/</loc>
-    <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>

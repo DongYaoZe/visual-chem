@@ -92,11 +92,28 @@
 	let hookTop = $derived(hookStages.at(-1)?.x ?? 0.1);
 	let progress = $derived(((activeIndex + 1) / story.scenes.length) * 100);
 	let experimentAlreadySelected = $derived(recordedExperimentalIndices.includes(experimentIndex));
+	let experimentCoverage = $derived([
+		recordedExperimentalIndices.some((index) => ETHANOL_WATER_LAI_2014.points[index].x < 0.33),
+		recordedExperimentalIndices.some((index) => {
+			const x = ETHANOL_WATER_LAI_2014.points[index].x;
+			return x >= 0.33 && x < 0.66;
+		}),
+		recordedExperimentalIndices.some((index) => ETHANOL_WATER_LAI_2014.points[index].x >= 0.66)
+	]);
+	let experimentCoverageCount = $derived(experimentCoverage.filter(Boolean).length);
 	let catalogHref = $derived(locale === 'en' ? resolve('/en/') : resolve('/'));
 
 	function recordExperiment() {
 		if (experimentAlreadySelected) return;
 		recordedExperimentalIndices = [...recordedExperimentalIndices, experimentIndex].sort(
+			(first, second) => first - second
+		);
+	}
+
+	function selectAndRecordExperiment(index: number) {
+		experimentIndex = index;
+		if (recordedExperimentalIndices.includes(index)) return;
+		recordedExperimentalIndices = [...recordedExperimentalIndices, index].sort(
 			(first, second) => first - second
 		);
 	}
@@ -178,6 +195,7 @@
 			closeAriaLabel={story.stage.closeGraphicAriaLabel}
 			openButtonLabel={story.stage.openGraphicButton}
 			statusAriaLabel={story.stage.shortStateAriaLabel}
+			compactMobile
 		>
 			{#snippet stage()}
 				<TriView
@@ -297,6 +315,45 @@
 						{/if}
 
 						{#if scene.id === 'build-the-map'}
+							<div class="sample-picker">
+								<span>{story.interactions.experiment.sampleStripLabel}</span>
+								<div
+									class="sample-strip"
+									role="group"
+									aria-label={story.interactions.experiment.sampleStripAriaLabel}
+								>
+									{#each ETHANOL_WATER_LAI_2014.points as point, index (`${index}-${point.x}`)}
+										<button
+											type="button"
+											class:selected={recordedExperimentalIndices.includes(index)}
+											class:current={experimentIndex === index}
+											aria-pressed={recordedExperimentalIndices.includes(index)}
+											aria-label={story.interactions.experiment.sampleButtonAriaLabel({
+												index: index + 1,
+												liquidComposition: point.x.toFixed(3)
+											})}
+											onclick={() => selectAndRecordExperiment(index)}
+										>
+											<small>{index + 1}</small>
+											<strong>{point.x.toFixed(2)}</strong>
+										</button>
+									{/each}
+								</div>
+								<div class="coverage-row">
+									<span>{story.interactions.experiment.coverageLabel}</span>
+									{#each story.interactions.experiment.coverageBands as band, index (band)}
+										<small class:covered={experimentCoverage[index]}>{band}</small>
+									{/each}
+								</div>
+								<p>
+									{experimentCoverageCount === 3
+										? story.interactions.experiment.coverageComplete
+										: story.interactions.experiment.coverageHint({
+												covered: experimentCoverageCount,
+												total: 3
+											})}
+								</p>
+							</div>
 							<label class="range-control experiment">
 								<span>{story.interactions.experiment.controlLabel}</span>
 								<strong>{experimentPoint.x.toFixed(3)}</strong>
@@ -907,6 +964,97 @@
 		line-height: 1.65;
 	}
 
+	.sample-picker {
+		margin-top: 1.1rem;
+		padding: 0.8rem;
+		border: 1px solid var(--line);
+		border-radius: 11px;
+		background: rgba(255, 255, 255, 0.45);
+	}
+
+	.sample-picker > span,
+	.coverage-row > span {
+		display: block;
+		color: var(--ink);
+		font-family: var(--mono);
+		font-size: 0.62rem;
+		font-weight: 800;
+	}
+
+	.sample-strip {
+		display: grid;
+		grid-template-columns: repeat(8, minmax(0, 1fr));
+		gap: 0.32rem;
+		margin-top: 0.65rem;
+	}
+
+	.sample-strip button {
+		display: grid;
+		min-height: 42px;
+		padding: 0.3rem 0.15rem;
+		place-items: center;
+		border: 1px solid rgba(31, 40, 38, 0.15);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.72);
+		color: var(--ink-muted);
+		cursor: pointer;
+	}
+
+	.sample-strip button small {
+		font-family: var(--mono);
+		font-size: 0.48rem;
+		opacity: 0.62;
+	}
+
+	.sample-strip button strong {
+		font-family: var(--mono);
+		font-size: 0.62rem;
+	}
+
+	.sample-strip button.current {
+		outline: 2px solid var(--water);
+		outline-offset: 1px;
+	}
+
+	.sample-strip button.selected {
+		border-color: var(--ethanol);
+		background: rgba(216, 104, 45, 0.12);
+		color: var(--ink);
+	}
+
+	.coverage-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		align-items: center;
+		margin-top: 0.7rem;
+	}
+
+	.coverage-row > span {
+		margin-right: 0.15rem;
+	}
+
+	.coverage-row small {
+		padding: 0.25rem 0.42rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		color: var(--ink-muted);
+		font-size: 0.56rem;
+	}
+
+	.coverage-row small.covered {
+		border-color: #367a48;
+		background: rgba(54, 122, 72, 0.1);
+		color: #285d38;
+	}
+
+	.sample-picker > p {
+		margin: 0.55rem 0 0;
+		color: var(--ink-muted);
+		font-size: 0.66rem;
+		line-height: 1.55;
+	}
+
 	.range-control,
 	.dehydrate-control,
 	.sandbox-controls label {
@@ -1316,12 +1464,23 @@
 			gap: 1rem;
 		}
 
-		.step {
-			min-height: 96vh;
+		.step,
+		.step.symbol-step {
+			min-height: auto;
+			padding-block: 2.2rem;
+			align-items: stretch;
+		}
+
+		.step.symbol-step {
+			padding-top: 2.2rem;
 		}
 
 		.step-card {
 			padding: 1rem;
+		}
+
+		.sample-strip {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
 		}
 
 		.sieve-visual {

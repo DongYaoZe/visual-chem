@@ -158,6 +158,10 @@ export const zhCNEthanolDistillationContent = {
 		},
 		experiment: {
 			controlLabel: '文献样品 · 液相 x',
+			sampleStripLabel: '直接点选实验组成',
+			sampleStripAriaLabel: 'Lai 2014 的 16 组实验组成',
+			sampleButtonAriaLabel: ({ index, liquidComposition }) =>
+				`选择并加入第 ${index} 组实验数据，液相乙醇摩尔分数 ${liquidComposition}`,
 			sliderAriaLabel: '选择 Lai 2014 文献实验样品',
 			sliderValueText: ({ index, liquidComposition }) =>
 				`第 ${index} 组，液相乙醇摩尔分数 ${liquidComposition}`,
@@ -167,8 +171,13 @@ export const zhCNEthanolDistillationContent = {
 			addedButton: '这一组已加入',
 			clearButton: '清空选择',
 			selectionOutput: ({ selected, total }) => `已选 ${selected} / ${total} 组`,
+			coverageLabel: '采样覆盖',
+			coverageBands: ['低组成', '中组成', '高组成'],
+			coverageHint: ({ covered, total }) =>
+				`目前覆盖 ${covered} / ${total} 个组成区间。别只挑彼此挨着的数据点。`,
+			coverageComplete: '低、中、高组成都有证据；现在再看你的草图在哪些地方仍然猜得太多。',
 			incompleteEvidence:
-				'换一组组成再加入。圆、三角来自同一个平衡状态的液相 x 与气相 y；选满 5 组后再与完整 16 组实验表核对。',
+				'直接点选上方不同组成。圆、三角来自同一个平衡状态的液相 x 与气相 y；至少选 5 组，并尽量覆盖整条组成轴，再与完整 16 组实验表核对。',
 			completeEvidence:
 				'粗虚线只是你依据已选数据画出的草图。现在其余文献点也已展开：看看哪些区段刚才仍缺证据，以及模型稍后会怎样解释整条趋势。'
 		},

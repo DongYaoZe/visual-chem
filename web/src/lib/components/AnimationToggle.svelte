@@ -26,9 +26,9 @@
 	}
 </script>
 
-<button type="button" onclick={toggle}>
-	<span aria-hidden="true">{paused ? '▶' : 'Ⅱ'}</span>
-	{paused ? content.resume : content.pause}
+<button type="button" onclick={toggle} aria-label={paused ? content.resume : content.pause}>
+	<span class="icon" aria-hidden="true">{paused ? '▶' : 'Ⅱ'}</span>
+	<span class="label">{paused ? content.resume : content.pause}</span>
 </button>
 
 <style>
@@ -54,7 +54,7 @@
 		backdrop-filter: blur(9px);
 	}
 
-	button span {
+	button .icon {
 		font-size: 0.66rem;
 	}
 
@@ -62,8 +62,14 @@
 		button {
 			right: 8px;
 			bottom: 8px;
+			width: 36px;
 			min-height: 36px;
-			padding: 0.45rem 0.55rem;
+			padding: 0;
+			justify-content: center;
+		}
+
+		button .label {
+			display: none;
 		}
 	}
 </style>

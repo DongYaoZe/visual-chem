@@ -3,6 +3,7 @@
 	import Seo from '$lib/components/Seo.svelte';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import TriView from '$lib/components/TriView.svelte';
+	import { storiesForSeason } from '$lib/config/story-manifest.js';
 	import { getSiteContent, type LocaleCode } from '$lib/content';
 	import { heroCurveGeometry } from './hero-curve';
 
@@ -12,43 +13,24 @@
 
 	let { locale = 'zh-CN' }: Props = $props();
 	let site = $derived(getSiteContent(locale));
-	let storyHref = $derived(
-		locale === 'en'
-			? resolve('/en/stories/ethanol-distillation/')
-			: resolve('/stories/ethanol-distillation/')
-	);
-	let boilingMapHref = $derived(
-		locale === 'en' ? resolve('/en/stories/boiling-map/') : resolve('/stories/boiling-map/')
-	);
-	let saltSplitHref = $derived(
-		locale === 'en' ? resolve('/en/stories/salt-split/') : resolve('/stories/salt-split/')
-	);
-	let entropyHref = $derived(
-		locale === 'en' ? resolve('/en/stories/entropy/') : resolve('/stories/entropy/')
-	);
-	let gibbsHref = $derived(
-		locale === 'en' ? resolve('/en/stories/gibbs-valley/') : resolve('/stories/gibbs-valley/')
-	);
-	let nernstHref = $derived(
-		locale === 'en' ? resolve('/en/stories/nernst/') : resolve('/stories/nernst/')
-	);
-	let coolingCurveHref = $derived(
-		locale === 'en' ? resolve('/en/stories/cooling-curve/') : resolve('/stories/cooling-curve/')
-	);
-	let kineticsHref = $derived(
-		locale === 'en' ? resolve('/en/stories/kinetics/') : resolve('/stories/kinetics/')
-	);
-	let arrheniusHref = $derived(
-		locale === 'en' ? resolve('/en/stories/arrhenius/') : resolve('/stories/arrhenius/')
-	);
-	let catalystHref = $derived(
-		locale === 'en' ? resolve('/en/stories/catalyst/') : resolve('/stories/catalyst/')
-	);
-	let hydrogenSpectrumHref = $derived(
-		locale === 'en'
-			? resolve('/en/stories/hydrogen-spectrum/')
-			: resolve('/stories/hydrogen-spectrum/')
-	);
+	const seasonOneStories = storiesForSeason(1);
+	const seasonTwoStories = storiesForSeason(2);
+	const seasonThreeStories = storiesForSeason(3);
+	const seasonFourStories = storiesForSeason(4);
+
+	// `resolve` is typed as an overload for every generated static pathname.
+	// A manifest-selected route is runtime-safe but cannot be expressed as one
+	// of those overloads without repeating all twelve slugs in a second union.
+	// The manifest spec + catalogue E2E are the source-of-truth checks; this
+	// narrow literal type only satisfies SvelteKit's overloaded call signature.
+	type ManifestStoryPath = '/stories/ethanol-distillation/';
+
+	function storyPath(slug: string): ManifestStoryPath {
+		const localePrefix = locale === 'en' ? '/en' : '';
+		return `${localePrefix}/stories/${slug}/` as ManifestStoryPath;
+	}
+
+	let firstStoryPath = $derived(storyPath(seasonOneStories[0].slug));
 	let demoComposition = $state(0.1);
 	let demoStage = $state(2);
 	// The hero envelope is computed from the calibrated model, not sketched.
@@ -87,7 +69,7 @@
 			</h1>
 			<p class="lead">{site.home.hero.lead}</p>
 			<div class="hero-actions">
-				<a class="primary" href={storyHref}
+				<a class="primary" href={resolve(firstStoryPath)}
 					>{site.home.hero.primaryAction.label}
 					<span>{site.home.hero.primaryAction.symbol}</span></a
 				>
@@ -195,42 +177,17 @@
 		</header>
 
 		<div class="story-list">
-			<a class="story live" href={storyHref}>
-				<span class="number">{site.home.season.stories[0].number}</span>
-				<div>
-					<small>{site.home.season.stories[0].status}</small>
-					<h3>{site.home.season.stories[0].title}</h3>
-					<p>{site.home.season.stories[0].description}</p>
-				</div>
-				<strong>{site.home.season.stories[0].action}</strong>
-			</a>
-			<a class="story live" href={boilingMapHref}>
-				<span class="number">{site.home.season.stories[1].number}</span>
-				<div>
-					<small>{site.home.season.stories[1].status}</small>
-					<h3>{site.home.season.stories[1].title}</h3>
-					<p>{site.home.season.stories[1].description}</p>
-				</div>
-				<strong>{site.home.season.stories[1].action}</strong>
-			</a>
-			<a class="story live" href={saltSplitHref}>
-				<span class="number">{site.home.season.stories[2].number}</span>
-				<div>
-					<small>{site.home.season.stories[2].status}</small>
-					<h3>{site.home.season.stories[2].title}</h3>
-					<p>{site.home.season.stories[2].description}</p>
-				</div>
-				<strong>{site.home.season.stories[2].action}</strong>
-			</a>
-			<a class="story live" href={coolingCurveHref}>
-				<span class="number">{site.home.season.stories[3].number}</span>
-				<div>
-					<small>{site.home.season.stories[3].status}</small>
-					<h3>{site.home.season.stories[3].title}</h3>
-					<p>{site.home.season.stories[3].description}</p>
-				</div>
-				<strong>{site.home.season.stories[3].action}</strong>
-			</a>
+			{#each site.home.season.stories as story, index (story.number)}
+				<a class="story live" href={resolve(storyPath(seasonOneStories[index].slug))}>
+					<span class="number">{story.number}</span>
+					<div>
+						<small>{story.status}</small>
+						<h3>{story.title}</h3>
+						<p>{story.description}</p>
+					</div>
+					<strong>{story.action}</strong>
+				</a>
+			{/each}
 		</div>
 	</section>
 
@@ -244,33 +201,17 @@
 		</header>
 
 		<div class="story-list">
-			<a class="story live" href={entropyHref}>
-				<span class="number">{site.home.seasonTwo.stories[0].number}</span>
-				<div>
-					<small>{site.home.seasonTwo.stories[0].status}</small>
-					<h3>{site.home.seasonTwo.stories[0].title}</h3>
-					<p>{site.home.seasonTwo.stories[0].description}</p>
-				</div>
-				<strong>{site.home.seasonTwo.stories[0].action}</strong>
-			</a>
-			<a class="story live" href={gibbsHref}>
-				<span class="number">{site.home.seasonTwo.stories[1].number}</span>
-				<div>
-					<small>{site.home.seasonTwo.stories[1].status}</small>
-					<h3>{site.home.seasonTwo.stories[1].title}</h3>
-					<p>{site.home.seasonTwo.stories[1].description}</p>
-				</div>
-				<strong>{site.home.seasonTwo.stories[1].action}</strong>
-			</a>
-			<a class="story live" href={nernstHref}>
-				<span class="number">{site.home.seasonTwo.stories[2].number}</span>
-				<div>
-					<small>{site.home.seasonTwo.stories[2].status}</small>
-					<h3>{site.home.seasonTwo.stories[2].title}</h3>
-					<p>{site.home.seasonTwo.stories[2].description}</p>
-				</div>
-				<strong>{site.home.seasonTwo.stories[2].action}</strong>
-			</a>
+			{#each site.home.seasonTwo.stories as story, index (story.number)}
+				<a class="story live" href={resolve(storyPath(seasonTwoStories[index].slug))}>
+					<span class="number">{story.number}</span>
+					<div>
+						<small>{story.status}</small>
+						<h3>{story.title}</h3>
+						<p>{story.description}</p>
+					</div>
+					<strong>{story.action}</strong>
+				</a>
+			{/each}
 		</div>
 	</section>
 
@@ -284,33 +225,17 @@
 		</header>
 
 		<div class="story-list">
-			<a class="story live" href={kineticsHref}>
-				<span class="number">{site.home.seasonThree.stories[0].number}</span>
-				<div>
-					<small>{site.home.seasonThree.stories[0].status}</small>
-					<h3>{site.home.seasonThree.stories[0].title}</h3>
-					<p>{site.home.seasonThree.stories[0].description}</p>
-				</div>
-				<strong>{site.home.seasonThree.stories[0].action}</strong>
-			</a>
-			<a class="story live" href={arrheniusHref}>
-				<span class="number">{site.home.seasonThree.stories[1].number}</span>
-				<div>
-					<small>{site.home.seasonThree.stories[1].status}</small>
-					<h3>{site.home.seasonThree.stories[1].title}</h3>
-					<p>{site.home.seasonThree.stories[1].description}</p>
-				</div>
-				<strong>{site.home.seasonThree.stories[1].action}</strong>
-			</a>
-			<a class="story live" href={catalystHref}>
-				<span class="number">{site.home.seasonThree.stories[2].number}</span>
-				<div>
-					<small>{site.home.seasonThree.stories[2].status}</small>
-					<h3>{site.home.seasonThree.stories[2].title}</h3>
-					<p>{site.home.seasonThree.stories[2].description}</p>
-				</div>
-				<strong>{site.home.seasonThree.stories[2].action}</strong>
-			</a>
+			{#each site.home.seasonThree.stories as story, index (story.number)}
+				<a class="story live" href={resolve(storyPath(seasonThreeStories[index].slug))}>
+					<span class="number">{story.number}</span>
+					<div>
+						<small>{story.status}</small>
+						<h3>{story.title}</h3>
+						<p>{story.description}</p>
+					</div>
+					<strong>{story.action}</strong>
+				</a>
+			{/each}
 		</div>
 	</section>
 
@@ -324,29 +249,17 @@
 		</header>
 
 		<div class="story-list">
-			<a class="story live" href={hydrogenSpectrumHref}>
-				<span class="number">{site.home.seasonFour.stories[0].number}</span>
-				<div>
-					<small>{site.home.seasonFour.stories[0].status}</small>
-					<h3>{site.home.seasonFour.stories[0].title}</h3>
-					<p>{site.home.seasonFour.stories[0].description}</p>
-				</div>
-				<strong>{site.home.seasonFour.stories[0].action}</strong>
-			</a>
-			<a
-				class="story live"
-				href={locale === 'en'
-					? resolve('/en/stories/co2-infrared/')
-					: resolve('/stories/co2-infrared/')}
-			>
-				<span class="number">{site.home.seasonFour.stories[1].number}</span>
-				<div>
-					<small>{site.home.seasonFour.stories[1].status}</small>
-					<h3>{site.home.seasonFour.stories[1].title}</h3>
-					<p>{site.home.seasonFour.stories[1].description}</p>
-				</div>
-				<strong>{site.home.seasonFour.stories[1].action}</strong>
-			</a>
+			{#each site.home.seasonFour.stories as story, index (story.number)}
+				<a class="story live" href={resolve(storyPath(seasonFourStories[index].slug))}>
+					<span class="number">{story.number}</span>
+					<div>
+						<small>{story.status}</small>
+						<h3>{story.title}</h3>
+						<p>{story.description}</p>
+					</div>
+					<strong>{story.action}</strong>
+				</a>
+			{/each}
 		</div>
 	</section>
 
@@ -372,7 +285,7 @@
 		<p>{site.home.footer.tagline}</p>
 		<div>
 			<a href="https://github.com/DongYaoZe/visual-chem">{site.home.footer.sourceCodeLink}</a>
-			<a href={storyHref}>{site.home.footer.firstStoryLink}</a>
+			<a href={resolve(firstStoryPath)}>{site.home.footer.firstStoryLink}</a>
 		</div>
 	</footer>
 </main>

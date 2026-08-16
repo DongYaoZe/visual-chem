@@ -27,7 +27,9 @@ async function expectNoSeriousAccessibilityViolations(page: Page) {
 	expect(violations, JSON.stringify(violations, null, 2)).toEqual([]);
 }
 
-test('hydrogen-spectrum story exposes complete Chinese and English editions', async ({ page }) => {
+test('hydrogen-spectrum story exposes complete Chinese and English editions', async ({
+	page
+}, testInfo) => {
 	const pageErrors: Error[] = [];
 	page.on('pageerror', (error) => pageErrors.push(error));
 
@@ -35,7 +37,13 @@ test('hydrogen-spectrum story exposes complete Chinese and English editions', as
 	await expect(
 		page.getByRole('heading', { level: 1, name: /氢原子为什么\s*只发出几根线/ })
 	).toBeVisible();
-	await expect(page.getByTestId('hydrogen-spectrum-tri-view').first()).toBeVisible();
+	const narrativeStage = page.getByTestId('hydrogen-spectrum-tri-view').first();
+	if (testInfo.project.name === 'mobile-chromium') {
+		await expect(narrativeStage).toBeHidden();
+		await expect(page.locator('.short-state.compact-mobile').first()).toBeVisible();
+	} else {
+		await expect(narrativeStage).toBeVisible();
+	}
 	await expect(page.locator('.katex-error')).toHaveCount(0);
 	const ids = await page
 		.locator('[id]')

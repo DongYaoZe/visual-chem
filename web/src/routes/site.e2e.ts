@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
+import { STORY_MANIFEST, storiesForSeason } from '$lib/config/story-manifest.js';
 
 const basePath = process.env.BASE_PATH ?? '';
 const appPath = (path: string) => `${basePath}${path}`;
@@ -33,40 +34,77 @@ test('homepage presents the project and a working story entry', async ({ page })
 	expect(pageErrors).toEqual([]);
 });
 
-test('both catalogues expose the complete season-three trilogy', async ({ page }) => {
-	await page.goto(appPath('/'));
-	const chineseCards = page.locator('.season-three a.story');
-	await expect(chineseCards).toHaveCount(3);
-	await expect(chineseCards.nth(0)).toHaveAttribute('href', `${basePath}/stories/kinetics/`);
-	await expect(chineseCards.nth(1)).toHaveAttribute('href', `${basePath}/stories/arrhenius/`);
-	await expect(chineseCards.nth(2)).toHaveAttribute('href', `${basePath}/stories/catalyst/`);
+test('both catalogues expose every live story from the manifest', async ({ page }) => {
+	for (const locale of ['zh-CN', 'en'] as const) {
+		await page.goto(appPath(locale === 'en' ? '/en/' : '/'));
 
-	await page.goto(appPath('/en/'));
-	const englishCards = page.locator('.season-three a.story');
-	await expect(englishCards).toHaveCount(3);
-	await expect(englishCards.nth(0)).toHaveAttribute('href', `${basePath}/en/stories/kinetics/`);
-	await expect(englishCards.nth(1)).toHaveAttribute('href', `${basePath}/en/stories/arrhenius/`);
-	await expect(englishCards.nth(2)).toHaveAttribute('href', `${basePath}/en/stories/catalyst/`);
+		for (const season of [1, 2, 3, 4] as const) {
+			const seasonClass =
+				season === 1
+					? '.season:not(.season-two):not(.season-three):not(.season-four)'
+					: `.season-${['', '', 'two', 'three', 'four'][season]}`;
+			const cards = page.locator(`${seasonClass} a.story`);
+			const expected = storiesForSeason(season);
+			await expect(cards).toHaveCount(expected.length);
+
+			for (const [index, story] of expected.entries()) {
+				const localePrefix = locale === 'en' ? '/en' : '';
+				await expect(cards.nth(index)).toHaveAttribute(
+					'href',
+					`${basePath}${localePrefix}/stories/${story.slug}/`
+				);
+			}
+		}
+	}
+
+	expect(STORY_MANIFEST).toHaveLength(12);
 });
 
-test('both catalogues expose the season-four stories', async ({ page }) => {
-	await page.goto(appPath('/'));
-	const chineseCards = page.locator('.season-four a.story');
-	await expect(chineseCards).toHaveCount(2);
-	await expect(chineseCards.nth(0)).toHaveAttribute(
+test('header primary action follows the reader context', async ({ page }) => {
+	await gotoHydrated(page, '/');
+	await expect(page.locator('header nav a').first()).toHaveText('开始第一篇故事');
+	await expect(page.locator('header nav a').first()).toHaveAttribute(
 		'href',
-		`${basePath}/stories/hydrogen-spectrum/`
+		`${basePath}/stories/ethanol-distillation/`
 	);
-	await expect(chineseCards.nth(1)).toHaveAttribute('href', `${basePath}/stories/co2-infrared/`);
 
-	await page.goto(appPath('/en/'));
-	const englishCards = page.locator('.season-four a.story');
-	await expect(englishCards).toHaveCount(2);
-	await expect(englishCards.nth(0)).toHaveAttribute(
-		'href',
-		`${basePath}/en/stories/hydrogen-spectrum/`
+	await gotoHydrated(page, '/stories/co2-infrared/');
+	await expect(page.locator('header nav a').first()).toHaveText('故事目录');
+	await expect(page.locator('header nav a').first()).toHaveAttribute('href', `${basePath}/`);
+
+	await gotoHydrated(page, '/en/stories/co2-infrared/');
+	await expect(page.locator('header nav a').first()).toHaveText('Story catalogue');
+	await expect(page.locator('header nav a').first()).toHaveAttribute('href', `${basePath}/en/`);
+});
+
+test('flagship stories use text-first stages on phone widths', async ({ page }, testInfo) => {
+	test.skip(
+		testInfo.project.name !== 'mobile-chromium',
+		'Phone layout is covered by the mobile project.'
 	);
-	await expect(englishCards.nth(1)).toHaveAttribute('href', `${basePath}/en/stories/co2-infrared/`);
+
+	for (const path of [
+		'/stories/ethanol-distillation/',
+		'/stories/hydrogen-spectrum/',
+		'/stories/co2-infrared/'
+	]) {
+		await gotoHydrated(page, path);
+		const state = page.locator('.short-state.compact-mobile').first();
+		const graphic = page.locator('.graphic.compact-mobile').first();
+		const open = state.getByRole('button', { name: '查看当前图' });
+
+		await expect(state).toBeVisible();
+		await expect(open).toBeVisible();
+		await expect(graphic).toBeHidden();
+
+		await open.click();
+		await expect(graphic).toHaveAttribute('role', 'dialog');
+		await expect(graphic).toBeVisible();
+
+		await page.keyboard.press('Escape');
+		await expect(graphic).toBeHidden();
+		await expect(open).toBeFocused();
+	}
 });
 
 test('story keeps the prediction and synchronized apparatus interactive', async ({ page }) => {
@@ -84,21 +122,18 @@ test('story keeps the prediction and synchronized apparatus interactive', async 
 
 test('the reader can rebuild the phase envelope from literature measurements', async ({ page }) => {
 	await gotoHydrated(page, '/stories/ethanol-distillation/');
-	const recordButton = page.getByRole('button', { name: '加入这组文献实验数据' });
-	await recordButton.scrollIntoViewIfNeeded();
-	const composition = page.locator('label.experiment input[type="range"]');
+	const samples = page.locator('.sample-strip button');
+	await samples.first().scrollIntoViewIfNeeded();
+	await expect(samples).toHaveCount(16);
 	await expect(page.locator('.graphic .bubble-line')).toHaveCount(0);
 
-	for (const value of ['1', '4', '7', '10', '13']) {
-		await composition.evaluate((element, nextValue) => {
-			const input = element as HTMLInputElement;
-			input.value = nextValue;
-			input.dispatchEvent(new Event('input', { bubbles: true }));
-		}, value);
-		await recordButton.click();
+	for (const index of [1, 4, 7, 10, 13]) {
+		await samples.nth(index).click();
 	}
 
 	await expect(page.locator('.experiment-actions output')).toContainText('已选 5 / 16 组');
+	await expect(page.locator('.coverage-row small.covered')).toHaveCount(3);
+	await expect(page.locator('.sample-picker')).toContainText('低、中、高组成都有证据');
 	// Clicking nudges the viewport, and the sticky graphic follows whichever
 	// scene the IntersectionObserver currently reports. Scroll back to the
 	// experiment scene so the assertions read the layer the reader would see.

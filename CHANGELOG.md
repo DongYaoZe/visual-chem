@@ -6,7 +6,7 @@ All notable public changes to VisualChem are recorded here. Versions follow Sema
 
 ### Added
 
-- SvelteKit narrative site with a project home page and the nine-scene story *The unreachable 100%*;
+- SvelteKit narrative site with a project home page and the nine-scene story _The unreachable 100%_;
 - linked macroscopic apparatus, particulate composition, and symbolic `T-x-y` views driven by one thermodynamic state;
 - browser-side Antoine, three-suffix Margules, bubble/dew-point, azeotrope, flash, lever-rule, and equilibrium-stage calculations;
 - independent SciPy golden reference and Vitest numerical checks;
@@ -20,8 +20,18 @@ All notable public changes to VisualChem are recorded here. Versions follow Sema
 - season one phase-equilibrium stories covering boiling maps, ternary salt separation, and eutectic cooling-curve reconstruction;
 - season two stories connecting microstate counting, Gibbs-energy landscapes, and the Nernst equation;
 - season three kinetics stories linking integrated rate laws, Arrhenius/Maxwell–Boltzmann reasoning, and catalytic energy pathways;
-- the opening season-four story *Why atoms sing only a few notes*, linking a hydrogen discharge tube, one computed energy-level transition, and its Rydberg line spectrum;
-- eleven bilingual story routes, each with synchronized macroscopic, particulate or microscopic, and symbolic views, prediction prompts, concept checks, and a free-play bench.
+- the opening season-four story _Why atoms sing only a few notes_, linking a hydrogen discharge tube, one computed energy-level transition, and its Rydberg line spectrum;
+- the second season-four story on CO₂ infrared absorption, linking molecular vibration, dipole-moment change, and computed wavenumber/wavelength readouts while distinguishing IR-active and silent modes;
+- twelve bilingual story routes, each with synchronized macroscopic, particulate or microscopic, and symbolic views, prediction prompts, concept checks, and a free-play bench;
+- a canonical story manifest that now drives catalogue routing, sitemap generation, and minimum visual-audit coverage for every live story.
+
+### Changed
+
+- flagship mobile scrollytelling now defaults to a text-first synchronized state strip with the full graphic available on demand; the compact global motion control no longer covers as much reading space on phones;
+- story-page header navigation now points back to the story catalogue instead of incorrectly advertising the first story from every deep route;
+- the ethanol-water literature reconstruction now lets readers select the 16 Lai 2014 measurements directly and reports low/mid/high composition coverage before the full evidence table is revealed;
+- CO₂ display equations are rendered through the shared KaTeX component and covered by an end-to-end rendering contract;
+- production audit is reproducible at the GitHub Pages `/visual-chem` base path and covers every live story on desktop and mobile.
 
 ### Evidence boundaries
 

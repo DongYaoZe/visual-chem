@@ -8,13 +8,23 @@ async function gotoHydrated(page: Page, path: string) {
 	await page.waitForSelector('html[data-hydrated="true"]', { timeout: 15000 });
 }
 
-test('CO2 infrared story exposes Chinese and English editions', async ({ page }) => {
+test('CO2 infrared story exposes Chinese and English editions', async ({ page }, testInfo) => {
 	await gotoHydrated(page, '/stories/co2-infrared/');
 	await expect(
 		page.getByRole('heading', { level: 1, name: /为什么有些振动\s*红外光看不见/ })
 	).toBeVisible();
-	await expect(page.getByTestId('co2-infrared-tri-view').first()).toBeVisible();
+	const narrativeStage = page.getByTestId('co2-infrared-tri-view').first();
+	if (testInfo.project.name === 'mobile-chromium') {
+		await expect(narrativeStage).toBeHidden();
+		await expect(page.locator('.short-state.compact-mobile').first()).toBeVisible();
+	} else {
+		await expect(narrativeStage).toBeVisible();
+	}
 	await expect(page.locator('.katex-error')).toHaveCount(0);
+	const firstFormula = page.locator('.formula').first();
+	await firstFormula.scrollIntoViewIfNeeded();
+	await expect(firstFormula.locator('[role="math"]')).toBeVisible();
+	await expect(firstFormula.locator('.katex-html')).toBeVisible();
 
 	await gotoHydrated(page, '/en/stories/co2-infrared/');
 	await expect(page.locator('html')).toHaveAttribute('lang', 'en');

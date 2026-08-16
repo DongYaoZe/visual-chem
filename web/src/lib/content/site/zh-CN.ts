@@ -13,6 +13,7 @@ export const zhCNSiteContent = {
 			homeAriaLabel: 'VisualChem 首页',
 			navigationAriaLabel: '主导航',
 			storyLink: '开始第一篇故事',
+			catalogLink: '故事目录',
 			githubLink: 'GitHub'
 		},
 		motionControl: {
@@ -110,7 +111,7 @@ export const zhCNSiteContent = {
 			type: 'website',
 			image: '/og-home.png',
 			imageAlt: 'VisualChem 首页：宏观、微观与符号三重表征围绕乙醇—水相图同步',
-			modifiedTime: '2026-07-24'
+			modifiedTime: '2026-08-07'
 		},
 		hero: {
 			eyebrow: 'OPEN CHEMISTRY · 从现象开始',

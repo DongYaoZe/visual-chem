@@ -20,6 +20,8 @@
 			? resolve('/en/stories/ethanol-distillation/')
 			: resolve('/stories/ethanol-distillation/')
 	);
+	let primaryHref = $derived(compact ? home : story);
+	let primaryLabel = $derived(compact ? content.catalogLink : content.storyLink);
 </script>
 
 <header class:compact>
@@ -34,7 +36,7 @@
 		<small>{content.tagline} · v{siteConfig.version}</small>
 	</a>
 	<nav aria-label={content.navigationAriaLabel}>
-		<a href={story}>{content.storyLink}</a>
+		<a href={primaryHref}>{primaryLabel}</a>
 		<a href="https://github.com/DongYaoZe/visual-chem">{content.githubLink}</a>
 	</nav>
 </header>

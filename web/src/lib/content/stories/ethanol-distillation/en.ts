@@ -169,6 +169,10 @@ export const enEthanolDistillationContent = {
 		},
 		experiment: {
 			controlLabel: 'Literature sample · liquid x',
+			sampleStripLabel: 'Pick experimental compositions directly',
+			sampleStripAriaLabel: 'The 16 experimental compositions reported by Lai 2014',
+			sampleButtonAriaLabel: ({ index, liquidComposition }) =>
+				`Select and add experimental sample ${index}, liquid ethanol mole fraction ${liquidComposition}`,
 			sliderAriaLabel: 'Choose an experimental sample from Lai 2014',
 			sliderValueText: ({ index, liquidComposition }) =>
 				`Sample ${index}, liquid ethanol mole fraction ${liquidComposition}`,
@@ -178,8 +182,14 @@ export const enEthanolDistillationContent = {
 			addedButton: 'This sample is already added',
 			clearButton: 'Clear selection',
 			selectionOutput: ({ selected, total }) => `${selected} / ${total} samples selected`,
+			coverageLabel: 'Sampling coverage',
+			coverageBands: ['low composition', 'middle composition', 'high composition'],
+			coverageHint: ({ covered, total }) =>
+				`You currently cover ${covered} / ${total} composition regions. Do not choose only neighbouring measurements.`,
+			coverageComplete:
+				'You now have evidence at low, middle, and high composition. Look again for places where your sketch still interpolates too confidently.',
 			incompleteEvidence:
-				'Choose another composition and add it. The circle and triangle are liquid x and vapor y from the same equilibrium state. After selecting 5 samples, compare your sketch with the complete table of 16 measurements.',
+				'Pick different compositions directly above. The circle and triangle are liquid x and vapor y from the same equilibrium state. Select at least 5 samples across the composition axis before comparing your sketch with the complete table of 16 measurements.',
 			completeEvidence:
 				'The heavy dashed lines are only your sketch through the selected data. The remaining literature points are now revealed: look for regions where your sketch lacked evidence, and later ask how the model explains the full trend.'
 		},

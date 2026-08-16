@@ -14,6 +14,7 @@ export const enSiteContent = {
 			homeAriaLabel: 'VisualChem home',
 			navigationAriaLabel: 'Main navigation',
 			storyLink: 'Start the first story',
+			catalogLink: 'Story catalogue',
 			githubLink: 'GitHub'
 		},
 		motionControl: {
@@ -114,7 +115,7 @@ export const enSiteContent = {
 			image: '/og-home.png',
 			imageAlt:
 				'VisualChem home: macroscopic, particulate, and symbolic views synchronized around an ethanol–water phase diagram',
-			modifiedTime: '2026-07-24'
+			modifiedTime: '2026-08-07'
 		},
 		hero: {
 			eyebrow: 'OPEN CHEMISTRY · EXPLORABLE STORIES',

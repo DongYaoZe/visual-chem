@@ -9,3 +9,11 @@ __pycache__/
 .streamlit/
 /test-results/
 .claude/
+
+# Local build / agent / browser artefacts
+/.svelte-kit/
+/.workbuddy/
+/node_modules/
+/web/.playwright-results-*/
+/web/.vite-*/
+/web/test-results/

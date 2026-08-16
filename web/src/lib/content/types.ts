@@ -36,6 +36,7 @@ export interface HeaderContent {
 	homeAriaLabel: string;
 	navigationAriaLabel: string;
 	storyLink: string;
+	catalogLink: string;
 	githubLink: string;
 }
 
@@ -343,6 +344,12 @@ export interface StoryInteractionsContent {
 	};
 	experiment: {
 		controlLabel: string;
+		sampleStripLabel: string;
+		sampleStripAriaLabel: string;
+		sampleButtonAriaLabel: ContentMessage<{
+			index: DisplayValue;
+			liquidComposition: DisplayValue;
+		}>;
 		sliderAriaLabel: string;
 		sliderValueText: ContentMessage<{
 			index: DisplayValue;
@@ -357,6 +364,10 @@ export interface StoryInteractionsContent {
 		addedButton: string;
 		clearButton: string;
 		selectionOutput: ContentMessage<{ selected: DisplayValue; total: DisplayValue }>;
+		coverageLabel: string;
+		coverageBands: readonly [string, string, string];
+		coverageHint: ContentMessage<{ covered: DisplayValue; total: DisplayValue }>;
+		coverageComplete: string;
 		incompleteEvidence: string;
 		completeEvidence: string;
 	};

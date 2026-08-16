@@ -1,9 +1,12 @@
 import { mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
+import { STORY_MANIFEST } from '../src/lib/config/story-manifest.js';
 
-const origin = process.env.VISUAL_CHEM_ORIGIN ?? 'http://127.0.0.1:5173';
+const origin = (process.env.VISUAL_CHEM_ORIGIN ?? 'http://127.0.0.1:5173').replace(/\/$/, '');
 const output = new URL('../test-results/', import.meta.url);
+const desktop = { width: 1440, height: 1000 };
+const mobile = { width: 390, height: 844 };
 
 await mkdir(output, { recursive: true });
 
@@ -30,116 +33,65 @@ async function capture(name, path, viewport, selector, interact) {
 }
 
 async function chooseLiteratureSamples(page) {
-	const slider = page.getByRole('slider', { name: '选择 Lai 2014 文献实验样品' });
-	for (const value of ['1', '4', '7', '10', '13']) {
-		await slider.evaluate((element, nextValue) => {
-			element.value = nextValue;
-			element.dispatchEvent(new Event('input', { bubbles: true }));
-		}, value);
-		await page.getByRole('button', { name: '加入这组文献实验数据' }).click();
+	const samples = page.locator('.sample-strip button');
+	for (const index of [1, 4, 7, 10, 13]) {
+		await samples.nth(index).click();
 	}
 	await page.waitForTimeout(500);
 }
 
-await capture('home-desktop', '/', { width: 1440, height: 1000 });
-await capture('story-desktop', '/stories/ethanol-distillation', { width: 1440, height: 1000 });
+const keySceneInteractions = {
+	'hydrogen-spectrum': async (page) => {
+		await page
+			.locator('[data-scene-id="three-families"]')
+			.getByRole('button', { name: 'n=3', exact: true })
+			.click();
+		await page.waitForTimeout(400);
+	}
+};
+
+await capture('home-desktop', '/', desktop);
+await capture('home-mobile', '/', mobile);
+
+// Every live story receives the same minimum visual contract: hero + one
+// explanatory scene at desktop and phone widths. The canonical story list and
+// key-scene ids come from story-manifest.js, so adding a live route without an
+// audit target is no longer a silent omission.
+for (const story of STORY_MANIFEST) {
+	const path = `/stories/${story.slug}`;
+	const selector = `[data-scene-id="${story.keyScene}"]`;
+	const interact = keySceneInteractions[story.slug];
+
+	await capture(`${story.slug}-hero-desktop`, path, desktop);
+	await capture(`${story.slug}-stage-desktop`, path, desktop, selector, interact);
+	await capture(`${story.slug}-hero-mobile`, path, mobile);
+	await capture(`${story.slug}-stage-mobile`, path, mobile, selector, interact);
+}
+
+// The ethanol-water flagship has evidence-layer states worth preserving in
+// addition to the generic contract above.
 await capture(
-	'story-scrolly-desktop',
+	'ethanol-distillation-experiment-desktop',
 	'/stories/ethanol-distillation',
-	{ width: 1440, height: 1000 },
-	'[data-scene-index="4"]'
-);
-await capture(
-	'story-experiment-desktop',
-	'/stories/ethanol-distillation',
-	{ width: 1440, height: 1000 },
-	'[data-scene-index="4"]',
+	desktop,
+	'[data-scene-id="build-the-map"]',
 	chooseLiteratureSamples
 );
 await capture(
-	'story-model-comparison-desktop',
+	'ethanol-distillation-experiment-mobile',
 	'/stories/ethanol-distillation',
-	{ width: 1440, height: 1000 },
-	'[data-scene-index="6"]',
+	mobile,
+	'[data-scene-id="build-the-map"]',
+	chooseLiteratureSamples
+);
+await capture(
+	'ethanol-distillation-model-comparison-desktop',
+	'/stories/ethanol-distillation',
+	desktop,
+	'[data-scene-id="nonideal-model"]',
 	async (page) => {
 		await page.getByRole('slider', { name: '教学模型的非理想强度' }).fill('1');
 		await page.waitForTimeout(500);
-	}
-);
-await capture('home-mobile', '/', { width: 390, height: 844 });
-await capture('story-mobile', '/stories/ethanol-distillation', { width: 390, height: 844 });
-await capture(
-	'story-scrolly-mobile',
-	'/stories/ethanol-distillation',
-	{ width: 390, height: 844 },
-	'[data-scene-index="4"]'
-);
-await capture(
-	'story-experiment-mobile',
-	'/stories/ethanol-distillation',
-	{ width: 390, height: 844 },
-	'[data-scene-index="4"]',
-	chooseLiteratureSamples
-);
-
-// Season-three visual regression set: every story gets a hero and its most
-// explanatory linked-view scene at desktop and phone widths.
-for (const story of [
-	{ slug: 'kinetics', scene: 'fingerprints' },
-	{ slug: 'arrhenius', scene: 'the-tail' },
-	{ slug: 'catalyst', scene: 'lower-pass' }
-]) {
-	const path = `/stories/${story.slug}`;
-	await capture(`${story.slug}-hero-desktop`, path, { width: 1440, height: 1000 });
-	await capture(
-		`${story.slug}-stage-desktop`,
-		path,
-		{ width: 1440, height: 1000 },
-		`[data-scene-id="${story.scene}"]`
-	);
-	await capture(`${story.slug}-hero-mobile`, path, { width: 390, height: 844 });
-	await capture(
-		`${story.slug}-stage-mobile`,
-		path,
-		{ width: 390, height: 844 },
-		`[data-scene-id="${story.scene}"]`
-	);
-}
-
-// Season-four opening story: inspect the spectral hook and the linked family
-// switch at both target widths.
-await capture('hydrogen-spectrum-hero-desktop', '/stories/hydrogen-spectrum', {
-	width: 1440,
-	height: 1000
-});
-await capture(
-	'hydrogen-spectrum-stage-desktop',
-	'/stories/hydrogen-spectrum',
-	{ width: 1440, height: 1000 },
-	'[data-scene-id="three-families"]',
-	async (page) => {
-		await page
-			.locator('[data-scene-id="three-families"]')
-			.getByRole('button', { name: 'n=3', exact: true })
-			.click();
-		await page.waitForTimeout(400);
-	}
-);
-await capture('hydrogen-spectrum-hero-mobile', '/stories/hydrogen-spectrum', {
-	width: 390,
-	height: 844
-});
-await capture(
-	'hydrogen-spectrum-stage-mobile',
-	'/stories/hydrogen-spectrum',
-	{ width: 390, height: 844 },
-	'[data-scene-id="three-families"]',
-	async (page) => {
-		await page
-			.locator('[data-scene-id="three-families"]')
-			.getByRole('button', { name: 'n=3', exact: true })
-			.click();
-		await page.waitForTimeout(400);
 	}
 );
 

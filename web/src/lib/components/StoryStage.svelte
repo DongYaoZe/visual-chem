@@ -12,10 +12,24 @@
 		stage: Snippet;
 		/** The compact readings quoted in the short-viewport status strip. */
 		status: Snippet;
+		/**
+		 * On phone-width viewports, prefer the compact state strip and let the
+		 * reader open the full graphic on demand. Desktop/tablet behaviour stays
+		 * sticky. Use this selectively for stories whose stage would otherwise
+		 * consume too much vertical reading space.
+		 */
+		compactMobile?: boolean;
 	}
 
-	let { dialogAriaLabel, closeAriaLabel, openButtonLabel, statusAriaLabel, stage, status }: Props =
-		$props();
+	let {
+		dialogAriaLabel,
+		closeAriaLabel,
+		openButtonLabel,
+		statusAriaLabel,
+		stage,
+		status,
+		compactMobile = false
+	}: Props = $props();
 
 	let open = $state(false);
 	let openButton: HTMLButtonElement;
@@ -69,6 +83,7 @@
 <div
 	class="graphic"
 	class:short-open={open}
+	class:compact-mobile={compactMobile}
 	role={open ? 'dialog' : undefined}
 	aria-modal={open ? 'true' : undefined}
 	aria-label={open ? dialogAriaLabel : undefined}
@@ -82,7 +97,7 @@
 	>
 	{@render stage()}
 </div>
-<aside class="short-state" aria-label={statusAriaLabel}>
+<aside class="short-state" class:compact-mobile={compactMobile} aria-label={statusAriaLabel}>
 	{@render status()}
 	<button bind:this={openButton} type="button" onclick={openDialog}>{openButtonLabel}</button>
 </aside>
@@ -117,6 +132,73 @@
 	@media (max-width: 620px) {
 		.graphic {
 			width: calc(100% - 8px);
+		}
+
+		/* Text-first phone mode for selected flagship stories. The synchronized
+		 * state remains visible; the full computed stage is one explicit tap away
+		 * instead of permanently covering the next paragraph. */
+		.graphic.compact-mobile:not(.short-open) {
+			display: none;
+		}
+
+		.short-state.compact-mobile {
+			position: sticky;
+			top: 0;
+			z-index: 7;
+			display: flex;
+			min-height: 42px;
+			padding: 0.45rem 0.7rem;
+			gap: 0.55rem;
+			align-items: center;
+			justify-content: center;
+			border-block: 1px solid var(--line);
+			background: rgba(250, 247, 239, 0.97);
+			font-family: var(--mono);
+			font-size: 0.58rem;
+			box-shadow: 0 10px 24px rgba(36, 40, 34, 0.08);
+		}
+
+		.short-state.compact-mobile button {
+			margin-left: auto;
+			padding: 0.38rem 0.58rem;
+			border: 1px solid var(--ink);
+			border-radius: 999px;
+			background: var(--ink);
+			color: var(--paper);
+			cursor: pointer;
+			font-weight: 800;
+			white-space: nowrap;
+		}
+
+		.graphic.compact-mobile.short-open {
+			position: fixed;
+			inset: 6px;
+			top: 6px;
+			z-index: 120;
+			display: grid;
+			width: auto;
+			margin: 0;
+			overflow: auto;
+			place-items: center;
+			padding: 34px 4px 4px;
+			background: rgba(244, 239, 228, 0.98);
+		}
+
+		.graphic.compact-mobile.short-open .close-graphic {
+			position: fixed;
+			top: 12px;
+			right: 12px;
+			z-index: 121;
+			display: grid;
+			width: 36px;
+			height: 36px;
+			place-items: center;
+			border: 1px solid var(--ink);
+			border-radius: 50%;
+			background: var(--paper);
+			color: var(--ink);
+			cursor: pointer;
+			font-size: 1.2rem;
 		}
 	}
 
