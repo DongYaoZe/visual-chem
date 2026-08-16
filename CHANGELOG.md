@@ -34,7 +34,8 @@ All notable public changes to VisualChem are recorded here. Versions follow Sema
 - the azeotrope scene now keeps its composition control, apparatus, particle view, symbolic map, and `y-x` readout on one equilibrium state instead of silently applying a ten-stage transform;
 - the CO₂ story now carries one visible causal chain from normal mode through dipole-moment change and IR response to the resulting band, with silent modes visibly blocked at `Δμ = 0`;
 - CO₂ display equations are rendered through the shared KaTeX component and covered by an end-to-end rendering contract;
-- production audit is reproducible at the GitHub Pages `/visual-chem` base path and covers every live story on desktop and mobile, including the flagship x→y key scene.
+- production audit is reproducible at the GitHub Pages `/visual-chem` base path and covers every live story on desktop and mobile, including the flagship x→y key scene; the three flagship stories additionally receive every-scene 320×568 compact screenshots with the same horizontal-overflow hard gate;
+- short-screen flagship heroes preserve their large editorial titles while removing empty vertical space; hydrogen-spectrum and CO₂ evidence panels return to document flow on very short phones instead of being pinned to the viewport bottom.
 
 ### Evidence boundaries
 

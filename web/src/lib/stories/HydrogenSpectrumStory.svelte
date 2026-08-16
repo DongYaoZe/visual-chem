@@ -838,6 +838,36 @@
 			flex-direction: column;
 		}
 	}
+	@media (max-width: 620px) and (max-height: 650px) {
+		.story-hero {
+			min-height: calc(100svh - 68px);
+			padding-block: 1.4rem 0.8rem;
+			justify-content: flex-start;
+		}
+
+		.story-hero h1 {
+			margin: 0.7rem 0 1rem;
+		}
+
+		.hero-subtitle {
+			font-size: 1rem;
+			line-height: 1.55;
+		}
+
+		.hero-spectrum {
+			position: relative;
+			right: auto;
+			bottom: auto;
+			width: 64%;
+			margin: 1.05rem 0 0 auto;
+			opacity: 0.4;
+		}
+
+		.hero-band {
+			height: 124px;
+		}
+	}
+
 	@media (max-width: 850px) and (max-height: 650px) {
 		.step {
 			min-height: auto;

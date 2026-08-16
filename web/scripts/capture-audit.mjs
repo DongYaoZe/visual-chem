@@ -7,10 +7,22 @@ const origin = (process.env.VISUAL_CHEM_ORIGIN ?? 'http://127.0.0.1:5173').repla
 const output = new URL('../test-results/', import.meta.url);
 const desktop = { width: 1440, height: 1000 };
 const mobile = { width: 390, height: 844 };
+const compactMobile = { width: 320, height: 568 };
+const compactFlagships = ['ethanol-distillation', 'hydrogen-spectrum', 'co2-infrared'];
 
 await mkdir(output, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
+
+async function assertNoHorizontalOverflow(page, name) {
+	const horizontalOverflow = await page.evaluate(() => {
+		const root = document.documentElement;
+		return root.scrollWidth - root.clientWidth;
+	});
+	if (horizontalOverflow > 1) {
+		throw new Error(`${name} overflows the viewport horizontally by ${horizontalOverflow}px.`);
+	}
+}
 
 async function capture(name, path, viewport, selector, interact) {
 	const context = await browser.newContext({ viewport });
@@ -21,14 +33,34 @@ async function capture(name, path, viewport, selector, interact) {
 		await page.waitForTimeout(900);
 	}
 	if (interact) await interact(page);
-	const horizontalOverflow = await page.evaluate(() => {
-		const root = document.documentElement;
-		return root.scrollWidth - root.clientWidth;
-	});
-	if (horizontalOverflow > 1) {
-		throw new Error(`${name} overflows the viewport horizontally by ${horizontalOverflow}px.`);
-	}
+	await assertNoHorizontalOverflow(page, name);
 	await page.screenshot({ path: fileURLToPath(new URL(`${name}.png`, output)) });
+	await context.close();
+}
+
+async function captureCompactScenes(slug) {
+	const context = await browser.newContext({ viewport: compactMobile });
+	const page = await context.newPage();
+	const path = `/stories/${slug}`;
+	await page.goto(`${origin}${path}`, { waitUntil: 'networkidle' });
+	await assertNoHorizontalOverflow(page, `${slug}-compact-hero`);
+	await page.screenshot({
+		path: fileURLToPath(new URL(`${slug}-compact-hero.png`, output))
+	});
+
+	const sceneIds = await page
+		.locator('[data-scene-id]')
+		.evaluateAll((elements) =>
+			elements.map((element) => element.getAttribute('data-scene-id')).filter(Boolean)
+		);
+	for (const sceneId of sceneIds) {
+		const scene = page.locator(`[data-scene-id="${sceneId}"]`);
+		await scene.scrollIntoViewIfNeeded();
+		await page.waitForTimeout(320);
+		const name = `${slug}-compact-${sceneId}`;
+		await assertNoHorizontalOverflow(page, name);
+		await page.screenshot({ path: fileURLToPath(new URL(`${name}.png`, output)) });
+	}
 	await context.close();
 }
 
@@ -66,6 +98,14 @@ for (const story of STORY_MANIFEST) {
 	await capture(`${story.slug}-stage-desktop`, path, desktop, selector, interact);
 	await capture(`${story.slug}-hero-mobile`, path, mobile);
 	await capture(`${story.slug}-stage-mobile`, path, mobile, selector, interact);
+}
+
+// The flagship trio additionally receives a 320×568 short-screen contract.
+// Every narrative scene is captured, not just one key scene, so dense cards,
+// fixed controls and phone-only text-first behavior are visible under a
+// narrow/short viewport that the regular Pixel-class audit does not stress.
+for (const slug of compactFlagships) {
+	await captureCompactScenes(slug);
 }
 
 // The ethanol-water flagship has evidence-layer states worth preserving in

@@ -1592,6 +1592,36 @@
 		}
 	}
 
+	@media (max-width: 620px) and (max-height: 650px) {
+		.story-hero {
+			min-height: calc(100svh - 68px);
+			padding-block: 1.4rem 0.8rem;
+			justify-content: flex-start;
+		}
+
+		.hero-meta {
+			gap: 0.45rem 0.9rem;
+		}
+
+		.story-hero h1 {
+			margin: 0.65rem 0 1rem;
+		}
+
+		.hero-bottom {
+			gap: 0.65rem;
+		}
+
+		.hero-bottom > p {
+			font-size: 1rem;
+			line-height: 1.55;
+		}
+
+		.hero-curve {
+			bottom: -2%;
+			opacity: 0.2;
+		}
+	}
+
 	@media (max-width: 850px) and (max-height: 650px) {
 		.step {
 			min-height: auto;

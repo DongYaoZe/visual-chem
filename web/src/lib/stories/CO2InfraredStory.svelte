@@ -700,4 +700,35 @@
 			flex-direction: column;
 		}
 	}
+
+	@media (max-width: 620px) and (max-height: 650px) {
+		.story-hero {
+			min-height: calc(100svh - 68px);
+			padding-block: 1.4rem 0.8rem;
+			justify-content: flex-start;
+		}
+
+		.story-hero h1 {
+			margin: 0.7rem 0 1rem;
+		}
+
+		.hero-subtitle {
+			font-size: 1rem;
+			line-height: 1.55;
+		}
+
+		.hero-modes {
+			position: relative;
+			right: auto;
+			bottom: auto;
+			width: 70%;
+			margin: 1.05rem 0 0 auto;
+			padding: 0.8rem;
+			opacity: 0.42;
+		}
+
+		.hero-modes span {
+			padding: 0.72rem 0.35rem;
+		}
+	}
 </style>
