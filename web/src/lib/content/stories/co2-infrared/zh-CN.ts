@@ -133,6 +133,18 @@ CO₂ 的例子先把最关键的判据讲清楚。分子有某个振动，不�
 		wavelengthLabel: '波长',
 		activityLabel: '红外活性',
 		activityNames: { active: '可吸收', silent: '静默' },
+		causal: {
+			modeLabel: '正常模',
+			dipoleLabel: '偶极矩',
+			dipoleChanges: 'Δμ ≠ 0',
+			dipoleStatic: 'Δμ = 0',
+			responseLabel: '红外响应',
+			absorbed: '发生吸收',
+			notAbsorbed: '基本频率不吸收',
+			resultLabel: '谱图结果',
+			band: ({ wavenumberCm }) => `${wavenumberCm} cm⁻¹ 峰`,
+			noFundamentalBand: '无基本吸收峰'
+		},
 		instrument: {
 			ariaLabel: ({ mode, wavenumberCm, irActive }) =>
 				`红外光穿过二氧化碳样品，当前${mode}位于 ${wavenumberCm} 每厘米，${irActive ? '探测器记录吸收' : '基本频率不产生红外吸收'}。`,

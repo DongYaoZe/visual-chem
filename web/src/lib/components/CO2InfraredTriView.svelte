@@ -84,6 +84,63 @@
 			</div>
 		</dl>
 	</header>
+	<div
+		class="causal-relay"
+		class:silent={!frame.irActive}
+		data-testid="co2-causal-relay"
+		data-active={frame.irActive}
+		data-dipole-change={frame.dipoleChange}
+	>
+		<div class="causal-node">
+			<small>{content.causal.modeLabel}</small>
+			<strong>{co2ModeLabel(frame.id)} · {modeName}</strong>
+		</div>
+		<span class="relay-track segment-one" class:flowing={active} aria-hidden="true">
+			<i class="relay-pulse"></i>
+		</span>
+		<div
+			class="causal-node"
+			class:positive={frame.dipoleChange}
+			class:negative={!frame.dipoleChange}
+		>
+			<small>{content.causal.dipoleLabel}</small>
+			<strong
+				>{frame.dipoleChange ? content.causal.dipoleChanges : content.causal.dipoleStatic}</strong
+			>
+		</div>
+		<span
+			class="relay-track segment-two"
+			class:flowing={active && frame.dipoleChange}
+			class:blocked={!frame.dipoleChange}
+			aria-hidden="true"
+		>
+			<i class="relay-pulse"></i>
+		</span>
+		<div class="causal-node" class:positive={frame.irActive} class:negative={!frame.irActive}>
+			<small>{content.causal.responseLabel}</small>
+			<strong>{frame.irActive ? content.causal.absorbed : content.causal.notAbsorbed}</strong>
+		</div>
+		<span
+			class="relay-track segment-three"
+			class:flowing={active && frame.irActive}
+			class:blocked={!frame.irActive}
+			aria-hidden="true"
+		>
+			<i class="relay-pulse"></i>
+		</span>
+		<div
+			class="causal-node result"
+			class:positive={frame.irActive}
+			class:negative={!frame.irActive}
+		>
+			<small>{content.causal.resultLabel}</small>
+			<strong
+				>{frame.irActive
+					? content.causal.band({ wavenumberCm: frame.wavenumberCm })
+					: content.causal.noFundamentalBand}</strong
+			>
+		</div>
+	</div>
 	<div class="views">
 		<figure
 			class="panel macro"
@@ -307,6 +364,115 @@
 		border-color: rgba(110, 110, 110, 0.25);
 		color: #666;
 	}
+	.causal-relay {
+		display: grid;
+		grid-template-columns:
+			minmax(0, 1.15fr) 30px minmax(0, 0.82fr) 30px minmax(0, 0.95fr)
+			30px minmax(0, 0.9fr);
+		padding: 0.55rem 0.7rem;
+		gap: 0.35rem;
+		align-items: center;
+		border-bottom: 1px solid var(--line);
+		background: linear-gradient(90deg, rgba(53, 124, 157, 0.06), rgba(250, 247, 239, 0.48));
+	}
+	.causal-node {
+		min-width: 0;
+		padding: 0.38rem 0.45rem;
+		border: 1px solid rgba(31, 40, 38, 0.1);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.58);
+	}
+	.causal-node small,
+	.causal-node strong {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.causal-node small {
+		margin-bottom: 0.12rem;
+		color: var(--ink-muted);
+		font-family: var(--mono);
+		font-size: 0.46rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+	.causal-node strong {
+		font-family: var(--mono);
+		font-size: 0.58rem;
+	}
+	.causal-node.positive {
+		border-color: rgba(44, 158, 170, 0.3);
+		background: rgba(44, 158, 170, 0.08);
+		color: #216f7e;
+	}
+	.causal-node.negative {
+		border-color: rgba(110, 110, 110, 0.18);
+		background: rgba(110, 110, 110, 0.055);
+		color: #676d6c;
+	}
+	.relay-track {
+		position: relative;
+		display: block;
+		height: 2px;
+		border-radius: 999px;
+		background: rgba(31, 40, 38, 0.14);
+	}
+	.relay-track::after {
+		position: absolute;
+		top: 50%;
+		right: -1px;
+		width: 0;
+		height: 0;
+		border-top: 4px solid transparent;
+		border-bottom: 4px solid transparent;
+		border-left: 6px solid rgba(31, 40, 38, 0.26);
+		content: '';
+		transform: translateY(-50%);
+	}
+	.relay-track.flowing {
+		background: rgba(44, 158, 170, 0.28);
+	}
+	.relay-track.flowing::after {
+		border-left-color: #2c9eaa;
+	}
+	.relay-track.blocked {
+		background: repeating-linear-gradient(90deg, rgba(90, 96, 95, 0.28) 0 4px, transparent 4px 8px);
+	}
+	.relay-track.blocked::after {
+		border-left-color: rgba(90, 96, 95, 0.28);
+	}
+	.relay-pulse {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		display: none;
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: #2c9eaa;
+		box-shadow: 0 0 0 4px rgba(44, 158, 170, 0.12);
+		transform: translate(-50%, -50%);
+	}
+	.relay-track.flowing .relay-pulse {
+		display: block;
+		animation: relay-flow-x 2.1s linear infinite;
+	}
+	.segment-two .relay-pulse {
+		animation-delay: -0.7s !important;
+	}
+	.segment-three .relay-pulse {
+		animation-delay: -1.4s !important;
+	}
+	@keyframes relay-flow-x {
+		from {
+			left: 0;
+		}
+		to {
+			left: 100%;
+		}
+	}
 	.views {
 		display: grid;
 		grid-template-columns: 1.05fr 0.95fr;
@@ -435,6 +601,67 @@
 		}
 	}
 	@media (max-width: 850px) {
+		.causal-relay {
+			grid-template-columns: 1fr;
+			padding: 0.5rem 0.65rem;
+			gap: 0.25rem;
+		}
+		.causal-node {
+			text-align: center;
+		}
+		.causal-node small,
+		.causal-node strong {
+			overflow: visible;
+			text-overflow: clip;
+			white-space: normal;
+		}
+		.relay-track {
+			width: 2px;
+			height: 16px;
+			justify-self: center;
+		}
+		.relay-track::after {
+			top: auto;
+			right: auto;
+			bottom: -1px;
+			left: 50%;
+			border-top: 6px solid rgba(31, 40, 38, 0.26);
+			border-right: 4px solid transparent;
+			border-bottom: 0;
+			border-left: 4px solid transparent;
+			transform: translateX(-50%);
+		}
+		.relay-track.flowing::after {
+			border-top-color: #2c9eaa;
+			border-left-color: transparent;
+		}
+		.relay-track.blocked {
+			background: repeating-linear-gradient(
+				180deg,
+				rgba(90, 96, 95, 0.28) 0 4px,
+				transparent 4px 8px
+			);
+		}
+		.relay-track.blocked::after {
+			border-top-color: rgba(90, 96, 95, 0.28);
+			border-left-color: transparent;
+		}
+		.relay-pulse {
+			top: 0;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		.relay-track.flowing .relay-pulse {
+			animation-name: relay-flow-y;
+		}
+		@keyframes relay-flow-y {
+			from {
+				top: 0;
+			}
+			to {
+				top: 100%;
+			}
+		}
 		header {
 			display: block;
 		}

@@ -48,7 +48,15 @@
 			style:fill={liquidColor}
 			d="M70 208c34-14 131-14 165 0 15 28-4 44-29 44H98c-25 0-44-16-28-44Z"
 		/>
-		<ellipse class="liquid-top" style:fill={liquidColor} cx="152" cy="208" rx="82" ry="13" />
+		<ellipse
+			class="liquid-top"
+			data-map-anchor="apparatus-liquid"
+			style:fill={liquidColor}
+			cx="152"
+			cy="208"
+			rx="82"
+			ry="13"
+		/>
 		<circle class="heat-glow" filter={`url(#${uid}-soft-glow)`} cx="153" cy="268" r="44" />
 		<path class="heater" d="M96 270c20-18 92-18 112 0" />
 
@@ -78,7 +86,15 @@
 			style:fill={vaporColor}
 			d="M370 224c20-8 73-8 94 0l8 22c2 6-5 10-17 10h-76c-12 0-19-4-17-10Z"
 		/>
-		<ellipse class="distillate-top" style:fill={vaporColor} cx="417" cy="224" rx="47" ry="7" />
+		<ellipse
+			class="distillate-top"
+			data-map-anchor="apparatus-vapor"
+			style:fill={vaporColor}
+			cx="417"
+			cy="224"
+			rx="47"
+			ry="7"
+		/>
 
 		{#each [0, 1, 2] as drop (drop)}
 			<circle

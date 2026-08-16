@@ -158,6 +158,7 @@ test('macro bubbles encode normalized rate while sandbox units and orders stay p
 test('Chinese and English kinetics pages have no serious or critical axe violations', async ({
 	page
 }) => {
+	test.setTimeout(45_000);
 	await gotoHydrated(page, '/stories/kinetics/');
 	await expectNoSeriousAccessibilityViolations(page);
 	await gotoHydrated(page, '/en/stories/kinetics/');

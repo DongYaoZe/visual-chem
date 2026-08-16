@@ -152,6 +152,8 @@ export const enEthanolDistillationContent = {
 			prompt: 'PREDICT FIRST',
 			choices: [{ label: 'It will reach 100%' }, { label: 'It will stop somewhere' }],
 			addStageButton: '+ Add one stage',
+			autoRunButton: 'Let it keep running',
+			autoPauseButton: 'Pause auto demo',
 			resetButton: 'Reset',
 			stageOutput: ({ stage, composition }) => `Stage ${stage}: x = ${composition}`,
 			evidence:

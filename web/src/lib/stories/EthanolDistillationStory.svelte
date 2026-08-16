@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import { resolve } from '$app/paths';
 	import { ETHANOL_WATER_LAI_2014, thermoFrame } from '$lib/chem';
 	import ConceptCheck from '$lib/components/ConceptCheck.svelte';
@@ -27,6 +28,8 @@
 
 	let activeIndex = $state(0);
 	let hookStage = $state(0);
+	let hookAutoPlaying = $state(false);
+	let hookAutoTimer: ReturnType<typeof setInterval> | null = null;
 	let hookPrediction = $state<'reach' | 'stop' | null>(null);
 	let bubblePrediction = $state<'pure' | 'richer' | 'same' | null>(null);
 	let stageControl = $state(7);
@@ -72,6 +75,7 @@
 	let visualPoint = $derived(experimentSceneActive ? experimentPoint : visualFrame.current);
 	let searchPoint = $derived(thermoFrame({ composition: azeotropeSearch }).current);
 	let searchDelta = $derived(searchPoint.y - azeotropeSearch);
+	const fixedPointLockTolerance = 3e-4;
 	const experimentalAzeotrope = ETHANOL_WATER_LAI_2014.azeotrope;
 	const sievePores = Array.from({ length: 24 }, (_, index) => index);
 	const azeotropeX = experimentalAzeotrope.x;
@@ -102,6 +106,50 @@
 	]);
 	let experimentCoverageCount = $derived(experimentCoverage.filter(Boolean).length);
 	let catalogHref = $derived(locale === 'en' ? resolve('/en/') : resolve('/'));
+
+	function stopHookAuto(): void {
+		if (hookAutoTimer !== null) {
+			clearInterval(hookAutoTimer);
+			hookAutoTimer = null;
+		}
+		hookAutoPlaying = false;
+	}
+
+	function addHookStage(): void {
+		stopHookAuto();
+		hookStage = Math.min(14, hookStage + 1);
+	}
+
+	function toggleHookAuto(): void {
+		if (hookAutoPlaying) {
+			stopHookAuto();
+			return;
+		}
+		if (hookStage < 3 || hookStage >= 14) return;
+
+		hookAutoPlaying = true;
+		hookAutoTimer = setInterval(() => {
+			if (document.documentElement.dataset.motion === 'paused') return;
+			if (hookStage >= 14) {
+				stopHookAuto();
+				return;
+			}
+			hookStage += 1;
+			if (hookStage >= 14) stopHookAuto();
+		}, 520);
+	}
+
+	function resetHook(): void {
+		stopHookAuto();
+		hookStage = 0;
+	}
+
+	function activateStoryScene(index: number): void {
+		if (index !== 0) stopHookAuto();
+		activeIndex = index;
+	}
+
+	onDestroy(stopHookAuto);
 
 	function recordExperiment() {
 		if (experimentAlreadySelected) return;
@@ -207,6 +255,8 @@
 					showAzeotrope={activeScene.showAzeotrope}
 					experimentMode={experimentSceneActive}
 					showExperimentalData={activeScene.showExperimentalData}
+					highlightFixedPoint={activeSceneId === 'fixed-point'}
+					fixedPointTolerance={fixedPointLockTolerance}
 					experimentalPoint={experimentSceneActive ? experimentPoint : undefined}
 					recordedExperimentalIndices={experimentSceneActive ? recordedExperimentalIndices : []}
 					label={story.stage.triViewAriaLabel}
@@ -224,7 +274,7 @@
 			{/snippet}
 		</StoryStage>
 
-		<div class="steps" use:scrolly={{ onActive: (index) => (activeIndex = index) }}>
+		<div class="steps" use:scrolly={{ onActive: activateStoryScene }}>
 			{#each story.scenes as scene, index (scene.id)}
 				<article
 					class="step"
@@ -263,11 +313,22 @@
 									>
 								</div>
 							</div>
-							<div class="inline-control">
-								<button type="button" onclick={() => (hookStage = Math.min(14, hookStage + 1))}
+							<div class="inline-control hook-stage-controls">
+								<button type="button" onclick={addHookStage} disabled={hookStage >= 14}
 									>{story.interactions.hook.addStageButton}</button
 								>
-								<button class="ghost" type="button" onclick={() => (hookStage = 0)}
+								{#if hookStage >= 3 && hookStage < 14}
+									<button
+										class="auto-run"
+										type="button"
+										aria-pressed={hookAutoPlaying}
+										onclick={toggleHookAuto}
+										>{hookAutoPlaying
+											? story.interactions.hook.autoPauseButton
+											: story.interactions.hook.autoRunButton}</button
+									>
+								{/if}
+								<button class="ghost" type="button" onclick={resetHook}
 									>{story.interactions.hook.resetButton}</button
 								>
 								<output
@@ -443,7 +504,7 @@
 						{#if scene.id === 'fixed-point'}
 							<label class="range-control search">
 								<span>{story.interactions.azeotropeSearch.controlLabel}</span>
-								<strong class:near={Math.abs(searchDelta) < 0.003}
+								<strong class:near={Math.abs(searchDelta) < fixedPointLockTolerance}
 									>{searchDelta >= 0 ? '+' : ''}{searchDelta.toFixed(4)}</strong
 								>
 								<input
@@ -461,7 +522,7 @@
 									})}</small
 								>
 							</label>
-							{#if Math.abs(searchDelta) < 0.003}
+							{#if Math.abs(searchDelta) < fixedPointLockTolerance}
 								<p class="evidence">
 									{story.interactions.azeotropeSearch.nearEvidence({
 										modelComposition: '0.895',
@@ -945,6 +1006,21 @@
 
 	.inline-control .ghost {
 		background: transparent;
+	}
+
+	.inline-control button:disabled {
+		cursor: not-allowed;
+		opacity: 0.45;
+	}
+
+	.hook-stage-controls .auto-run {
+		border-color: rgba(214, 107, 50, 0.55);
+		background: rgba(214, 107, 50, 0.1);
+	}
+
+	.hook-stage-controls .auto-run[aria-pressed='true'] {
+		background: var(--ethanol);
+		color: white;
 	}
 
 	.inline-control output {

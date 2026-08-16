@@ -39,11 +39,17 @@ test('prediction and mode controls preserve one shared computed frame', async ({
 	const scene = page.locator('[data-scene-id="silent-stretch"]');
 	await scene.scrollIntoViewIfNeeded();
 	const stage = page.getByTestId('co2-infrared-tri-view').first();
+	const relay = stage.getByTestId('co2-causal-relay');
 	await expect(stage.getByTestId('co2-ir-instrument')).toHaveAttribute(
 		'data-mode',
 		'symmetric-stretch'
 	);
 	await expect(stage.getByTestId('co2-ir-instrument')).toHaveAttribute('data-active', 'false');
+	await expect(relay).toHaveAttribute('data-dipole-change', 'false');
+	await expect(relay).toHaveAttribute('data-active', 'false');
+	await expect(relay.locator('.relay-track.flowing')).toHaveCount(1);
+	await expect(relay).toContainText('Δμ = 0');
+	await expect(relay).toContainText('无基本吸收峰');
 
 	const sandbox = page.locator('section.sandbox');
 	await sandbox.scrollIntoViewIfNeeded();
@@ -66,4 +72,10 @@ test('prediction and mode controls preserve one shared computed frame', async ({
 		'data-mode',
 		'asymmetric-stretch'
 	);
+	const sandboxRelay = sandbox.getByTestId('co2-causal-relay');
+	await expect(sandboxRelay).toHaveAttribute('data-dipole-change', 'true');
+	await expect(sandboxRelay).toHaveAttribute('data-active', 'true');
+	await expect(sandboxRelay.locator('.relay-track.flowing')).toHaveCount(3);
+	await expect(sandboxRelay).toContainText('Δμ ≠ 0');
+	await expect(sandboxRelay).toContainText('2349 cm⁻¹ 峰');
 });

@@ -133,6 +133,18 @@ CO₂ supplies the essential rule: a molecule may have a vibration that infrared
 		wavelengthLabel: 'Wavelength',
 		activityLabel: 'IR activity',
 		activityNames: { active: 'absorbs', silent: 'silent' },
+		causal: {
+			modeLabel: 'Normal mode',
+			dipoleLabel: 'Dipole moment',
+			dipoleChanges: 'Δμ ≠ 0',
+			dipoleStatic: 'Δμ = 0',
+			responseLabel: 'IR response',
+			absorbed: 'absorbs',
+			notAbsorbed: 'no fundamental absorption',
+			resultLabel: 'Spectrum result',
+			band: ({ wavenumberCm }) => `${wavenumberCm} cm⁻¹ band`,
+			noFundamentalBand: 'no fundamental band'
+		},
 		instrument: {
 			ariaLabel: ({ mode, wavenumberCm, irActive }) =>
 				`Infrared light crosses a carbon-dioxide cell. ${mode} at ${wavenumberCm} reciprocal centimetres ${irActive ? 'produces absorption' : 'has no fundamental infrared absorption'}.`,

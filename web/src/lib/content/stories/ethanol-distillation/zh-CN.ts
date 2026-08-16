@@ -146,6 +146,8 @@ export const zhCNEthanolDistillationContent = {
 			prompt: '先预测',
 			choices: [{ label: '会到 100%' }, { label: '会停在某处' }],
 			addStageButton: '+ 再加一级',
+			autoRunButton: '继续看它自己走',
+			autoPauseButton: '暂停自动演示',
 			resetButton: '重置',
 			stageOutput: ({ stage, composition }) => `第 ${stage} 级：x = ${composition}`,
 			evidence:

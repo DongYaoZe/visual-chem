@@ -120,6 +120,86 @@ test('story keeps the prediction and synchronized apparatus interactive', async 
 	expect(pageErrors).toEqual([]);
 });
 
+test('three manual stages unlock a bounded auto demonstration', async ({ page }) => {
+	await gotoHydrated(page, '/stories/ethanol-distillation/');
+	const hook = page.locator('[data-scene-id="hook"]');
+	await hook.scrollIntoViewIfNeeded();
+	const add = hook.getByRole('button', { name: '+ 再加一级' });
+	for (let index = 0; index < 3; index += 1) await add.click();
+
+	const run = hook.getByRole('button', { name: '继续看它自己走' });
+	await expect(run).toBeVisible();
+	await run.click();
+	await expect(hook.getByRole('button', { name: '暂停自动演示' })).toHaveAttribute(
+		'aria-pressed',
+		'true'
+	);
+	const output = hook.locator('.hook-stage-controls output');
+	await expect(output).toContainText(/第 (?:[6-9]|1[0-4]) 级/, { timeout: 3500 });
+
+	await hook.getByRole('button', { name: '重置' }).click();
+	await expect(output).toContainText('第 0 级');
+	await page.waitForTimeout(700);
+	await expect(output).toContainText('第 0 级');
+});
+
+test('the x-to-y relay maps one equilibrium state across apparatus and T-x-y space', async ({
+	page
+}, testInfo) => {
+	await gotoHydrated(page, '/stories/ethanol-distillation/');
+	const mapping = page.getByTestId('equilibrium-mapping').first();
+	await page.locator('[data-scene-id="tie-line"]').scrollIntoViewIfNeeded();
+	if (testInfo.project.name === 'mobile-chromium') {
+		await expect(mapping).not.toHaveClass(/visible/);
+		return;
+	}
+	await expect(mapping).toHaveClass(/visible/);
+	await expect(mapping).toHaveAttribute('data-liquid-x', '0.100');
+	const idealVapor = Number(await mapping.getAttribute('data-vapor-y'));
+	expect(idealVapor).toBeGreaterThan(0.1);
+	await expect(mapping.locator('.mapping-flow')).toHaveCount(2);
+
+	await page.mouse.wheel(0, 1);
+	await page.locator('[data-scene-id="build-the-map"]').scrollIntoViewIfNeeded();
+	await expect(mapping).not.toHaveClass(/visible/);
+
+	await page.mouse.wheel(0, 1);
+	await page.locator('[data-scene-id="nonideal-model"]').scrollIntoViewIfNeeded();
+	await expect(mapping).toHaveClass(/visible/);
+	await expect(mapping).toHaveAttribute('data-liquid-x', '0.350');
+});
+
+test('the azeotrope search turns y minus x into a visible fixed-point lock', async ({ page }) => {
+	await gotoHydrated(page, '/stories/ethanol-distillation/');
+	const scene = page.locator('[data-scene-id="fixed-point"]');
+	await scene.scrollIntoViewIfNeeded();
+	const slider = scene.getByRole('slider', { name: '寻找共沸点的乙醇摩尔分数' });
+	const lock = page.getByTestId('fixed-point-lock').first();
+	const triViewReadouts = page.getByTestId('tri-view').first().locator('header dd');
+	await expect(lock).toHaveAttribute('data-locked', 'false');
+	await expect(triViewReadouts.nth(0)).toHaveText('0.820');
+	await expect(triViewReadouts.nth(1)).toHaveText('0.835');
+
+	await slider.evaluate((element) => {
+		const input = element as HTMLInputElement;
+		input.value = '0.895';
+		input.dispatchEvent(new Event('input', { bubbles: true }));
+	});
+	await expect(lock).toHaveAttribute('data-locked', 'true');
+	await expect(triViewReadouts.nth(0)).toHaveText('0.895');
+	await expect(triViewReadouts.nth(1)).toHaveText('0.895');
+	await expect(lock.locator('.fixed-badge-text')).toHaveText('x = y');
+	const gap = Number(await lock.getAttribute('data-gap'));
+	expect(gap).toBeLessThan(0.003);
+
+	await slider.evaluate((element) => {
+		const input = element as HTMLInputElement;
+		input.value = '0.820';
+		input.dispatchEvent(new Event('input', { bubbles: true }));
+	});
+	await expect(lock).toHaveAttribute('data-locked', 'false');
+});
+
 test('the reader can rebuild the phase envelope from literature measurements', async ({ page }) => {
 	await gotoHydrated(page, '/stories/ethanol-distillation/');
 	const samples = page.locator('.sample-strip button');

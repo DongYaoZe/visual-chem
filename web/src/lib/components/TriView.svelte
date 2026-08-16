@@ -6,12 +6,27 @@
 		thermoFrame,
 		type ExperimentalVlePoint
 	} from '$lib/chem';
+	import { mixtureColor } from '$lib/color';
 	import { type VisualizationContent, zhCNSiteContent } from '$lib/content';
 	import DistillationApparatus from './DistillationApparatus.svelte';
 	import ParticleChamber from './ParticleChamber.svelte';
 	import TxyDiagram from './TxyDiagram.svelte';
 
 	type Focus = 'macro' | 'micro' | 'symbol' | 'all';
+
+	interface MappingPoint {
+		x: number;
+		y: number;
+	}
+
+	interface MappingGeometry {
+		width: number;
+		height: number;
+		liquidStart: MappingPoint;
+		liquidEnd: MappingPoint;
+		vaporStart: MappingPoint;
+		vaporEnd: MappingPoint;
+	}
 
 	interface Props {
 		composition: number;
@@ -24,6 +39,8 @@
 		showAzeotrope?: boolean;
 		experimentMode?: boolean;
 		showExperimentalData?: boolean;
+		highlightFixedPoint?: boolean;
+		fixedPointTolerance?: number;
 		experimentalPoint?: ExperimentalVlePoint;
 		recordedExperimentalIndices?: number[];
 		label?: string;
@@ -41,13 +58,18 @@
 		showAzeotrope = true,
 		experimentMode = false,
 		showExperimentalData = false,
+		highlightFixedPoint = false,
+		fixedPointTolerance = 3e-4,
 		experimentalPoint,
 		recordedExperimentalIndices = [],
 		label,
 		content = zhCNSiteContent.shared
 	}: Props = $props();
+	const uid = $props.id();
 	let root: HTMLElement;
+	let viewsElement: HTMLElement;
 	let visible = $state(true);
+	let mappingGeometry = $state<MappingGeometry | null>(null);
 
 	// One resolved thermodynamic state feeds every panel below, so the header,
 	// the apparatus, the particles, and the diagram can never disagree.
@@ -56,14 +78,73 @@
 	let usesExperimentalEvidence = $derived(experimentMode || showExperimentalData);
 	let running = $derived(active && visible);
 	let ariaLabel = $derived(label ?? content.triView.defaultAriaLabel);
+	let liquidMapColor = $derived(mixtureColor(current.x));
+	let vaporMapColor = $derived(mixtureColor(current.y));
 
 	onMount(() => {
 		const observer = new IntersectionObserver(([entry]) => (visible = entry.isIntersecting), {
 			rootMargin: '120px'
 		});
 		observer.observe(root);
-		return () => observer.disconnect();
+
+		const resizeObserver = new ResizeObserver(measureMapping);
+		resizeObserver.observe(viewsElement);
+		const initialFrame = requestAnimationFrame(measureMapping);
+
+		return () => {
+			observer.disconnect();
+			resizeObserver.disconnect();
+			cancelAnimationFrame(initialFrame);
+		};
 	});
+
+	$effect(() => {
+		const stateKey = `${current.x}:${current.y}:${current.temperatureC}:${focus}`;
+		if (!viewsElement || !stateKey) return;
+		const frameId = requestAnimationFrame(measureMapping);
+		return () => cancelAnimationFrame(frameId);
+	});
+
+	function anchorCenter(selector: string, bounds: DOMRect): MappingPoint | null {
+		const anchor = viewsElement?.querySelector<SVGGraphicsElement>(selector);
+		if (!anchor) return null;
+		const rect = anchor.getBoundingClientRect();
+		return {
+			x: rect.left + rect.width / 2 - bounds.left,
+			y: rect.top + rect.height / 2 - bounds.top
+		};
+	}
+
+	function measureMapping(): void {
+		if (!viewsElement) return;
+		const bounds = viewsElement.getBoundingClientRect();
+		if (bounds.width <= 0 || bounds.height <= 0) return;
+
+		const liquidStart = anchorCenter('[data-map-anchor="apparatus-liquid"]', bounds);
+		const vaporStart = anchorCenter('[data-map-anchor="apparatus-vapor"]', bounds);
+		const liquidEnd = anchorCenter('[data-map-anchor="diagram-liquid"]', bounds);
+		const vaporEnd = anchorCenter('[data-map-anchor="diagram-vapor"]', bounds);
+		if (!liquidStart || !vaporStart || !liquidEnd || !vaporEnd) {
+			mappingGeometry = null;
+			return;
+		}
+
+		mappingGeometry = {
+			width: bounds.width,
+			height: bounds.height,
+			liquidStart,
+			liquidEnd,
+			vaporStart,
+			vaporEnd
+		};
+	}
+
+	function mappingPath(start: MappingPoint, end: MappingPoint): string {
+		const deltaY = Math.max(1, end.y - start.y);
+		const firstControlY = start.y + Math.max(34, deltaY * 0.34);
+		const secondControlY = end.y - Math.max(42, deltaY * 0.24);
+		return `M ${start.x} ${start.y} C ${start.x} ${firstControlY}, ${end.x} ${secondControlY}, ${end.x} ${end.y}`;
+	}
 
 	function dimmed(panel: Exclude<Focus, 'all'>): boolean {
 		return focus !== 'all' && focus !== panel;
@@ -126,7 +207,58 @@
 		<span>{current.temperatureC.toFixed(2)} °C</span>
 	</div>
 
-	<div class="views">
+	<div class="views" bind:this={viewsElement}>
+		<svg
+			class="mapping-overlay"
+			class:visible={focus === 'all' && mappingGeometry !== null}
+			viewBox={mappingGeometry
+				? `0 0 ${mappingGeometry.width} ${mappingGeometry.height}`
+				: '0 0 1 1'}
+			preserveAspectRatio="none"
+			aria-hidden="true"
+			data-testid="equilibrium-mapping"
+			data-liquid-x={current.x.toFixed(3)}
+			data-vapor-y={current.y.toFixed(3)}
+		>
+			<defs>
+				<marker
+					id={`${uid}-mapping-arrow`}
+					viewBox="0 0 10 10"
+					refX="9.2"
+					refY="5"
+					markerWidth="10"
+					markerHeight="10"
+					markerUnits="userSpaceOnUse"
+					orient="auto-start-reverse"
+				>
+					<path d="M 0 0 L 10 5 L 0 10 z" fill="context-stroke" />
+				</marker>
+			</defs>
+			{#if mappingGeometry}
+				{@const liquidMappingPath = mappingPath(
+					mappingGeometry.liquidStart,
+					mappingGeometry.liquidEnd
+				)}
+				{@const vaporMappingPath = mappingPath(
+					mappingGeometry.vaporStart,
+					mappingGeometry.vaporEnd
+				)}
+				<path class="mapping-halo" d={liquidMappingPath} />
+				<path class="mapping-halo" d={vaporMappingPath} />
+				<path
+					class="mapping-flow"
+					d={liquidMappingPath}
+					style:stroke={liquidMapColor}
+					marker-end={`url(#${uid}-mapping-arrow)`}
+				/>
+				<path
+					class="mapping-flow vapor-flow"
+					d={vaporMappingPath}
+					style:stroke={vaporMapColor}
+					marker-end={`url(#${uid}-mapping-arrow)`}
+				/>
+			{/if}
+		</svg>
 		<div class="panel macro" class:dimmed={dimmed('macro')}>
 			<DistillationApparatus
 				liquidComposition={current.x}
@@ -151,6 +283,8 @@
 				{showAzeotrope}
 				{experimentMode}
 				{showExperimentalData}
+				{highlightFixedPoint}
+				{fixedPointTolerance}
 				currentPointOverride={experimentalPoint}
 				{recordedExperimentalIndices}
 				content={content.diagram}
@@ -234,8 +368,53 @@
 	}
 
 	.views {
+		position: relative;
 		display: grid;
 		grid-template-columns: 1.25fr 0.75fr;
+	}
+
+	.mapping-overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 350ms ease;
+	}
+
+	.mapping-overlay.visible {
+		opacity: 0.86;
+	}
+
+	.mapping-halo,
+	.mapping-flow {
+		fill: none;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.mapping-halo {
+		stroke: rgba(250, 247, 239, 0.92);
+		stroke-width: 8;
+	}
+
+	.mapping-flow {
+		stroke-width: 3;
+		stroke-dasharray: 11 15;
+		animation: mapping-flow 1.9s linear infinite;
+		filter: drop-shadow(0 1px 2px rgba(31, 40, 38, 0.2));
+	}
+
+	.vapor-flow {
+		animation-delay: -0.95s;
+	}
+
+	@keyframes mapping-flow {
+		to {
+			stroke-dashoffset: -52;
+		}
 	}
 
 	.mobile-status {
@@ -266,6 +445,10 @@
 	}
 
 	@media (max-width: 800px) {
+		.mapping-overlay {
+			display: none;
+		}
+
 		header {
 			align-items: flex-start;
 			flex-direction: column;

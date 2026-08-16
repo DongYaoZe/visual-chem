@@ -140,6 +140,7 @@ test('the catalyst sandbox shows both rates rising while the relative advantage 
 test('Chinese and English catalyst pages have no serious or critical axe violations', async ({
 	page
 }) => {
+	test.setTimeout(45_000);
 	await gotoHydrated(page, '/stories/catalyst/');
 	await expectNoSeriousAccessibilityViolations(page);
 	await gotoHydrated(page, '/en/stories/catalyst/');

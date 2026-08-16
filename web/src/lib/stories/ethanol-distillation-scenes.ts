@@ -105,7 +105,7 @@ export const ETHANOL_DISTILLATION_SCENES: readonly SceneDefinition[] = [
 	{
 		id: 'fixed-point',
 		composition: 0.82,
-		stage: 10,
+		stage: 0,
 		interactionScale: 1,
 		reveal: 1,
 		focus: 'symbol',

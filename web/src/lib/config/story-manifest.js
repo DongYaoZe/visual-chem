@@ -20,7 +20,7 @@ export const STORY_MANIFEST = Object.freeze([
 		season: 1,
 		slug: 'ethanol-distillation',
 		published: '2026-07-16',
-		keyScene: 'build-the-map'
+		keyScene: 'tie-line'
 	},
 	{
 		number: 2,

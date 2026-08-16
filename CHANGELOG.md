@@ -30,8 +30,11 @@ All notable public changes to VisualChem are recorded here. Versions follow Sema
 - flagship mobile scrollytelling now defaults to a text-first synchronized state strip with the full graphic available on demand; the compact global motion control no longer covers as much reading space on phones;
 - story-page header navigation now points back to the story catalogue instead of incorrectly advertising the first story from every deep route;
 - the ethanol-water literature reconstruction now lets readers select the 16 Lai 2014 measurements directly and reports low/mid/high composition coverage before the full evidence table is revealed;
+- the flagship ethanol-water story now links the apparatus to the `T-x-y` map with a computed x→y spatial relay, unlocks a bounded auto demonstration after three manual equilibrium stages, and turns the azeotrope search into a visible `x = y` fixed-point lock;
+- the azeotrope scene now keeps its composition control, apparatus, particle view, symbolic map, and `y-x` readout on one equilibrium state instead of silently applying a ten-stage transform;
+- the CO₂ story now carries one visible causal chain from normal mode through dipole-moment change and IR response to the resulting band, with silent modes visibly blocked at `Δμ = 0`;
 - CO₂ display equations are rendered through the shared KaTeX component and covered by an end-to-end rendering contract;
-- production audit is reproducible at the GitHub Pages `/visual-chem` base path and covers every live story on desktop and mobile.
+- production audit is reproducible at the GitHub Pages `/visual-chem` base path and covers every live story on desktop and mobile, including the flagship x→y key scene.
 
 ### Evidence boundaries
 

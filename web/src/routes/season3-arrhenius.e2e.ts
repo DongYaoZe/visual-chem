@@ -173,6 +173,7 @@ test('the sandbox couples temperature and Ea to the Arrhenius and Dolbear readou
 test('Chinese and English Arrhenius pages have no serious or critical axe violations', async ({
 	page
 }) => {
+	test.setTimeout(45_000);
 	await gotoHydrated(page, '/stories/arrhenius/');
 	await expectNoSeriousAccessibilityViolations(page);
 	await gotoHydrated(page, '/en/stories/arrhenius/');

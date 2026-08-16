@@ -16,6 +16,8 @@
 		showAzeotrope?: boolean;
 		experimentMode?: boolean;
 		showExperimentalData?: boolean;
+		highlightFixedPoint?: boolean;
+		fixedPointTolerance?: number;
 		currentPointOverride?: ExperimentalVlePoint;
 		recordedExperimentalIndices?: number[];
 		content?: DiagramContent;
@@ -27,6 +29,8 @@
 		showAzeotrope = true,
 		experimentMode = false,
 		showExperimentalData = false,
+		highlightFixedPoint = false,
+		fixedPointTolerance = 3e-4,
 		currentPointOverride,
 		recordedExperimentalIndices = [],
 		content = zhCNSiteContent.shared.diagram
@@ -39,6 +43,10 @@
 	let azeotrope = $derived(frame.azeotrope);
 	let stages = $derived(frame.stages);
 	let current = $derived(currentPointOverride ?? frame.current);
+	let fixedPointGap = $derived(Math.abs(current.y - current.x));
+	let fixedPointLocked = $derived(fixedPointGap < fixedPointTolerance);
+	let fixedPointMidX = $derived((xScale(current.x) + xScale(current.y)) / 2);
+	let fixedPointY = $derived(yScale(current.temperatureC));
 	let minTemperature = $derived(frame.temperatureExtent.minC - 1.2);
 	let maxTemperature = $derived(frame.temperatureExtent.maxC + 1.5);
 	let revealedCurve = $derived(
@@ -155,7 +163,7 @@
 	);
 </script>
 
-<figure class="diagram">
+<figure class="diagram" class:fixed-focus={highlightFixedPoint}>
 	<svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={accessibleLabel}>
 		{#each tickValues as tick (tick)}
 			<line
@@ -267,9 +275,16 @@
 			y1={yScale(current.temperatureC)}
 			y2={yScale(current.temperatureC)}
 		/>
-		<circle class="liquid-point" cx={xScale(current.x)} cy={yScale(current.temperatureC)} r="5" />
+		<circle
+			class="liquid-point"
+			data-map-anchor="diagram-liquid"
+			cx={xScale(current.x)}
+			cy={yScale(current.temperatureC)}
+			r="5"
+		/>
 		<polygon
 			class="vapor-point"
+			data-map-anchor="diagram-vapor"
 			points={trianglePoints(xScale(current.y), yScale(current.temperatureC), 5.5)}
 		/>
 		<text
@@ -330,6 +345,51 @@
 				y={yScale(ETHANOL_WATER_LAI_2014.azeotrope.temperatureC) - 13}
 				text-anchor="end">{content.laiExperimentalAzeotrope}</text
 			>
+		{/if}
+
+		{#if highlightFixedPoint}
+			<g
+				class="fixed-point-climax"
+				class:locked={fixedPointLocked}
+				data-testid="fixed-point-lock"
+				data-locked={fixedPointLocked}
+				data-gap={fixedPointGap.toFixed(4)}
+			>
+				<line
+					class="fixed-gap-line"
+					x1={xScale(current.x)}
+					x2={xScale(current.y)}
+					y1={fixedPointY}
+					y2={fixedPointY}
+				/>
+				<circle class="fixed-end" cx={xScale(current.x)} cy={fixedPointY} r="8" />
+				<circle class="fixed-end" cx={xScale(current.y)} cy={fixedPointY} r="8" />
+				{#if fixedPointLocked}
+					<circle class="lock-ring outer" cx={fixedPointMidX} cy={fixedPointY} r="22" />
+					<circle class="lock-ring inner" cx={fixedPointMidX} cy={fixedPointY} r="13" />
+					<rect
+						class="fixed-badge locked-badge"
+						x={fixedPointMidX - 31}
+						y={fixedPointY - 48}
+						width="62"
+						height="22"
+						rx="11"
+					/>
+					<text class="fixed-badge-text" x={fixedPointMidX} y={fixedPointY - 33}>x = y</text>
+				{:else}
+					<rect
+						class="fixed-badge"
+						x={fixedPointMidX - 43}
+						y={fixedPointY - 48}
+						width="86"
+						height="22"
+						rx="11"
+					/>
+					<text class="fixed-badge-text" x={fixedPointMidX} y={fixedPointY - 33}
+						>|y−x| {fixedPointGap.toFixed(4)}</text
+					>
+				{/if}
+			</g>
 		{/if}
 
 		<text
@@ -455,6 +515,81 @@
 		stroke: var(--ink);
 		stroke-dasharray: 3 3;
 		stroke-width: 1.4;
+	}
+
+	.fixed-focus .grid,
+	.fixed-focus .region-label,
+	.fixed-focus .two-phase {
+		opacity: 0.35;
+	}
+
+	.fixed-point-climax {
+		pointer-events: none;
+	}
+
+	.fixed-gap-line {
+		stroke: var(--acid);
+		stroke-linecap: round;
+		stroke-width: 4;
+	}
+
+	.fixed-end {
+		fill: rgba(250, 247, 239, 0.96);
+		stroke: var(--acid);
+		stroke-width: 2;
+	}
+
+	.fixed-badge {
+		fill: rgba(250, 247, 239, 0.95);
+		stroke: rgba(191, 61, 48, 0.42);
+		stroke-width: 1;
+	}
+
+	.locked-badge {
+		fill: rgba(191, 61, 48, 0.1);
+		stroke: var(--acid);
+	}
+
+	.fixed-badge-text {
+		fill: var(--acid);
+		font-family: var(--mono);
+		font-size: 10px;
+		font-weight: 800;
+		text-anchor: middle;
+	}
+
+	.fixed-point-climax.locked .fixed-gap-line {
+		opacity: 0.25;
+		stroke-width: 1.5;
+	}
+
+	.lock-ring {
+		fill: none;
+		stroke: var(--acid);
+		transform-box: fill-box;
+		transform-origin: center;
+		animation: fixed-lock-pulse 1.8s ease-out infinite;
+	}
+
+	.lock-ring.outer {
+		stroke-width: 2.2;
+	}
+
+	.lock-ring.inner {
+		stroke-width: 1.4;
+		animation-delay: -0.9s;
+	}
+
+	@keyframes fixed-lock-pulse {
+		0% {
+			opacity: 0.85;
+			transform: scale(0.82);
+		}
+		75%,
+		100% {
+			opacity: 0;
+			transform: scale(1.28);
+		}
 	}
 
 	.ladder {

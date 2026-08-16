@@ -333,6 +333,8 @@ export interface StoryInteractionsContent {
 		prompt: string;
 		choices: readonly [ChoiceContent, ChoiceContent];
 		addStageButton: string;
+		autoRunButton: string;
+		autoPauseButton: string;
 		resetButton: string;
 		stageOutput: ContentMessage<{ stage: DisplayValue; composition: DisplayValue }>;
 		evidence: string;
@@ -1619,6 +1621,18 @@ export interface CO2InfraredTriViewContent {
 	wavelengthLabel: string;
 	activityLabel: string;
 	activityNames: { active: string; silent: string };
+	causal: {
+		modeLabel: string;
+		dipoleLabel: string;
+		dipoleChanges: string;
+		dipoleStatic: string;
+		responseLabel: string;
+		absorbed: string;
+		notAbsorbed: string;
+		resultLabel: string;
+		band: ContentMessage<{ wavenumberCm: DisplayValue }>;
+		noFundamentalBand: string;
+	};
 	instrument: {
 		ariaLabel: ContentMessage<{ mode: string; wavenumberCm: DisplayValue; irActive: boolean }>;
 		viewName: string;
